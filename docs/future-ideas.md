@@ -67,6 +67,53 @@ fields (attack type, stance, distance, counter relationships) are ever needed, s
 nullable columns to one table. Not needed for MVP — the flat `techniques` table is sufficient for
 name + category + tagging.
 
+## Opponent intelligence / fight scouting
+
+Digitize competitive scouting: a per-opponent profile with head-to-head record, match history
+(result, score breakdown, notes, optional video link), known techniques with a personal threat
+rating, and free-text strengths/weaknesses/strategy notes. A "prepare for opponent" view before a
+tournament would summarize head-to-head record, the opponent's primary attacks, and what's worked
+against them before — a pre-fight briefing rather than a raw log.
+
+This is a meaningfully different feature from anything else in this list — it's about the
+*opponent*, not the athlete's own training/competition history — and privacy matters here more
+than elsewhere (scouting notes are private-by-default, never a social/shared feature).
+
+Rough schema shape (not final, sketched so future work has somewhere to attach rather than
+retrofitting):
+
+```sql
+create table opponents (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid references auth.users(id) not null,
+  name text not null,
+  country text,
+  club text,
+  division text,
+  notes text
+);
+
+create table opponent_matches (
+  id uuid primary key default gen_random_uuid(),
+  opponent_id uuid references opponents(id) not null,
+  competition_result_id uuid references competition_results(id), -- link to the real result row, don't duplicate score data
+  video_url text,
+  notes text
+);
+
+create table opponent_techniques (
+  opponent_id uuid references opponents(id) not null,
+  technique_id uuid references techniques(id) not null,
+  threat_rating int check (threat_rating between 1 and 5),
+  notes text,
+  primary key (opponent_id, technique_id)
+);
+```
+
+Note: `competition_results` already has `opponent_name`/`opponent_notes` text fields per
+build-plan.md — this feature would eventually replace those free-text fields with a proper
+`opponent_id` foreign key once an `opponents` table exists, rather than duplicating the concept.
+
 ## Karate journey timeline
 
 A narrative timeline separate from the raw data tables — key life milestones (e.g. "started
