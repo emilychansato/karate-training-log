@@ -23,3 +23,43 @@ Rough shape (unscoped, needs real design later):
 Not scoped for effort, storage cost (video is expensive to store/serve), or which AI/CV
 approach to use. Bigger lift than anything currently in build-plan.md — treat as a distinct
 future project phase, not a stretch pick to slot into Week 4.
+
+## Technique mastery levels + rep tracking
+
+Turn each technique/kata from a plain list into a "profile": mastery level (practicing /
+developing / competition-ready), total reps trained, sessions trained, last-trained date,
+self-rated success score, competition usage count, and a chronological timeline of session
+notes tied to that specific technique. Makes the technique library something worth filling
+out, not just a tag list.
+
+## Post-session "what improved / what struggled" checklists
+
+Structured checkboxes after each session (speed, timing, distance, power, accuracy, strategy /
+fatigue, reaction time, footwork, confidence, technique consistency) instead of just a free-text
+notes field. Over time this could surface real patterns (e.g. "scoring rate drops after minute 2
+of kumite rounds") that a single 1-5 rating can't show.
+
+## Tournament prep mode
+
+A structured countdown view tied to an upcoming competition: goals per discipline (e.g. target
+kata score, kumite tactical goals), broken into a week-by-week plan (technique building →
+pressure rounds → simulation matches → taper). Distinct from just logging a competition result
+after the fact — this would be forward-looking prep, not a retrospective log.
+
+## Per-kata analytics pages
+
+A dedicated page per kata (not just a name in a dropdown): difficulty rating, key concepts/focus
+areas, personal best/average competition score, common deduction categories, and eventually
+attached training clips. Builds on the 102-kata reference table already seeded.
+
+## Coach dashboard / multi-athlete view
+
+A separate view for a coach account to see multiple athletes' training consistency, weak areas,
+and competition-readiness at a glance. Implies real auth/permissions work (coach-to-athlete
+relationships, not just per-user RLS) — a genuinely different feature, not a UI tweak.
+
+## Karate journey timeline
+
+A narrative timeline separate from the raw data tables — key life milestones (e.g. "started
+karate," "first medal," "made national team") alongside the stats, so the app tells the story of
+the athlete's career, not just charts.
