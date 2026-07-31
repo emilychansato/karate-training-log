@@ -58,6 +58,15 @@ A separate view for a coach account to see multiple athletes' training consisten
 and competition-readiness at a glance. Implies real auth/permissions work (coach-to-athlete
 relationships, not just per-user RLS) — a genuinely different feature, not a UI tweak.
 
+## Split techniques into kata_details / kumite_details tables
+
+Currently `techniques` is one table for kata, kumite combos, and conditioning, distinguished only
+by a `category` text column. If kata-specific fields (WKF rank/style, difficulty) or kumite-specific
+fields (attack type, stance, distance, counter relationships) are ever needed, split into
+`kata_details` / `kumite_details` tables keyed off `technique_id` rather than adding a growing set of
+nullable columns to one table. Not needed for MVP — the flat `techniques` table is sufficient for
+name + category + tagging.
+
 ## Karate journey timeline
 
 A narrative timeline separate from the raw data tables — key life milestones (e.g. "started

@@ -48,6 +48,30 @@ Seed set:
 
 - **Self-rating: single 1-5 scale** per session (already matches `training_sessions.self_rating int check (between 1 and 5)` in the existing schema — no change needed). Not split into separate technique/intensity ratings.
 - Session technique tagging (`session_techniques` join table) already exists in the schema and applies to both kata and kumite_combo categories.
+- **Correction, for the record:** an external review of this doc claimed `duration_minutes`, `session_type`, and a notes field were missing from the schema. They're not — `training_sessions` already has `duration_min int not null`, `type text not null` (kata/kumite drills/conditioning/sparring), and `notes text` per `build-plan.md` §2.1. No schema change needed for any of these three.
+
+## Technique portfolio (bookmark + nickname)
+
+New feature, confirmed 2026-07-31: users can bookmark any technique from the library (official seeded kata/kumite entries, or their own custom additions) into a personal list, with a custom nickname — e.g. bookmark "Kizami tsuki → Gyaku tsuki" and nickname it "1-2". This is a separate concept from the private custom-technique-add flow above: bookmarking doesn't create a new technique, it labels an existing one for personal use. The full shared library stays intact underneath.
+
+New join table:
+
+```sql
+create table user_techniques (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid references auth.users(id) not null,
+  technique_id uuid references techniques(id) not null,
+  nickname text,
+  created_at timestamptz default now(),
+  unique (user_id, technique_id)
+);
+
+alter table user_techniques enable row level security;
+create policy "own bookmarks only" on user_techniques
+  for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+```
+
+`nickname` is nullable — bookmarking without a nickname just pins the technique to the user's personal list (e.g. "techniques I'm currently drilling"), same UX gap the external review's "technique aliases" suggestion was pointing at.
 
 ## Competition scoring — schema delta required
 
@@ -66,7 +90,9 @@ alter table competition_results
   add column opponent_ippon int default 0;
 ```
 
-`points_for`/`points_against` can either be dropped in favor of these (computed as `yuko*1 + waza_ari*2 + ippon*3` in the UI/a view) or kept as a denormalized total — **decide during implementation, not this design pass**. `win_method` should also account for the real WKF disqualification/decision types confirmed via the rules PDF: `ippon` | `waza-ari` | `yuko` (point-gap win) | `hansoku` | `kiken` | `shikkaku` | `hantei` (judges' decision) — a broader enum than the plan's original 5 values.
+**Refinement:** keep `points_for`/`points_against` rather than dropping them, but compute them once at write time (e.g. a trigger, or set them in the same insert/update from the UI) rather than recalculating `yuko*1 + waza_ari*2 + ippon*3` on every analytics query. This keeps aggregate queries (average points scored per match, win rate when scoring first) cheap while the granular breakdown still exists for detail views.
+
+`win_method` should also account for the real WKF disqualification/decision types confirmed via the rules PDF: `ippon` | `waza-ari` | `yuko` (point-gap win) | `hansoku` | `kiken` | `shikkaku` | `hantei` (judges' decision) — a broader enum than the plan's original 5 values.
 
 ## Out of scope for this pass
 
