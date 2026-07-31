@@ -73,6 +73,23 @@ create policy "own bookmarks only" on user_techniques
 
 `nickname` is nullable — bookmarking without a nickname just pins the technique to the user's personal list (e.g. "techniques I'm currently drilling"), same UX gap the external review's "technique aliases" suggestion was pointing at.
 
+## Post-session "what improved / what struggled" checklist
+
+Moved into scope 2026-07-31 (was previously logged as a future idea). Structured checkboxes on the session form, in addition to the existing free-text `notes` field — not replacing it. Two checkbox groups:
+
+- **What improved:** Speed, Timing, Distance, Power, Accuracy, Strategy
+- **What struggled:** Fatigue, Reaction time, Footwork, Confidence, Technique consistency
+
+Both are optional multi-select (zero or more checked), stored as text arrays on `training_sessions`:
+
+```sql
+alter table training_sessions
+  add column improved text[] default '{}',
+  add column struggled text[] default '{}';
+```
+
+The checkbox label sets above are fixed (not user-editable) for this pass — a controlled vocabulary, not free tags, so the values stay queryable for future analytics (e.g. "which struggle tag correlates with lower self-ratings") without dealing with typo-variant free text.
+
 ## Competition scoring — schema delta required
 
 The existing `competition_results` schema (see `build-plan.md` §2.1) has `kata_technical_score` / `kata_athletic_score` (kata) and `points_for` / `points_against` / `win_method` (kumite). The interview confirmed:
@@ -96,7 +113,7 @@ alter table competition_results
 
 ## Out of scope for this pass
 
-Everything in `docs/future-ideas.md`: kata video comparison + AI feedback, technique mastery levels/rep tracking, post-session improvement checklists, tournament prep mode, per-kata analytics pages, coach dashboard, karate journey timeline. None of these are touched in this build.
+Everything in `docs/future-ideas.md`: kata video comparison + AI feedback, technique mastery levels/rep tracking, tournament prep mode, per-kata analytics pages, coach dashboard, opponent intelligence/fight scouting, splitting `techniques` into `kata_details`/`kumite_details`, karate journey timeline. None of these are touched in this build.
 
 ## Self-review notes
 

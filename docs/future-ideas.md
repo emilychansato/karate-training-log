@@ -32,13 +32,6 @@ self-rated success score, competition usage count, and a chronological timeline 
 notes tied to that specific technique. Makes the technique library something worth filling
 out, not just a tag list.
 
-## Post-session "what improved / what struggled" checklists
-
-Structured checkboxes after each session (speed, timing, distance, power, accuracy, strategy /
-fatigue, reaction time, footwork, confidence, technique consistency) instead of just a free-text
-notes field. Over time this could surface real patterns (e.g. "scoring rate drops after minute 2
-of kumite rounds") that a single 1-5 rating can't show.
-
 ## Tournament prep mode
 
 A structured countdown view tied to an upcoming competition: goals per discipline (e.g. target
