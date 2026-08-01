@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
+import { MemoryRouter, Routes, Route } from 'react-router-dom'
 import userEvent from '@testing-library/user-event'
 import { Login } from './Login'
 import { useAuth } from '../hooks/useAuth'
@@ -83,5 +84,26 @@ describe('Login', () => {
     await user.click(screen.getByRole('button', { name: /sign up/i }))
 
     expect(await screen.findByText(/check your email/i)).toBeInTheDocument()
+  })
+
+  it('redirects to / when already signed in (e.g. sign-up logged the user in immediately)', () => {
+    vi.mocked(useAuth).mockReturnValue({
+      user: { id: 'u1', email: 'test@example.com' },
+      loading: false,
+      signUp: vi.fn(),
+      signIn: vi.fn(),
+      signOut: vi.fn(),
+    })
+
+    render(
+      <MemoryRouter initialEntries={['/login']}>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/" element={<p>Dashboard</p>} />
+        </Routes>
+      </MemoryRouter>
+    )
+
+    expect(screen.getByText('Dashboard')).toBeInTheDocument()
   })
 })

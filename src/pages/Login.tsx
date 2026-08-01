@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from 'react'
+import { Navigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { Button } from '../components/ui/button'
 import { Input } from '../components/ui/input'
@@ -12,7 +13,7 @@ import {
 } from '../components/ui/card'
 
 export function Login() {
-  const { signIn, signUp } = useAuth()
+  const { user, signIn, signUp } = useAuth()
   const [mode, setMode] = useState<'sign-in' | 'sign-up'>('sign-in')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -32,6 +33,10 @@ export function Login() {
     } else if (mode === 'sign-up') {
       setSignUpComplete(true)
     }
+  }
+
+  if (user) {
+    return <Navigate to="/" replace />
   }
 
   return (
