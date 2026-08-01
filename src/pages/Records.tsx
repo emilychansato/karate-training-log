@@ -4,6 +4,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/card'
 import { Icon } from '../components/ui/icon'
 import { AnimatedNumber } from '../components/ui/animated-number'
 import { CelebrationBurst } from '../components/ui/celebration-burst'
+import { CardSkeletonList } from '../components/ui/skeleton'
 
 export function Records() {
   const { loading, records, opponents, divisionHistory } = useCompetitionStats()
@@ -17,7 +18,7 @@ export function Records() {
       </div>
 
       {loading ? (
-        <p className="text-sm text-muted-foreground">Loading…</p>
+        <CardSkeletonList count={3} />
       ) : (
         <>
           <Card>

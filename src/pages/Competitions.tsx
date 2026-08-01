@@ -5,6 +5,7 @@ import { useCompetitionResults } from '../hooks/useCompetitionResults'
 import { Icon } from '../components/ui/icon'
 import { useReducedMotion } from '../hooks/useReducedMotion'
 import { popIn, staggerContainer, springy } from '../lib/motion'
+import { CardSkeletonList } from '../components/ui/skeleton'
 
 export function Competitions() {
   const [showForm, setShowForm] = useState(false)
@@ -26,7 +27,7 @@ export function Competitions() {
         </button>
       </div>
       {showForm && <CompetitionForm onSuccess={() => setShowForm(false)} />}
-      {loading && <p className="text-sm text-muted-foreground">Loading…</p>}
+      {loading && <CardSkeletonList />}
       {!loading && results.length === 0 && (
         <motion.div
           initial={reducedMotion ? undefined : { opacity: 0, y: 6 }}

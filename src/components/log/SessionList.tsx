@@ -4,6 +4,7 @@ import { useReducedMotion } from '../../hooks/useReducedMotion'
 import { popIn, staggerContainer, springy } from '../../lib/motion'
 import { Button } from '../ui/button'
 import { Icon } from '../ui/icon'
+import { CardSkeletonList } from '../ui/skeleton'
 
 const TYPE_STYLES: Record<string, string> = {
   kata: 'bg-ao text-white',
@@ -16,7 +17,7 @@ export function SessionList() {
   const { sessions, loading, deleteSession } = useTrainingSessions()
   const reducedMotion = useReducedMotion()
 
-  if (loading) return <p className="text-sm text-muted-foreground">Loading…</p>
+  if (loading) return <CardSkeletonList />
 
   if (sessions.length === 0) {
     return (
