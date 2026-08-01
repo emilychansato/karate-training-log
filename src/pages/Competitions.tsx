@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { CompetitionForm } from '../components/forms/CompetitionForm'
 import { useCompetitions } from '../hooks/useCompetitions'
 import { usePlannedCompetitions } from '../hooks/usePlannedCompetitions'
+import { useWkfEvents } from '../hooks/useWkfEvents'
 import { Icon } from '../components/ui/icon'
 import { Input } from '../components/ui/input'
 import { Button } from '../components/ui/button'
@@ -12,6 +13,73 @@ import { useReducedMotion } from '../hooks/useReducedMotion'
 import { popIn, staggerContainer, springy } from '../lib/motion'
 import { CardSkeletonList } from '../components/ui/skeleton'
 import { WinRateGauge } from '../components/dashboard/WinRateGauge'
+
+function WkfEventsSection() {
+  const { events, loading, syncing, syncNow } = useWkfEvents()
+  const { addPlanned } = usePlannedCompetitions()
+  const [addedIds, setAddedIds] = useState<Set<string>>(new Set())
+
+  async function handleAdd(eventId: string) {
+    const wkfEvent = events.find((e) => e.id === eventId)
+    if (!wkfEvent) return
+    const { error } = await addPlanned({
+      event: wkfEvent.name,
+      date: wkfEvent.date_start,
+      location: wkfEvent.location ?? undefined,
+    })
+    if (!error) setAddedIds((prev) => new Set(prev).add(eventId))
+  }
+
+  return (
+    <div className="flex flex-col gap-3">
+      <div className="flex items-center justify-between">
+        <span className="label-caps text-muted-foreground">WKF calendar</span>
+        <button
+          onClick={() => syncNow()}
+          disabled={syncing}
+          className="label-caps flex items-center gap-1 text-muted-foreground hover:text-foreground disabled:opacity-50"
+        >
+          <Icon name="monitoring" className="size-3.5" />
+          {syncing ? 'Syncing…' : 'Sync now'}
+        </button>
+      </div>
+
+      {loading ? (
+        <CardSkeletonList count={2} />
+      ) : events.length === 0 ? (
+        <p className="py-4 text-center text-sm text-muted-foreground">
+          No WKF events synced yet — tap "Sync now" to pull the calendar.
+        </p>
+      ) : (
+        <ul className="flex flex-col gap-3">
+          {events.map((e) => (
+            <li
+              key={e.id}
+              className="card-elevated flex items-center justify-between border border-border bg-card p-4"
+            >
+              <div>
+                <p className="font-heading text-lg">{e.name}</p>
+                <p className="label-caps text-muted-foreground">
+                  {e.date_start}
+                  {e.date_end ? ` – ${e.date_end}` : ''}
+                  {e.location ? ` · ${e.location}` : ''}
+                </p>
+              </div>
+              <Button
+                variant={addedIds.has(e.id) ? 'ghost' : 'outline'}
+                size="sm"
+                disabled={addedIds.has(e.id)}
+                onClick={() => handleAdd(e.id)}
+              >
+                {addedIds.has(e.id) ? 'Added' : 'Add'}
+              </Button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  )
+}
 
 function UpcomingTab() {
   const { planned, loading, addPlanned, removePlanned } = usePlannedCompetitions()
@@ -32,56 +100,63 @@ function UpcomingTab() {
   }
 
   return (
-    <div className="flex flex-col gap-4">
-      <button
-        onClick={() => setShowForm((v) => !v)}
-        className="label-caps self-start text-muted-foreground hover:text-foreground"
-      >
-        {showForm ? 'Cancel' : '+ Add upcoming competition'}
-      </button>
+    <div className="flex flex-col gap-8">
+      <WkfEventsSection />
 
-      {showForm && (
-        <form
-          onSubmit={handleAdd}
-          className="card-elevated flex flex-col gap-3 border border-border bg-card p-4"
-        >
-          <Input placeholder="Event name" value={event} onChange={(e) => setEvent(e.target.value)} required />
-          <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} required />
-          <Input
-            placeholder="Location (optional)"
-            value={location}
-            onChange={(e) => setLocation(e.target.value)}
-          />
-          <Button type="submit" className="glow-primary">
-            Save
-          </Button>
-        </form>
-      )}
+      <div className="flex flex-col gap-4">
+        <div className="flex items-center justify-between">
+          <span className="label-caps text-muted-foreground">My planned competitions</span>
+          <button
+            onClick={() => setShowForm((v) => !v)}
+            className="label-caps text-muted-foreground hover:text-foreground"
+          >
+            {showForm ? 'Cancel' : '+ Add'}
+          </button>
+        </div>
 
-      {loading ? (
-        <CardSkeletonList count={2} />
-      ) : planned.length === 0 ? (
-        <p className="py-6 text-center text-sm text-muted-foreground">
-          No upcoming competitions yet.
-        </p>
-      ) : (
-        <ul className="flex flex-col gap-3">
-          {planned.map((p) => (
-            <li key={p.id} className="card-elevated flex items-center justify-between border border-border bg-card p-4">
-              <div>
-                <p className="font-heading text-lg">{p.event}</p>
-                <p className="label-caps text-muted-foreground">
-                  {p.date}
-                  {p.location ? ` · ${p.location}` : ''}
-                </p>
-              </div>
-              <Button variant="ghost" size="sm" onClick={() => removePlanned(p.id)}>
-                Remove
-              </Button>
-            </li>
-          ))}
-        </ul>
-      )}
+        {showForm && (
+          <form
+            onSubmit={handleAdd}
+            className="card-elevated flex flex-col gap-3 border border-border bg-card p-4"
+          >
+            <Input placeholder="Event name" value={event} onChange={(e) => setEvent(e.target.value)} required />
+            <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} required />
+            <Input
+              placeholder="Location (optional)"
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+            />
+            <Button type="submit" className="glow-primary">
+              Save
+            </Button>
+          </form>
+        )}
+
+        {loading ? (
+          <CardSkeletonList count={2} />
+        ) : planned.length === 0 ? (
+          <p className="py-6 text-center text-sm text-muted-foreground">
+            No upcoming competitions yet.
+          </p>
+        ) : (
+          <ul className="flex flex-col gap-3">
+            {planned.map((p) => (
+              <li key={p.id} className="card-elevated flex items-center justify-between border border-border bg-card p-4">
+                <div>
+                  <p className="font-heading text-lg">{p.event}</p>
+                  <p className="label-caps text-muted-foreground">
+                    {p.date}
+                    {p.location ? ` · ${p.location}` : ''}
+                  </p>
+                </div>
+                <Button variant="ghost" size="sm" onClick={() => removePlanned(p.id)}>
+                  Remove
+                </Button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
     </div>
   )
 }

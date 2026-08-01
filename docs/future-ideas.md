@@ -197,6 +197,30 @@ coverage) better than one hardcoded source would. Recommendation when this is pi
 ships immediately with zero dependency (already being built 2026-08-02); if/when auto-sourcing
 gets built, lean toward (4) over (2) for coverage, gated behind a review queue.
 
+**Update 2026-08-02 — built, real, working:** WKF's own calendar (wkf.net/calendar) turned
+out to be plain server-rendered HTML with no bot protection (unlike sportdata.org) - the
+"Next Events" carousel on that page is a clean repeated block with name/location/date-range/
+category per event. Built a real ingestion pipeline:
+- `supabase/functions/ingest-wkf-events/index.ts` - a Deno Edge Function that fetches the
+  calendar page, regex-parses the carousel (verified against the real downloaded HTML before
+  deploying), and upserts into a new `wkf_events` table (shared reference data, dedup'd via a
+  `source_hash` of name+date+location, same RLS pattern as `sports`/official `techniques` rows
+  — readable by any authenticated user).
+- `useWkfEvents` hook: loads events, and a `syncNow()` that invokes the Edge Function on demand.
+- Competitions page → Upcoming tab: shows the synced WKF events with a "Sync now" button and a
+  per-event "Add" button that copies it into the user's own `planned_competitions` (no filter
+  UI, per instruction — just the raw list).
+
+**Still open — weekly auto-sync (`pg_cron`):** wiring the Edge Function to run automatically
+every week needs a scheduled Postgres job that calls the function's HTTPS endpoint with an
+auth header. That auth value is a secret and must never go into a committed migration file.
+Safe path when this gets picked up: enable the `pg_cron` and `pg_net` extensions, store the
+service-role key (or a dedicated function-invoke secret) in Supabase Vault via the dashboard
+SQL editor (a one-off manual step, not a migration), then schedule
+`select cron.schedule('wkf-weekly-sync', '0 6 * * 1', $$ select net.http_post(...) $$)`
+referencing the vaulted secret via `vault.decrypted_secrets` rather than a literal key in the
+SQL. Until this is set up, "Sync now" in the UI is the real, working way to refresh the list.
+
 ## Technique detail page (video + notes + kata competition-order planner)
 
 Two related asks bundled into "click into a technique":
