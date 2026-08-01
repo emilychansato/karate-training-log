@@ -34,12 +34,16 @@ vi.mock('../lib/supabaseClient', () => {
   const insertSelect = vi.fn(() => ({ single }))
   const matchInsert = vi.fn(() => ({ select: insertSelect }))
   const linkInsert = vi.fn().mockResolvedValue({ error: null })
+  const linkDeleteEq = vi.fn().mockResolvedValue({ error: null })
+  const linkDelete = vi.fn(() => ({ eq: linkDeleteEq }))
   const eqDelete = vi.fn().mockResolvedValue({ error: null })
   const deleteFn = vi.fn(() => ({ eq: eqDelete }))
+  const eqUpdate = vi.fn().mockResolvedValue({ error: null })
+  const updateFn = vi.fn(() => ({ eq: eqUpdate }))
 
   const from = vi.fn((table: string) => {
-    if (table === 'match_techniques') return { insert: linkInsert }
-    return { select, insert: matchInsert, delete: deleteFn }
+    if (table === 'match_techniques') return { insert: linkInsert, delete: linkDelete }
+    return { select, insert: matchInsert, update: updateFn, delete: deleteFn }
   })
 
   return {
@@ -97,5 +101,29 @@ describe('useCompetitionMatches', () => {
 
     const linkCall = vi.mocked(supabase.from).mock.calls.find((c) => c[0] === 'match_techniques')
     expect(linkCall).toBeTruthy()
+  })
+
+  it('updateMatch updates the match, resyncs favorite techniques, and returns no error', async () => {
+    const { result } = renderHook(() => useCompetitionMatches('c1'))
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    let response: { error: string | null } = { error: 'unset' }
+    await act(async () => {
+      response = await result.current.updateMatch(
+        'm1',
+        { opponent_name: 'Jamie Lee', my_yuko: 2 },
+        ['t3']
+      )
+    })
+
+    expect(response.error).toBeNull()
+    const matchesFrom = vi
+      .mocked(supabase.from)
+      .mock.results.find((r) => r.value.update)
+    expect(matchesFrom?.value.update).toHaveBeenCalledWith(
+      expect.objectContaining({ opponent_name: 'Jamie Lee', my_yuko: 2, points_for: 2 })
+    )
+    const techniqueCalls = vi.mocked(supabase.from).mock.calls.filter((c) => c[0] === 'match_techniques')
+    expect(techniqueCalls.length).toBeGreaterThan(0)
   })
 })

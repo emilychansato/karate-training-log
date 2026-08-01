@@ -29,7 +29,7 @@ describe('MatchForm', () => {
     expect(screen.queryByText('My Yuko')).not.toBeInTheDocument()
   })
 
-  it('only shows favorite-technique chips matching the match discipline', () => {
+  it('only shows favorite-technique chips for kumite matches, never kata', () => {
     const { rerender } = render(
       <MatchForm discipline="kumite" createMatch={vi.fn()} onSuccess={vi.fn()} />
     )
@@ -37,8 +37,9 @@ describe('MatchForm', () => {
     expect(screen.queryByText('Heian Shodan')).not.toBeInTheDocument()
 
     rerender(<MatchForm discipline="kata" createMatch={vi.fn()} onSuccess={vi.fn()} />)
-    expect(screen.getByText('Heian Shodan')).toBeInTheDocument()
+    expect(screen.queryByText('Heian Shodan')).not.toBeInTheDocument()
     expect(screen.queryByText('Kizami tsuki → Gyaku tsuki')).not.toBeInTheDocument()
+    expect(screen.queryByText(/favorite techniques/i)).not.toBeInTheDocument()
   })
 
   it('submits a kumite match with the opponent name, score breakdown, and selected favorite techniques', async () => {

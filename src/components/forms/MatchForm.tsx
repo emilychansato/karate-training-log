@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import type { WinMethod, NewCompetitionMatch } from '../../hooks/useCompetitionMatches'
+import type { WinMethod, NewCompetitionMatch, CompetitionMatch } from '../../hooks/useCompetitionMatches'
 import { useTechniques } from '../../hooks/useTechniques'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
@@ -10,10 +10,7 @@ import { Label } from '../ui/label'
 import { Stepper } from '../ui/stepper'
 import { ToggleChip } from '../ui/toggle-chip'
 
-const DISCIPLINE_CATEGORY: Record<'kata' | 'kumite', string> = {
-  kata: 'kata',
-  kumite: 'kumite_combo',
-}
+const KUMITE_TECHNIQUE_CATEGORY = 'kumite_combo'
 
 const WIN_METHODS: WinMethod[] = [
   'ippon',
@@ -49,6 +46,8 @@ type FormOutput = z.output<typeof schema>
 export function MatchForm({
   discipline,
   createMatch,
+  match,
+  updateMatch,
   onSuccess,
 }: {
   discipline: 'kata' | 'kumite'
@@ -56,10 +55,18 @@ export function MatchForm({
     input: NewCompetitionMatch,
     favoriteTechniqueIds?: string[]
   ) => Promise<{ error: string | null }>
+  match?: CompetitionMatch
+  updateMatch?: (
+    id: string,
+    input: NewCompetitionMatch,
+    favoriteTechniqueIds?: string[]
+  ) => Promise<{ error: string | null }>
   onSuccess: () => void
 }) {
   const { techniques } = useTechniques()
-  const [favoriteIds, setFavoriteIds] = useState<string[]>([])
+  const [favoriteIds, setFavoriteIds] = useState<string[]>(
+    match ? match.favorite_techniques.map((t) => t.id) : []
+  )
   const {
     register,
     control,
@@ -67,12 +74,28 @@ export function MatchForm({
     watch,
     setValue,
     formState: { isSubmitting },
-  } = useForm<FormInput, unknown, FormOutput>({ resolver: zodResolver(schema) })
+  } = useForm<FormInput, unknown, FormOutput>({
+    resolver: zodResolver(schema),
+    defaultValues: match
+      ? {
+          round_label: match.round_label ?? undefined,
+          opponent_name: match.opponent_name ?? undefined,
+          kata_technical_score: match.kata_technical_score ?? undefined,
+          kata_athletic_score: match.kata_athletic_score ?? undefined,
+          my_yuko: match.my_yuko,
+          my_waza_ari: match.my_waza_ari,
+          my_ippon: match.my_ippon,
+          opponent_yuko: match.opponent_yuko,
+          opponent_waza_ari: match.opponent_waza_ari,
+          opponent_ippon: match.opponent_ippon,
+          win_method: match.win_method ?? undefined,
+          notes: match.notes ?? undefined,
+        }
+      : undefined,
+  })
 
   const winMethod = watch('win_method')
-  const availableTechniques = techniques.filter(
-    (t) => t.category === DISCIPLINE_CATEGORY[discipline]
-  )
+  const availableTechniques = techniques.filter((t) => t.category === KUMITE_TECHNIQUE_CATEGORY)
 
   function toggleFavorite(id: string) {
     setFavoriteIds((prev) =>
@@ -81,7 +104,9 @@ export function MatchForm({
   }
 
   async function onSubmit(values: FormOutput) {
-    const { error } = await createMatch(values, favoriteIds)
+    const { error } = match && updateMatch
+      ? await updateMatch(match.id, values, favoriteIds)
+      : await createMatch(values, favoriteIds)
     if (!error) onSuccess()
   }
 
@@ -211,7 +236,7 @@ export function MatchForm({
         </>
       )}
 
-      {availableTechniques.length > 0 && (
+      {discipline === 'kumite' && availableTechniques.length > 0 && (
         <div className="flex flex-col gap-2">
           <span className="label-caps text-muted-foreground">Favorite techniques</span>
           <div className="flex max-h-40 flex-wrap gap-2 overflow-y-auto">
@@ -238,7 +263,7 @@ export function MatchForm({
       </div>
 
       <Button type="submit" disabled={isSubmitting} className="glow-primary w-full">
-        {isSubmitting ? 'Saving…' : 'Save match'}
+        {isSubmitting ? 'Saving…' : match ? 'Update match' : 'Save match'}
       </Button>
     </form>
   )

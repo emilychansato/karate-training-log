@@ -133,11 +133,35 @@ export function useCompetitionMatches(competitionId: string) {
     return { error: null }
   }
 
+  async function updateMatch(
+    id: string,
+    input: NewCompetitionMatch,
+    favoriteTechniqueIds: string[] = []
+  ) {
+    const { points_for, points_against } = computePoints(input)
+    const { error } = await supabase
+      .from('competition_matches')
+      .update({ ...input, points_for, points_against })
+      .eq('id', id)
+
+    if (error) return { error: error.message }
+
+    await supabase.from('match_techniques').delete().eq('match_id', id)
+    if (favoriteTechniqueIds.length > 0) {
+      await supabase
+        .from('match_techniques')
+        .insert(favoriteTechniqueIds.map((technique_id) => ({ match_id: id, technique_id })))
+    }
+
+    await load()
+    return { error: null }
+  }
+
   async function deleteMatch(id: string) {
     const { error } = await supabase.from('competition_matches').delete().eq('id', id)
     if (!error) await load()
     return { error: error?.message ?? null }
   }
 
-  return { matches, loading, createMatch, deleteMatch }
+  return { matches, loading, createMatch, updateMatch, deleteMatch }
 }

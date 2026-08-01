@@ -22,9 +22,16 @@ const REFLECTION_LABELS: { key: 'what_went_well' | 'what_to_improve' | 'post_com
 export function CompetitionDetail() {
   const { id } = useParams<{ id: string }>()
   const { competitions, loading: competitionsLoading, updateCompetition } = useCompetitions()
-  const { matches, loading: matchesLoading, createMatch, deleteMatch } = useCompetitionMatches(id ?? '')
+  const {
+    matches,
+    loading: matchesLoading,
+    createMatch,
+    updateMatch,
+    deleteMatch,
+  } = useCompetitionMatches(id ?? '')
   const [showForm, setShowForm] = useState(false)
   const [showReflection, setShowReflection] = useState(false)
+  const [editingMatchId, setEditingMatchId] = useState<string | null>(null)
   const reducedMotion = useReducedMotion()
 
   const competition = competitions.find((c) => c.id === id)
@@ -139,54 +146,75 @@ export function CompetitionDetail() {
                 layout={!reducedMotion}
                 transition={springy}
               >
-                <div className="flex items-start justify-between">
-                  <div>
-                    {m.round_label && (
-                      <p className="label-caps text-muted-foreground">{m.round_label}</p>
+                {editingMatchId === m.id ? (
+                  <MatchForm
+                    discipline={competition.discipline}
+                    createMatch={createMatch}
+                    updateMatch={updateMatch}
+                    match={m}
+                    onSuccess={() => setEditingMatchId(null)}
+                  />
+                ) : (
+                  <>
+                    <div className="flex items-start justify-between">
+                      <div>
+                        {m.round_label && (
+                          <p className="label-caps text-muted-foreground">{m.round_label}</p>
+                        )}
+                        <p className="font-heading text-lg">{m.opponent_name ?? 'Opponent'}</p>
+                      </div>
+                      {competition.discipline === 'kumite' && (
+                        <p className="font-mono tabular-mono text-xl font-bold">
+                          <span className="text-aka">{m.points_for ?? 0}</span>
+                          {' – '}
+                          <span className="text-ao">{m.points_against ?? 0}</span>
+                        </p>
+                      )}
+                      {competition.discipline === 'kata' && m.kata_technical_score != null && (
+                        <p className="font-mono tabular-mono text-xl font-bold">
+                          {m.kata_technical_score}
+                        </p>
+                      )}
+                    </div>
+                    {m.win_method && (
+                      <p className="label-caps mt-2 text-muted-foreground">
+                        Won by {m.win_method}
+                      </p>
                     )}
-                    <p className="font-heading text-lg">{m.opponent_name ?? 'Opponent'}</p>
-                  </div>
-                  {competition.discipline === 'kumite' && (
-                    <p className="font-mono tabular-mono text-xl font-bold">
-                      <span className="text-aka">{m.points_for ?? 0}</span>
-                      {' – '}
-                      <span className="text-ao">{m.points_against ?? 0}</span>
-                    </p>
-                  )}
-                  {competition.discipline === 'kata' && m.kata_technical_score != null && (
-                    <p className="font-mono tabular-mono text-xl font-bold">
-                      {m.kata_technical_score}
-                    </p>
-                  )}
-                </div>
-                {m.win_method && (
-                  <p className="label-caps mt-2 text-muted-foreground">
-                    Won by {m.win_method}
-                  </p>
-                )}
-                {m.favorite_techniques.length > 0 && (
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    {m.favorite_techniques.map((t) => (
-                      <span
-                        key={t.id}
-                        className="label-caps flex items-center gap-1.5 border border-border bg-muted px-2 py-1 text-foreground"
+                    {m.favorite_techniques.length > 0 && (
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        {m.favorite_techniques.map((t) => (
+                          <span
+                            key={t.id}
+                            className="label-caps flex items-center gap-1.5 border border-border bg-muted px-2 py-1 text-foreground"
+                          >
+                            <span className="h-1 w-1 bg-ao" />
+                            {t.name}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                    {m.notes && <p className="mt-2 text-sm">{m.notes}</p>}
+                    <div className="mt-2 flex items-center gap-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setEditingMatchId(m.id)}
                       >
-                        <span className="h-1 w-1 bg-ao" />
-                        {t.name}
-                      </span>
-                    ))}
-                  </div>
+                        Edit
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="text-destructive"
+                        onClick={() => deleteMatch(m.id)}
+                      >
+                        <Icon name="close" className="size-3.5" />
+                        Delete
+                      </Button>
+                    </div>
+                  </>
                 )}
-                {m.notes && <p className="mt-2 text-sm">{m.notes}</p>}
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="mt-2 text-destructive"
-                  onClick={() => deleteMatch(m.id)}
-                >
-                  <Icon name="close" className="size-3.5" />
-                  Delete
-                </Button>
               </motion.li>
             ))}
           </AnimatePresence>
