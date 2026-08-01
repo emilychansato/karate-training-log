@@ -9,9 +9,52 @@ Full MVP in one pass: auth (Step 10 onward) + CRUD for training sessions and com
 ## UI library and styling
 
 - **shadcn/ui** is adopted as the component library (Radix + Tailwind), not plain Tailwind components. Reference: `satnaing/shadcn-admin` (12.8k★, MIT) for the sidebar/route-shell pattern — read for structure, not copied wholesale.
-- **Styling baseline: shadcn/ui defaults** (neutral grays, system font, no custom accent color). Real visual identity is deferred to a later Stitch-driven restyle phase — this pass prioritizes working functionality over visual polish.
+- **Styling baseline: revised 2026-08-01, supersedes the earlier "shadcn defaults, no accent" decision.** See "Visual identity" section below — this is now a real, decided design direction, not deferred.
 - Form validation: `react-hook-form` + `zod`, used for `SessionForm` and `CompetitionForm`'s conditional kata/kumite fields (`.refine()` for "kata fields required only if discipline=kata" logic).
 - Auth pattern: structurally informed by `jlumbroso/supabase-react-example` (Apache-2.0) for `useAuth.ts` and protected routes — not copy-pasted, written fresh against this app's schema.
+
+## Visual identity (decided 2026-08-01)
+
+Source: the user's own Stitch project **"Karate Athlete OS"** (`projects/880843193612452753`), which contains three fully-specified design system variants (Disciplined Craft, Obsidian Performance, Neo-Dojo Kinetic). This supersedes the earlier "plain shadcn defaults, restyle later via Stitch" decision — a real design system already exists for this app and drives the build directly, not a later phase.
+
+**Final direction: "Disciplined Craft," rebuilt for dark mode.** Disciplined Craft's typography, shape language, and structure are kept as-specified; only its light-mode surface colors are inverted to dark, since the source system was authored light-only. Confirmed via a side-by-side artifact comparison (true-black vs. soft-charcoal background) — **soft charcoal won**, for everyday-use eye comfort over the more dramatic true-black option.
+
+**Also explicitly rejected:** the glow/glassmorphism effects from Obsidian Performance and Neo-Dojo Kinetic — user's words: they "make it look vibe coded and cheap."
+
+### Tokens
+
+```css
+:root {
+  /* surfaces */
+  --background: #1a1a1c;
+  --card: #222225;
+  --border: #333336;
+
+  /* text */
+  --foreground: #f0f0f1;
+  --muted-foreground: #9b9b9f;
+  --card-title: #ababaf;
+
+  /* AKA / red (brightened from Disciplined Craft's #b91c1c for dark-bg contrast) */
+  --aka: #ff3b4a;
+  --aka-score: #ff5b67;
+
+  /* AO / blue (brightened from Disciplined Craft's #1e40af for dark-bg contrast) */
+  --ao: #3d8bff;
+  --ao-score: #5c9dff;
+
+  /* kata split-bar: technical = foreground, athletic = aka red */
+}
+```
+
+- **Corners: sharp, 0px** — no rounding anywhere, including buttons and inputs (Disciplined Craft's "Technical Brutalism" shape language, kept as-is).
+- **Grid/spacing: 4px base unit**, per Disciplined Craft's spec (`unit: 4px`, `gutter: 16px`, `margin-mobile: 16px`).
+- **Typography:**
+  - Headlines/labels: condensed, bold, uppercase, tight tracking — Archivo Narrow in the source system (self-host the real font in-app; do not rely on an external font CDN per this app's CSP-safe build practices).
+  - Body: Geist.
+  - Data/scores/timers: JetBrains Mono, `font-variant-numeric: tabular-nums` so digits don't shift width when counting up/down — this directly serves the kumite point badges and kata technical/athletic scores already in the schema.
+- **No shadows.** Depth via borders (1px default, thicker on active/focused elements) and tonal layering (card `#222225` vs. background `#1a1a1c`), per Disciplined Craft's "Elevation & Depth" section — matches the mobile-first, high-legibility goal better than soft shadows would.
+- **AKA/AO color-coding is functional, not decorative:** use `--aka`/`--ao` specifically for red-side/blue-side competitor data (kumite score badges, the `my_*`/`opponent_*` breakdown fields from the Competition scoring section below), not as a general two-color accent scheme elsewhere in the UI.
 
 ### Auth implementation note (cross-checked against current Supabase docs, 2026-07-31)
 
