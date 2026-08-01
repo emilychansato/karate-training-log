@@ -112,3 +112,75 @@ build-plan.md — this feature would eventually replace those free-text fields w
 A narrative timeline separate from the raw data tables — key life milestones (e.g. "started
 karate," "first medal," "made national team") alongside the stats, so the app tells the story of
 the athlete's career, not just charts.
+
+## Training Log / Competitions layout redesign (flagged 2026-08-02)
+
+Emily's words: it "looks so ugly" and "very Google Calendar-like," and filtering through a flat
+list "no one wants to go through." Not fixed in this session (the search/filter bar added
+2026-08-02 is a stopgap, not the real answer) — the actual fix is a different layout concept
+entirely, not more filters bolted onto a list. Worth a proper design pass referencing whatever
+visual inspiration Emily brings next, rather than guessing at a new layout here.
+
+## Competition timeline (past/upcoming) + per-competition memory
+
+Split `/competitions` into past and upcoming, presented as a timeline rather than a flat list.
+For **past** competitions specifically:
+- A coach's notes field (`competition_results.coach_notes text` — separate from the athlete's own
+  `notes` column, since it's a different author/voice).
+- Photo attachments per competition, framed as a "visual memory vlog," not just a data log.
+  Needs Supabase Storage (a bucket + `competition_photos` table: `id`, `competition_result_id`,
+  `storage_path`, `caption`, `created_at`, RLS scoped through the parent competition's `user_id`
+  same as every other table here).
+
+For **upcoming** competitions: this requires competitions to exist as rows *before* a result is
+logged (today `competition_results` only exists post-hoc, one row per finished result). Likely
+needs a lighter-weight `planned_competitions` table (event name, date, division, discipline —
+no scores yet) that a real result can later attach to or convert from.
+
+### Future memory (explicitly not to build yet, just remember): AI highlight reel / collage maker
+
+Once photos/videos are attached to competitions (above), a later feature: feed a competition's
+photo/video dump into an AI video editor or a Retro-style collage maker to auto-produce
+highlight reels and collages. This depends entirely on the photo/video attachment feature
+landing first, and is a heavy build (media processing, storage cost, likely a third-party
+video-gen API) — explicitly parked, not scoped, per Emily's request to just note it for later.
+
+## Connecting Competitions to real sport/tournament data (question asked 2026-08-02, answered inline, logged here for reference)
+
+Emily asked how this would work. Short answer: there's no single "give me all karate
+tournaments" API — WKF and most national federations don't publish open calendars as
+structured data. Realistic paths, roughly in order of effort:
+1. **Manual entry** (simplest, ships now): the `planned_competitions` table above, filled in by
+   the athlete/coach by hand. Not "connected to sport data" but unblocks the upcoming-competitions
+   UI immediately without any external dependency.
+2. **Scrape a specific federation's public calendar page** (e.g. a national federation site or
+   WKF's event listing) — fragile (breaks when their HTML changes), and scraping ToS should be
+   checked per-site before building this.
+3. **A real sports-data API** if one exists for karate specifically (most sports-data APIs
+   Emily may have heard of — e.g. those covering football/basketball/tennis — do not cover
+   karate; this would need active research to find a legitimate karate-specific or
+   multi-martial-arts events API, and likely a paid tier).
+Recommendation when this gets picked up: build (1) first since it's real, ships fast, and needs
+no external dependency; treat (2)/(3) as a later enhancement layered on top of the same table
+rather than a blocker.
+
+## Technique detail page (video + notes + kata competition-order planner)
+
+Two related asks bundled into "click into a technique":
+
+**Detail view**: clicking a technique (from the `/techniques` catalog) opens a page with an
+embedded reference video (YouTube — needs a `video_url` column on `techniques`, official rows
+would need this populated as a data task, not just a schema change), basic info (name, category,
+WKF grouping if applicable), and a personal notes field scoped to *that user's bookmark*
+(`user_techniques.notes text` — separate from the existing `nickname` column).
+
+**Kata competition-order planner**: WKF kata competitions are elimination rounds — you perform
+one kata per round, advance if you win, and typically can't repeat the same kata twice in one
+tournament, so competitors pre-plan an ordered list of katas by round (1st round, 2nd round,
+final, etc.), sometimes with a backup depending on the draw. This is a genuinely different
+feature from a bookmark list — it's a per-competition (or per-season "go-to rotation") ordered
+plan, not a property of the technique itself. Rough shape: a `kata_plans` table (`id`, `user_id`,
+name e.g. "Nationals 2026 rotation", optionally `competition_id` if tied to a specific planned
+competition) plus `kata_plan_entries` (`plan_id`, `round_label` e.g. "Round 1"/"Semifinal"/"Final",
+`technique_id`, `position`). Depends on `techniques` already existing (it does) and optionally on
+the planned-competitions table above if tying a plan to a specific upcoming event.
