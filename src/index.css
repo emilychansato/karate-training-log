@@ -1,1 +1,95 @@
 @import "tailwindcss";
+
+/* Self-hosted fonts (no external CDN) — Disciplined Craft typography */
+@import "@fontsource/archivo-narrow/700.css";
+@import "@fontsource/geist-sans/400.css";
+@import "@fontsource/geist-sans/500.css";
+@import "@fontsource/jetbrains-mono/500.css";
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-card-title: var(--card-title);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+
+  /* AKA / AO — functional competitor colors, not decorative accents */
+  --color-aka: var(--aka);
+  --color-aka-score: var(--aka-score);
+  --color-ao: var(--ao);
+  --color-ao-score: var(--ao-score);
+
+  --font-sans: "Geist", -apple-system, "Segoe UI", sans-serif;
+  --font-heading: "Archivo Narrow", "Arial Narrow", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+
+  --radius-sm: var(--radius);
+  --radius-md: var(--radius);
+  --radius-lg: var(--radius);
+}
+
+:root {
+  /* Disciplined Craft, rebuilt for dark mode (soft charcoal, confirmed 2026-08-01) */
+  --background: #1a1a1c;
+  --foreground: #f0f0f1;
+
+  --card: #222225;
+  --card-foreground: #f0f0f1;
+  --card-title: #ababaf;
+
+  --muted: #222225;
+  --muted-foreground: #9b9b9f;
+
+  --border: #333336;
+  --input: #333336;
+  --ring: #6b6b70;
+
+  /* Primary UI actions stay monochrome — AKA/AO red/blue are reserved for
+     competitor data, not general accents (see design spec). */
+  --primary: #f0f0f1;
+  --primary-foreground: #1a1a1c;
+
+  --secondary: #222225;
+  --secondary-foreground: #f0f0f1;
+
+  --destructive: #ff3b4a;
+  --destructive-foreground: #1a1a1c;
+
+  --aka: #ff3b4a;
+  --aka-score: #ff5b67;
+  --ao: #3d8bff;
+  --ao-score: #5c9dff;
+
+  /* Sharp corners, no rounding, per Disciplined Craft's shape language */
+  --radius: 0rem;
+
+  color-scheme: dark;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+}
+
+h1, h2, h3, .font-heading {
+  font-family: var(--font-heading);
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+}
+
+.font-mono, .tabular-mono {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
