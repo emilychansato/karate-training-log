@@ -1,4 +1,5 @@
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts'
+import { motion } from 'framer-motion'
 import { useTrainingSessions } from '../../hooks/useTrainingSessions'
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/card'
 import { Icon } from '../ui/icon'
@@ -20,7 +21,14 @@ export function RatingTrendChart() {
       </CardHeader>
       <CardContent>
         {!loading && rated.length === 0 ? (
-          <p className="text-sm text-muted-foreground">No ratings yet.</p>
+          <motion.p
+            className="text-sm text-muted-foreground"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.25 }}
+          >
+            No ratings yet.
+          </motion.p>
         ) : (
           <div className="h-48 w-full">
             <ResponsiveContainer>
@@ -28,7 +36,15 @@ export function RatingTrendChart() {
                 <XAxis dataKey="date" tick={{ fontSize: 11 }} />
                 <YAxis domain={[1, 5]} tick={{ fontSize: 11 }} />
                 <Tooltip />
-                <Line type="monotone" dataKey="self_rating" stroke="var(--aka)" dot />
+                <Line
+                  type="monotone"
+                  dataKey="self_rating"
+                  stroke="var(--aka)"
+                  dot
+                  isAnimationActive
+                  animationDuration={700}
+                  animationEasing="ease-out"
+                />
               </LineChart>
             </ResponsiveContainer>
           </div>

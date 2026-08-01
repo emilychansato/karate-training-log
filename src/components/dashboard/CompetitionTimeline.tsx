@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion'
 import { useCompetitionResults } from '../../hooks/useCompetitionResults'
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/card'
 import { Icon } from '../ui/icon'
@@ -15,7 +16,14 @@ export function CompetitionTimeline() {
       </CardHeader>
       <CardContent>
         {!loading && results.length === 0 ? (
-          <p className="text-sm text-muted-foreground">No competitions logged yet.</p>
+          <motion.p
+            className="text-sm text-muted-foreground"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.25 }}
+          >
+            No competitions logged yet.
+          </motion.p>
         ) : (
           <ul className="flex flex-col gap-2">
             {results.map((r) => (

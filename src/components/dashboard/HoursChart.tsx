@@ -1,4 +1,5 @@
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts'
+import { motion } from 'framer-motion'
 import { useTrainingSessions } from '../../hooks/useTrainingSessions'
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/card'
 import { Icon } from '../ui/icon'
@@ -30,7 +31,14 @@ export function HoursChart() {
       </CardHeader>
       <CardContent>
         {!loading && sessions.length === 0 ? (
-          <p className="text-sm text-muted-foreground">No sessions logged yet.</p>
+          <motion.p
+            className="text-sm text-muted-foreground"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.25 }}
+          >
+            No sessions logged yet.
+          </motion.p>
         ) : (
           <div className="h-48 w-full">
             <ResponsiveContainer>
@@ -38,7 +46,14 @@ export function HoursChart() {
                 <XAxis dataKey="week" tick={{ fontSize: 11 }} />
                 <YAxis tick={{ fontSize: 11 }} />
                 <Tooltip />
-                <Bar dataKey="hours" fill="var(--aka)" radius={0} />
+                <Bar
+                  dataKey="hours"
+                  fill="var(--aka)"
+                  radius={0}
+                  isAnimationActive
+                  animationDuration={700}
+                  animationEasing="ease-out"
+                />
               </BarChart>
             </ResponsiveContainer>
           </div>

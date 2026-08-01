@@ -1,9 +1,13 @@
+import { motion } from 'framer-motion'
 import { useCompetitionStats } from '../hooks/useCompetitionStats'
 import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/card'
 import { Icon } from '../components/ui/icon'
+import { AnimatedNumber } from '../components/ui/animated-number'
+import { CelebrationBurst } from '../components/ui/celebration-burst'
 
 export function Records() {
   const { loading, records, opponents, divisionHistory } = useCompetitionStats()
+  const hasStreak = records.longestWinStreak >= 3
 
   return (
     <div className="flex flex-col gap-6">
@@ -25,31 +29,47 @@ export function Records() {
             </CardHeader>
             <CardContent>
               {records.totalCompetitions === 0 ? (
-                <p className="text-sm text-muted-foreground">No competitions logged yet.</p>
+                <motion.p
+                  className="text-sm text-muted-foreground"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.25 }}
+                >
+                  No competitions logged yet.
+                </motion.p>
               ) : (
                 <dl className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-                  <div>
+                  <div className="relative">
+                    {hasStreak && <CelebrationBurst />}
                     <dt className="label-caps text-muted-foreground">Win streak</dt>
                     <dd className="font-mono tabular-mono mt-1 text-2xl font-bold text-aka">
-                      {records.longestWinStreak}
+                      <AnimatedNumber value={records.longestWinStreak} />
                     </dd>
                   </div>
                   <div>
                     <dt className="label-caps text-muted-foreground">Best match points</dt>
                     <dd className="font-mono tabular-mono mt-1 text-2xl font-bold">
-                      {records.highestPointsInMatch ?? '—'}
+                      {records.highestPointsInMatch != null ? (
+                        <AnimatedNumber value={records.highestPointsInMatch} />
+                      ) : (
+                        '—'
+                      )}
                     </dd>
                   </div>
                   <div>
                     <dt className="label-caps text-muted-foreground">Best kata score</dt>
                     <dd className="font-mono tabular-mono mt-1 text-2xl font-bold text-ao">
-                      {records.bestKataTechnicalScore ?? '—'}
+                      {records.bestKataTechnicalScore != null ? (
+                        <AnimatedNumber value={records.bestKataTechnicalScore} decimals={1} />
+                      ) : (
+                        '—'
+                      )}
                     </dd>
                   </div>
                   <div>
                     <dt className="label-caps text-muted-foreground">Total competitions</dt>
                     <dd className="font-mono tabular-mono mt-1 text-2xl font-bold">
-                      {records.totalCompetitions}
+                      <AnimatedNumber value={records.totalCompetitions} />
                     </dd>
                   </div>
                 </dl>
@@ -66,9 +86,14 @@ export function Records() {
             </CardHeader>
             <CardContent>
               {opponents.length === 0 ? (
-                <p className="text-sm text-muted-foreground">
+                <motion.p
+                  className="text-sm text-muted-foreground"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.25 }}
+                >
                   No scored kumite matches with an opponent name yet.
-                </p>
+                </motion.p>
               ) : (
                 <ul className="flex flex-col gap-3">
                   {opponents.map((o) => (
@@ -103,7 +128,14 @@ export function Records() {
             </CardHeader>
             <CardContent>
               {divisionHistory.length === 0 ? (
-                <p className="text-sm text-muted-foreground">No divisions logged yet.</p>
+                <motion.p
+                  className="text-sm text-muted-foreground"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.25 }}
+                >
+                  No divisions logged yet.
+                </motion.p>
               ) : (
                 <ul className="flex flex-col gap-2">
                   {divisionHistory.map((d, i) => (
