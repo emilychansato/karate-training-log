@@ -24,9 +24,11 @@ vi.mock('../lib/supabaseClient', () => {
   const insert = vi.fn(() => ({ select: insertSelect }))
   const eqDelete = vi.fn().mockResolvedValue({ error: null })
   const deleteFn = vi.fn(() => ({ eq: eqDelete }))
+  const eqUpdate = vi.fn().mockResolvedValue({ error: null })
+  const update = vi.fn(() => ({ eq: eqUpdate }))
   return {
     supabase: {
-      from: vi.fn(() => ({ select: listSelect, insert, delete: deleteFn })),
+      from: vi.fn(() => ({ select: listSelect, insert, delete: deleteFn, update })),
       auth: {
         getClaims: vi.fn().mockResolvedValue({ data: { claims: { sub: 'user-1' } } }),
       },
@@ -62,5 +64,24 @@ describe('useCompetitions', () => {
     expect(insertCall).toHaveBeenCalledWith(
       expect.objectContaining({ user_id: 'user-1', event: 'Nationals', discipline: 'kumite' })
     )
+  })
+
+  it('updateCompetition updates the reflection fields for the given id', async () => {
+    const { result } = renderHook(() => useCompetitions())
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    let response: { error: string | null } = { error: 'unset' }
+    await act(async () => {
+      response = await result.current.updateCompetition('c1', {
+        what_went_well: 'Fast footwork',
+        goals_for_next_time: 'Work on distance control',
+      })
+    })
+    expect(response.error).toBeNull()
+    const updateCall = vi.mocked(supabase.from).mock.results[0].value.update
+    expect(updateCall).toHaveBeenCalledWith({
+      what_went_well: 'Fast footwork',
+      goals_for_next_time: 'Work on distance control',
+    })
   })
 })

@@ -22,6 +22,7 @@ const { mockMatch } = vi.hoisted(() => ({
     win_method: 'waza-ari',
     notes: null,
     created_at: '2026-06-01T10:00:00Z',
+    match_techniques: [],
   },
 }))
 
@@ -29,23 +30,30 @@ vi.mock('../lib/supabaseClient', () => {
   const order = vi.fn().mockResolvedValue({ data: [mockMatch], error: null })
   const eqSelect = vi.fn(() => ({ order }))
   const select = vi.fn(() => ({ eq: eqSelect }))
-  const insert = vi.fn().mockResolvedValue({ error: null })
+  const single = vi.fn().mockResolvedValue({ data: { id: 'new-match-id' }, error: null })
+  const insertSelect = vi.fn(() => ({ single }))
+  const matchInsert = vi.fn(() => ({ select: insertSelect }))
+  const linkInsert = vi.fn().mockResolvedValue({ error: null })
   const eqDelete = vi.fn().mockResolvedValue({ error: null })
   const deleteFn = vi.fn(() => ({ eq: eqDelete }))
+
+  const from = vi.fn((table: string) => {
+    if (table === 'match_techniques') return { insert: linkInsert }
+    return { select, insert: matchInsert, delete: deleteFn }
+  })
+
   return {
-    supabase: {
-      from: vi.fn(() => ({ select, insert, delete: deleteFn })),
-    },
+    supabase: { from },
   }
 })
 
 describe('useCompetitionMatches', () => {
   beforeEach(() => vi.clearAllMocks())
 
-  it('loads matches scoped to the given competition', async () => {
+  it('loads matches scoped to the given competition, with favorite techniques flattened', async () => {
     const { result } = renderHook(() => useCompetitionMatches('c1'))
     await waitFor(() => expect(result.current.loading).toBe(false))
-    expect(result.current.matches).toEqual([mockMatch])
+    expect(result.current.matches).toEqual([{ ...mockMatch, favorite_techniques: [] }])
     expect(supabase.from).toHaveBeenCalledWith('competition_matches')
   })
 
@@ -66,8 +74,10 @@ describe('useCompetitionMatches', () => {
       })
     })
     expect(response.error).toBeNull()
-    const insertCall = vi.mocked(supabase.from).mock.results[0].value.insert
-    expect(insertCall).toHaveBeenCalledWith(
+    const matchesFrom = vi
+      .mocked(supabase.from)
+      .mock.results.find((r) => r.value.insert && r.value.select)
+    expect(matchesFrom?.value.insert).toHaveBeenCalledWith(
       expect.objectContaining({
         competition_id: 'c1',
         opponent_name: 'Jamie Lee',
@@ -75,5 +85,17 @@ describe('useCompetitionMatches', () => {
         points_against: 3,
       })
     )
+  })
+
+  it('createMatch links favoriteTechniqueIds into match_techniques', async () => {
+    const { result } = renderHook(() => useCompetitionMatches('c1'))
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    await act(async () => {
+      await result.current.createMatch({ opponent_name: 'Jamie Lee' }, ['t1', 't2'])
+    })
+
+    const linkCall = vi.mocked(supabase.from).mock.calls.find((c) => c[0] === 'match_techniques')
+    expect(linkCall).toBeTruthy()
   })
 })

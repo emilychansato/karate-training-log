@@ -13,6 +13,7 @@ describe('CompetitionForm', () => {
       competitions: [],
       loading: false,
       createCompetition,
+      updateCompetition: vi.fn(),
       deleteCompetition: vi.fn(),
     })
     const onSuccess = vi.fn()
@@ -37,6 +38,7 @@ describe('CompetitionForm', () => {
       competitions: [],
       loading: false,
       createCompetition: vi.fn(),
+      updateCompetition: vi.fn(),
       deleteCompetition: vi.fn(),
     })
     render(<CompetitionForm onSuccess={vi.fn()} />)

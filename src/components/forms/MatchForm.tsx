@@ -1,12 +1,19 @@
+import { useState } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import type { WinMethod, NewCompetitionMatch } from '../../hooks/useCompetitionMatches'
+import { useTechniques } from '../../hooks/useTechniques'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
 import { Label } from '../ui/label'
 import { Stepper } from '../ui/stepper'
 import { ToggleChip } from '../ui/toggle-chip'
+
+const DISCIPLINE_CATEGORY: Record<'kata' | 'kumite', string> = {
+  kata: 'kata',
+  kumite: 'kumite_combo',
+}
 
 const WIN_METHODS: WinMethod[] = [
   'ippon',
@@ -45,9 +52,14 @@ export function MatchForm({
   onSuccess,
 }: {
   discipline: 'kata' | 'kumite'
-  createMatch: (input: NewCompetitionMatch) => Promise<{ error: string | null }>
+  createMatch: (
+    input: NewCompetitionMatch,
+    favoriteTechniqueIds?: string[]
+  ) => Promise<{ error: string | null }>
   onSuccess: () => void
 }) {
+  const { techniques } = useTechniques()
+  const [favoriteIds, setFavoriteIds] = useState<string[]>([])
   const {
     register,
     control,
@@ -58,9 +70,18 @@ export function MatchForm({
   } = useForm<FormInput, unknown, FormOutput>({ resolver: zodResolver(schema) })
 
   const winMethod = watch('win_method')
+  const availableTechniques = techniques.filter(
+    (t) => t.category === DISCIPLINE_CATEGORY[discipline]
+  )
+
+  function toggleFavorite(id: string) {
+    setFavoriteIds((prev) =>
+      prev.includes(id) ? prev.filter((v) => v !== id) : [...prev, id]
+    )
+  }
 
   async function onSubmit(values: FormOutput) {
-    const { error } = await createMatch(values)
+    const { error } = await createMatch(values, favoriteIds)
     if (!error) onSuccess()
   }
 
@@ -188,6 +209,23 @@ export function MatchForm({
             </div>
           </div>
         </>
+      )}
+
+      {availableTechniques.length > 0 && (
+        <div className="flex flex-col gap-2">
+          <span className="label-caps text-muted-foreground">Favorite techniques</span>
+          <div className="flex max-h-40 flex-wrap gap-2 overflow-y-auto">
+            {availableTechniques.map((t) => (
+              <ToggleChip
+                key={t.id}
+                label={t.name}
+                accent="ao"
+                selected={favoriteIds.includes(t.id)}
+                onClick={() => toggleFavorite(t.id)}
+              />
+            ))}
+          </div>
+        </div>
       )}
 
       <div className="flex flex-col gap-1.5">
