@@ -1,7 +1,10 @@
 import type { ReactNode } from 'react'
-import { NavLink } from 'react-router-dom'
+import { NavLink, useLocation } from 'react-router-dom'
+import { motion } from 'framer-motion'
 import { useAuth } from '../../hooks/useAuth'
+import { useReducedMotion } from '../../hooks/useReducedMotion'
 import { Icon, type IconName } from '../ui/icon'
+import { snappy, pageEnter } from '../../lib/motion'
 
 const NAV_ITEMS: { to: string; label: string; icon: IconName }[] = [
   { to: '/', label: 'Dashboard', icon: 'dashboard' },
@@ -12,6 +15,8 @@ const NAV_ITEMS: { to: string; label: string; icon: IconName }[] = [
 
 export function AppShell({ children }: { children: ReactNode }) {
   const { signOut } = useAuth()
+  const location = useLocation()
+  const reducedMotion = useReducedMotion()
 
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground">
@@ -28,24 +33,44 @@ export function AppShell({ children }: { children: ReactNode }) {
               to={item.to}
               end={item.to === '/'}
               className={({ isActive }) =>
-                `label-caps px-3 py-2 ${
+                `label-caps relative px-3 py-2 ${
                   isActive ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'
                 }`
               }
             >
-              {item.label}
+              {({ isActive }) => (
+                <>
+                  {item.label}
+                  {isActive && (
+                    <motion.span
+                      layoutId="desktop-nav-underline"
+                      className="absolute inset-x-3 -bottom-[1px] h-[2px] bg-aka"
+                      transition={snappy}
+                    />
+                  )}
+                </>
+              )}
             </NavLink>
           ))}
         </nav>
         <button
           onClick={() => signOut()}
-          className="label-caps text-muted-foreground hover:text-foreground"
+          className="label-caps text-muted-foreground transition-colors duration-150 hover:text-foreground"
         >
           Sign out
         </button>
       </header>
 
-      <main className="mx-auto w-full max-w-3xl flex-1 p-4 pb-24 md:pb-8">{children}</main>
+      <main className="mx-auto w-full max-w-3xl flex-1 p-4 pb-24 md:pb-8">
+        <motion.div
+          key={location.pathname}
+          initial={reducedMotion ? undefined : 'hidden'}
+          animate={reducedMotion ? undefined : 'show'}
+          variants={pageEnter}
+        >
+          {children}
+        </motion.div>
+      </main>
 
       {/* Mobile bottom tab bar */}
       <nav className="fixed bottom-0 left-0 right-0 z-40 flex border-t border-border bg-background md:hidden">
@@ -55,14 +80,23 @@ export function AppShell({ children }: { children: ReactNode }) {
             to={item.to}
             end={item.to === '/'}
             className={({ isActive }) =>
-              `flex flex-1 flex-col items-center gap-1 py-2.5 ${
+              `relative flex flex-1 flex-col items-center gap-1 py-2.5 ${
                 isActive ? 'text-aka' : 'text-muted-foreground'
               }`
             }
           >
             {({ isActive }) => (
               <>
-                <Icon name={item.icon} filled={isActive} />
+                {isActive && (
+                  <motion.span
+                    layoutId="mobile-nav-indicator"
+                    className="absolute inset-x-2 top-0 h-[2px] bg-aka"
+                    transition={snappy}
+                  />
+                )}
+                <motion.span whileTap={{ scale: 0.8 }} transition={snappy}>
+                  <Icon name={item.icon} filled={isActive} />
+                </motion.span>
                 <span className="label-caps text-[9px] tracking-widest">{item.label}</span>
               </>
             )}
