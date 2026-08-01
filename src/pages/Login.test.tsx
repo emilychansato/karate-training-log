@@ -43,4 +43,26 @@ describe('Login', () => {
 
     expect(await screen.findByText('Invalid login credentials')).toBeInTheDocument()
   })
+
+  it('switches to sign-up mode and calls signUp instead of signIn', async () => {
+    const signUp = vi.fn().mockResolvedValue({ error: null })
+    const signIn = vi.fn()
+    vi.mocked(useAuth).mockReturnValue({
+      user: null,
+      loading: false,
+      signUp,
+      signIn,
+      signOut: vi.fn(),
+    })
+
+    render(<Login />)
+    const user = userEvent.setup()
+    await user.click(screen.getByRole('button', { name: /create an account/i }))
+    await user.type(screen.getByLabelText(/email/i), 'new@example.com')
+    await user.type(screen.getByLabelText(/password/i), 'secret123')
+    await user.click(screen.getByRole('button', { name: /sign up/i }))
+
+    expect(signUp).toHaveBeenCalledWith('new@example.com', 'secret123')
+    expect(signIn).not.toHaveBeenCalled()
+  })
 })

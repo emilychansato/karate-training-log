@@ -12,7 +12,8 @@ import {
 } from '../components/ui/card'
 
 export function Login() {
-  const { signIn } = useAuth()
+  const { signIn, signUp } = useAuth()
+  const [mode, setMode] = useState<'sign-in' | 'sign-up'>('sign-in')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
@@ -22,7 +23,8 @@ export function Login() {
     e.preventDefault()
     setSubmitting(true)
     setError(null)
-    const { error } = await signIn(email, password)
+    const { error } =
+      mode === 'sign-in' ? await signIn(email, password) : await signUp(email, password)
     setSubmitting(false)
     if (error) setError(error)
   }
@@ -32,7 +34,9 @@ export function Login() {
       <Card className="w-full sm:max-w-sm">
         <CardHeader>
           <CardTitle className="font-heading">Karate Training Log</CardTitle>
-          <CardDescription>Sign in to your account</CardDescription>
+          <CardDescription>
+            {mode === 'sign-in' ? 'Sign in to your account' : 'Create a new account'}
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
@@ -58,8 +62,24 @@ export function Login() {
             </div>
             {error && <p className="text-sm text-destructive">{error}</p>}
             <Button type="submit" disabled={submitting} className="w-full">
-              {submitting ? 'Signing in…' : 'Sign in'}
+              {submitting
+                ? mode === 'sign-in'
+                  ? 'Signing in…'
+                  : 'Signing up…'
+                : mode === 'sign-in'
+                  ? 'Sign in'
+                  : 'Sign up'}
             </Button>
+            <button
+              type="button"
+              onClick={() => {
+                setMode((m) => (m === 'sign-in' ? 'sign-up' : 'sign-in'))
+                setError(null)
+              }}
+              className="text-sm text-muted-foreground underline-offset-4 hover:underline"
+            >
+              {mode === 'sign-in' ? 'Create an account' : 'Already have an account? Sign in'}
+            </button>
           </form>
         </CardContent>
       </Card>
