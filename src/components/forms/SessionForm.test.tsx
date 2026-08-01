@@ -22,7 +22,7 @@ describe('SessionForm', () => {
     const user = userEvent.setup()
 
     await user.type(screen.getByLabelText(/date/i), '2026-08-01')
-    await user.selectOptions(screen.getByLabelText(/type/i), 'kumite')
+    await user.click(screen.getByRole('radio', { name: 'KUMITE' }))
     await user.type(screen.getByLabelText(/duration/i), '60')
     await user.click(screen.getByRole('checkbox', { name: 'Timing' }))
     await user.click(screen.getByRole('checkbox', { name: 'Footwork' }))

@@ -18,12 +18,12 @@ describe('CompetitionForm', () => {
     render(<CompetitionForm onSuccess={vi.fn()} />)
     const user = userEvent.setup()
 
-    await user.selectOptions(screen.getByLabelText(/discipline/i), 'kata')
+    await user.click(screen.getByRole('radio', { name: 'KATA' }))
     expect(screen.getByLabelText(/technical score/i)).toBeInTheDocument()
-    expect(screen.queryByLabelText(/my yuko/i)).not.toBeInTheDocument()
+    expect(screen.queryByText('My Yuko')).not.toBeInTheDocument()
 
-    await user.selectOptions(screen.getByLabelText(/discipline/i), 'kumite')
-    expect(screen.getByLabelText(/my yuko/i)).toBeInTheDocument()
+    await user.click(screen.getByRole('radio', { name: 'KUMITE' }))
+    expect(screen.getByText('My Yuko')).toBeInTheDocument()
     expect(screen.queryByLabelText(/technical score/i)).not.toBeInTheDocument()
   })
 
@@ -42,9 +42,9 @@ describe('CompetitionForm', () => {
 
     await user.type(screen.getByLabelText(/event/i), 'BC Open')
     await user.type(screen.getByLabelText(/^date/i), '2026-06-01')
-    await user.selectOptions(screen.getByLabelText(/discipline/i), 'kumite')
-    await user.type(screen.getByLabelText(/my yuko/i), '1')
-    await user.type(screen.getByLabelText(/my waza-ari/i), '1')
+    await user.click(screen.getByRole('radio', { name: 'KUMITE' }))
+    await user.click(screen.getByRole('button', { name: 'Increase My Yuko' }))
+    await user.click(screen.getByRole('button', { name: 'Increase My Waza-ari' }))
     await user.click(screen.getByRole('button', { name: /save result/i }))
 
     await waitFor(() =>

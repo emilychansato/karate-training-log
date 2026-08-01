@@ -114,3 +114,16 @@ body {
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
 }
 
+/* Premium accent glow — used sparingly, only on active/selected states and
+   primary CTAs, never as an ambient background effect. Kept tight and
+   low-opacity so it reads as "considered" rather than "neon app template". */
+.glow-aka {
+  box-shadow: 0 0 0 1px var(--aka), 0 4px 20px -4px color-mix(in oklab, var(--aka) 50%, transparent);
+}
+.glow-ao {
+  box-shadow: 0 0 0 1px var(--ao), 0 4px 20px -4px color-mix(in oklab, var(--ao) 50%, transparent);
+}
+.glow-primary {
+  box-shadow: 0 4px 24px -6px color-mix(in oklab, var(--foreground) 25%, transparent);
+}
+

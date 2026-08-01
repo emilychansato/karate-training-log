@@ -5,9 +5,14 @@ import { useTrainingSessions } from '../../hooks/useTrainingSessions'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
 import { Label } from '../ui/label'
-import { Checkbox } from '../ui/checkbox'
+import { SegmentedControl } from '../ui/segmented-control'
+import { ToggleChip } from '../ui/toggle-chip'
 
 const SESSION_TYPES = ['kata', 'kumite', 'conditioning', 'other'] as const
+const SESSION_TYPE_OPTIONS = SESSION_TYPES.map((t) => ({
+  value: t,
+  label: t.toUpperCase(),
+}))
 const IMPROVED_OPTIONS = ['Speed', 'Timing', 'Distance', 'Power', 'Accuracy', 'Strategy']
 const STRUGGLED_OPTIONS = [
   'Fatigue',
@@ -51,7 +56,7 @@ export function SessionForm({ onSuccess }: { onSuccess: () => void }) {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4 w-full">
+    <form onSubmit={handleSubmit(onSubmit)} className="card-elevated flex w-full flex-col gap-5 border border-border bg-card p-5">
       <div className="flex flex-col gap-1.5">
         <Label htmlFor="date">Date</Label>
         <Input id="date" type="date" {...register('date')} />
@@ -60,18 +65,18 @@ export function SessionForm({ onSuccess }: { onSuccess: () => void }) {
 
       <div className="flex flex-col gap-1.5">
         <Label htmlFor="type">Type</Label>
-        <select
-          id="type"
-          {...register('type')}
-          className="h-9 border border-input bg-input px-3 text-sm text-foreground [color-scheme:dark]"
-        >
-          <option value="">Select type…</option>
-          {SESSION_TYPES.map((t) => (
-            <option key={t} value={t}>
-              {t}
-            </option>
-          ))}
-        </select>
+        <Controller
+          name="type"
+          control={control}
+          render={({ field }) => (
+            <SegmentedControl
+              name="type"
+              options={SESSION_TYPE_OPTIONS}
+              value={field.value ?? ''}
+              onChange={field.onChange}
+            />
+          )}
+        />
         {errors.type && <p className="text-sm text-destructive">{errors.type.message}</p>}
       </div>
 
@@ -89,53 +94,55 @@ export function SessionForm({ onSuccess }: { onSuccess: () => void }) {
       </div>
 
       <fieldset className="flex flex-col gap-2">
-        <legend className="text-sm font-medium">What improved?</legend>
-        {IMPROVED_OPTIONS.map((label) => (
-          <Controller
-            key={label}
-            name="improved"
-            control={control}
-            render={({ field }) => (
-              <label className="flex items-center gap-2 text-sm">
-                <Checkbox
-                  checked={field.value?.includes(label)}
-                  onCheckedChange={(checked) => {
-                    const next = checked
-                      ? [...(field.value ?? []), label]
-                      : (field.value ?? []).filter((v) => v !== label)
+        <legend className="label-caps text-muted-foreground">What improved?</legend>
+        <div className="flex flex-wrap gap-2">
+          {IMPROVED_OPTIONS.map((label) => (
+            <Controller
+              key={label}
+              name="improved"
+              control={control}
+              render={({ field }) => (
+                <ToggleChip
+                  label={label}
+                  accent="ao"
+                  selected={!!field.value?.includes(label)}
+                  onClick={() => {
+                    const next = field.value?.includes(label)
+                      ? (field.value ?? []).filter((v) => v !== label)
+                      : [...(field.value ?? []), label]
                     field.onChange(next)
                   }}
                 />
-                {label}
-              </label>
-            )}
-          />
-        ))}
+              )}
+            />
+          ))}
+        </div>
       </fieldset>
 
       <fieldset className="flex flex-col gap-2">
-        <legend className="text-sm font-medium">What struggled?</legend>
-        {STRUGGLED_OPTIONS.map((label) => (
-          <Controller
-            key={label}
-            name="struggled"
-            control={control}
-            render={({ field }) => (
-              <label className="flex items-center gap-2 text-sm">
-                <Checkbox
-                  checked={field.value?.includes(label)}
-                  onCheckedChange={(checked) => {
-                    const next = checked
-                      ? [...(field.value ?? []), label]
-                      : (field.value ?? []).filter((v) => v !== label)
+        <legend className="label-caps text-muted-foreground">What struggled?</legend>
+        <div className="flex flex-wrap gap-2">
+          {STRUGGLED_OPTIONS.map((label) => (
+            <Controller
+              key={label}
+              name="struggled"
+              control={control}
+              render={({ field }) => (
+                <ToggleChip
+                  label={label}
+                  accent="aka"
+                  selected={!!field.value?.includes(label)}
+                  onClick={() => {
+                    const next = field.value?.includes(label)
+                      ? (field.value ?? []).filter((v) => v !== label)
+                      : [...(field.value ?? []), label]
                     field.onChange(next)
                   }}
                 />
-                {label}
-              </label>
-            )}
-          />
-        ))}
+              )}
+            />
+          ))}
+        </div>
       </fieldset>
 
       <div className="flex flex-col gap-1.5">
@@ -147,7 +154,7 @@ export function SessionForm({ onSuccess }: { onSuccess: () => void }) {
         />
       </div>
 
-      <Button type="submit" disabled={isSubmitting} className="w-full">
+      <Button type="submit" disabled={isSubmitting} className="glow-primary w-full">
         {isSubmitting ? 'Saving…' : 'Save session'}
       </Button>
     </form>

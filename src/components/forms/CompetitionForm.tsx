@@ -1,5 +1,4 @@
-import { useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import {
@@ -9,6 +8,9 @@ import {
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
 import { Label } from '../ui/label'
+import { SegmentedControl } from '../ui/segmented-control'
+import { Stepper } from '../ui/stepper'
+import { ToggleChip } from '../ui/toggle-chip'
 
 const WIN_METHODS: WinMethod[] = [
   'ippon',
@@ -52,12 +54,17 @@ type FormOutput = z.output<typeof schema>
 
 export function CompetitionForm({ onSuccess }: { onSuccess: () => void }) {
   const { createResult } = useCompetitionResults()
-  const [discipline, setDiscipline] = useState<'kata' | 'kumite' | ''>('')
   const {
     register,
+    control,
     handleSubmit,
+    watch,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<FormInput, unknown, FormOutput>({ resolver: zodResolver(schema) })
+
+  const discipline = watch('discipline')
+  const winMethod = watch('win_method')
 
   async function onSubmit(values: FormOutput) {
     const { error } = await createResult(values)
@@ -65,7 +72,10 @@ export function CompetitionForm({ onSuccess }: { onSuccess: () => void }) {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4 w-full">
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className="card-elevated flex w-full flex-col gap-5 border border-border bg-card p-5"
+    >
       <div className="flex flex-col gap-1.5">
         <Label htmlFor="event">Event</Label>
         <Input id="event" {...register('event')} />
@@ -80,17 +90,21 @@ export function CompetitionForm({ onSuccess }: { onSuccess: () => void }) {
 
       <div className="flex flex-col gap-1.5">
         <Label htmlFor="discipline">Discipline</Label>
-        <select
-          id="discipline"
-          {...register('discipline', {
-            onChange: (e) => setDiscipline(e.target.value),
-          })}
-          className="h-9 border border-input bg-input px-3 text-sm text-foreground [color-scheme:dark]"
-        >
-          <option value="">Select discipline…</option>
-          <option value="kata">Kata</option>
-          <option value="kumite">Kumite</option>
-        </select>
+        <Controller
+          name="discipline"
+          control={control}
+          render={({ field }) => (
+            <SegmentedControl
+              name="discipline"
+              options={[
+                { value: 'kata', label: 'KATA' },
+                { value: 'kumite', label: 'KUMITE' },
+              ]}
+              value={field.value ?? ''}
+              onChange={field.onChange}
+            />
+          )}
+        />
       </div>
 
       {discipline === 'kata' && (
@@ -121,46 +135,88 @@ export function CompetitionForm({ onSuccess }: { onSuccess: () => void }) {
 
       {discipline === 'kumite' && (
         <>
-          <div className="grid grid-cols-2 gap-3">
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor="my_yuko">My Yuko</Label>
-              <Input id="my_yuko" type="number" {...register('my_yuko')} />
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div className="glow-aka flex flex-col gap-3 border-l-2 border-l-aka bg-muted p-4">
+              <span className="label-caps text-aka">AKA (my score)</span>
+              <Controller
+                name="my_yuko"
+                control={control}
+                render={({ field }) => (
+                  <Stepper label="My Yuko" accent="aka" value={Number(field.value) || 0} onChange={field.onChange} />
+                )}
+              />
+              <Controller
+                name="my_waza_ari"
+                control={control}
+                render={({ field }) => (
+                  <Stepper
+                    label="My Waza-ari"
+                    accent="aka"
+                    value={Number(field.value) || 0}
+                    onChange={field.onChange}
+                  />
+                )}
+              />
+              <Controller
+                name="my_ippon"
+                control={control}
+                render={({ field }) => (
+                  <Stepper label="My Ippon" accent="aka" value={Number(field.value) || 0} onChange={field.onChange} />
+                )}
+              />
             </div>
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor="opponent_yuko">Opponent Yuko</Label>
-              <Input id="opponent_yuko" type="number" {...register('opponent_yuko')} />
-            </div>
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor="my_waza_ari">My Waza-ari</Label>
-              <Input id="my_waza_ari" type="number" {...register('my_waza_ari')} />
-            </div>
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor="opponent_waza_ari">Opponent Waza-ari</Label>
-              <Input id="opponent_waza_ari" type="number" {...register('opponent_waza_ari')} />
-            </div>
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor="my_ippon">My Ippon</Label>
-              <Input id="my_ippon" type="number" {...register('my_ippon')} />
-            </div>
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor="opponent_ippon">Opponent Ippon</Label>
-              <Input id="opponent_ippon" type="number" {...register('opponent_ippon')} />
+            <div className="flex flex-col gap-3 border-l-2 border-l-ao bg-muted p-4">
+              <span className="label-caps text-ao">AO (opponent)</span>
+              <Controller
+                name="opponent_yuko"
+                control={control}
+                render={({ field }) => (
+                  <Stepper
+                    label="Opponent Yuko"
+                    accent="ao"
+                    value={Number(field.value) || 0}
+                    onChange={field.onChange}
+                  />
+                )}
+              />
+              <Controller
+                name="opponent_waza_ari"
+                control={control}
+                render={({ field }) => (
+                  <Stepper
+                    label="Opponent Waza-ari"
+                    accent="ao"
+                    value={Number(field.value) || 0}
+                    onChange={field.onChange}
+                  />
+                )}
+              />
+              <Controller
+                name="opponent_ippon"
+                control={control}
+                render={({ field }) => (
+                  <Stepper
+                    label="Opponent Ippon"
+                    accent="ao"
+                    value={Number(field.value) || 0}
+                    onChange={field.onChange}
+                  />
+                )}
+              />
             </div>
           </div>
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor="win_method">Win method</Label>
-            <select
-              id="win_method"
-              {...register('win_method')}
-              className="h-9 border border-input bg-input px-3 text-sm text-foreground [color-scheme:dark]"
-            >
-              <option value="">Select…</option>
+          <div className="flex flex-col gap-2">
+            <span className="label-caps text-muted-foreground">Win method</span>
+            <div className="flex flex-wrap gap-2">
               {WIN_METHODS.map((m) => (
-                <option key={m} value={m}>
-                  {m}
-                </option>
+                <ToggleChip
+                  key={m}
+                  label={m.toUpperCase()}
+                  selected={winMethod === m}
+                  onClick={() => setValue('win_method', m)}
+                />
               ))}
-            </select>
+            </div>
           </div>
         </>
       )}
@@ -184,7 +240,7 @@ export function CompetitionForm({ onSuccess }: { onSuccess: () => void }) {
         />
       </div>
 
-      <Button type="submit" disabled={isSubmitting} className="w-full">
+      <Button type="submit" disabled={isSubmitting} className="glow-primary w-full">
         {isSubmitting ? 'Saving…' : 'Save result'}
       </Button>
     </form>
