@@ -63,7 +63,7 @@ export function SessionForm({ onSuccess }: { onSuccess: () => void }) {
         <select
           id="type"
           {...register('type')}
-          className="h-9 border border-input bg-transparent px-3 text-sm"
+          className="h-9 border border-input bg-input px-3 text-sm text-foreground [color-scheme:dark]"
         >
           <option value="">Select type…</option>
           {SESSION_TYPES.map((t) => (
@@ -143,7 +143,7 @@ export function SessionForm({ onSuccess }: { onSuccess: () => void }) {
         <textarea
           id="notes"
           {...register('notes')}
-          className="min-h-20 border border-input bg-transparent px-3 py-2 text-sm"
+          className="min-h-20 border border-input bg-input px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground"
         />
       </div>
 

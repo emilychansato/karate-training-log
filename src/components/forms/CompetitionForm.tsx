@@ -85,7 +85,7 @@ export function CompetitionForm({ onSuccess }: { onSuccess: () => void }) {
           {...register('discipline', {
             onChange: (e) => setDiscipline(e.target.value),
           })}
-          className="h-9 border border-input bg-transparent px-3 text-sm"
+          className="h-9 border border-input bg-input px-3 text-sm text-foreground [color-scheme:dark]"
         >
           <option value="">Select discipline…</option>
           <option value="kata">Kata</option>
@@ -152,7 +152,7 @@ export function CompetitionForm({ onSuccess }: { onSuccess: () => void }) {
             <select
               id="win_method"
               {...register('win_method')}
-              className="h-9 border border-input bg-transparent px-3 text-sm"
+              className="h-9 border border-input bg-input px-3 text-sm text-foreground [color-scheme:dark]"
             >
               <option value="">Select…</option>
               {WIN_METHODS.map((m) => (
@@ -180,7 +180,7 @@ export function CompetitionForm({ onSuccess }: { onSuccess: () => void }) {
         <textarea
           id="notes"
           {...register('notes')}
-          className="min-h-20 border border-input bg-transparent px-3 py-2 text-sm"
+          className="min-h-20 border border-input bg-input px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground"
         />
       </div>
 
