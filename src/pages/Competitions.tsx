@@ -58,7 +58,7 @@ export function Competitions() {
           {results.map((r) => (
             <motion.li
               key={r.id}
-              className="border border-border bg-card p-5"
+              className="card-elevated border border-border bg-card p-5"
               variants={reducedMotion ? undefined : popIn}
               exit={reducedMotion ? undefined : 'exit'}
               layout={!reducedMotion}

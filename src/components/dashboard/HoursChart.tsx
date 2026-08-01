@@ -1,4 +1,4 @@
-import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts'
+import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, LabelList } from 'recharts'
 import { motion } from 'framer-motion'
 import { useTrainingSessions } from '../../hooks/useTrainingSessions'
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/card'
@@ -53,7 +53,16 @@ export function HoursChart() {
                   isAnimationActive
                   animationDuration={700}
                   animationEasing="ease-out"
-                />
+                >
+                  <LabelList
+                    dataKey="hours"
+                    position="top"
+                    formatter={(v: unknown) => (v != null ? `${v}H` : '')}
+                    className="font-mono tabular-mono"
+                    fill="var(--foreground)"
+                    fontSize={10}
+                  />
+                </Bar>
               </BarChart>
             </ResponsiveContainer>
           </div>

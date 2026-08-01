@@ -4,7 +4,33 @@ import { SessionForm } from '../components/forms/SessionForm'
 import { SessionList } from '../components/log/SessionList'
 import { Icon } from '../components/ui/icon'
 import { useReducedMotion } from '../hooks/useReducedMotion'
+import { useTrainingSessions } from '../hooks/useTrainingSessions'
+import { computeSessionStats } from '../lib/trainingStats'
 import { springy } from '../lib/motion'
+
+function StatStrip() {
+  const { sessions } = useTrainingSessions()
+  const stats = computeSessionStats(sessions, new Date())
+
+  return (
+    <div className="flex gap-3 overflow-x-auto pb-1">
+      <div className="card-elevated flex min-w-[130px] flex-col justify-between border border-border bg-card p-4">
+        <p className="label-caps text-muted-foreground">Sessions</p>
+        <p className="font-heading mt-1 text-2xl">{stats.totalSessions}</p>
+      </div>
+      <div className="card-elevated flex min-w-[130px] flex-col justify-between border border-border bg-card p-4">
+        <p className="label-caps text-muted-foreground">This week</p>
+        <p className="font-heading mt-1 text-2xl text-ao">{stats.hoursThisWeek}h</p>
+      </div>
+      <div className="card-elevated flex min-w-[130px] flex-col justify-between border border-border bg-card p-4">
+        <p className="label-caps text-muted-foreground">Intensity</p>
+        <p className="font-heading mt-1 text-2xl text-aka">
+          {stats.intensityPercent != null ? `${stats.intensityPercent}%` : '—'}
+        </p>
+      </div>
+    </div>
+  )
+}
 
 export function TrainingLog() {
   const [showForm, setShowForm] = useState(false)
@@ -24,6 +50,7 @@ export function TrainingLog() {
           {showForm ? 'Cancel' : '+ New session'}
         </button>
       </div>
+      <StatStrip />
       {showForm && <SessionForm onSuccess={() => setShowForm(false)} />}
       <SessionList />
 
