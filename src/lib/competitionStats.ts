@@ -1,4 +1,19 @@
-import type { CompetitionResult } from '../hooks/useCompetitionResults'
+/** A single match flattened with its parent competition's fields — the
+ * shape stats functions operate on, regardless of the fact that the data
+ * lives in two tables (competitions + competition_matches). */
+export interface CompetitionMatchRecord {
+  competitionId: string
+  matchId: string
+  event: string
+  date: string
+  division: string | null
+  placement: string | null
+  discipline: 'kata' | 'kumite'
+  kata_technical_score: number | null
+  opponent_name: string | null
+  points_for: number | null
+  points_against: number | null
+}
 
 export interface OpponentStat {
   opponentName: string
@@ -24,39 +39,40 @@ export interface DivisionEntry {
   placement: string | null
 }
 
-function outcome(r: CompetitionResult): 'win' | 'loss' | 'draw' {
-  if (r.points_for! > r.points_against!) return 'win'
-  if (r.points_for! < r.points_against!) return 'loss'
+function outcome(m: CompetitionMatchRecord): 'win' | 'loss' | 'draw' {
+  if (m.points_for! > m.points_against!) return 'win'
+  if (m.points_for! < m.points_against!) return 'loss'
   return 'draw'
 }
 
 function isScoredKumiteMatch(
-  r: CompetitionResult
-): r is CompetitionResult & { points_for: number; points_against: number } {
-  return r.discipline === 'kumite' && r.points_for != null && r.points_against != null
+  m: CompetitionMatchRecord
+): m is CompetitionMatchRecord & { points_for: number; points_against: number } {
+  return m.discipline === 'kumite' && m.points_for != null && m.points_against != null
 }
 
-export function computeOpponentHistory(results: CompetitionResult[]): OpponentStat[] {
-  const byOpponent = new Map<string, CompetitionResult[]>()
+export function computeOpponentHistory(matches: CompetitionMatchRecord[]): OpponentStat[] {
+  const byOpponent = new Map<string, CompetitionMatchRecord[]>()
 
-  for (const r of results) {
-    if (!r.opponent_name || !isScoredKumiteMatch(r)) continue
-    const existing = byOpponent.get(r.opponent_name) ?? []
-    existing.push(r)
-    byOpponent.set(r.opponent_name, existing)
+  for (const m of matches) {
+    if (!m.opponent_name || !isScoredKumiteMatch(m)) continue
+    const existing = byOpponent.get(m.opponent_name) ?? []
+    existing.push(m)
+    byOpponent.set(m.opponent_name, existing)
   }
 
-  return Array.from(byOpponent.entries()).map(([opponentName, matches]) => {
-    const wins = matches.filter((m) => outcome(m) === 'win').length
-    const losses = matches.filter((m) => outcome(m) === 'loss').length
-    const draws = matches.filter((m) => outcome(m) === 'draw').length
-    const avgPointsFor = matches.reduce((sum, m) => sum + m.points_for!, 0) / matches.length
+  return Array.from(byOpponent.entries()).map(([opponentName, opponentMatches]) => {
+    const wins = opponentMatches.filter((m) => outcome(m) === 'win').length
+    const losses = opponentMatches.filter((m) => outcome(m) === 'loss').length
+    const draws = opponentMatches.filter((m) => outcome(m) === 'draw').length
+    const avgPointsFor =
+      opponentMatches.reduce((sum, m) => sum + m.points_for!, 0) / opponentMatches.length
     const avgPointsAgainst =
-      matches.reduce((sum, m) => sum + m.points_against!, 0) / matches.length
+      opponentMatches.reduce((sum, m) => sum + m.points_against!, 0) / opponentMatches.length
 
     return {
       opponentName,
-      matches: matches.length,
+      matches: opponentMatches.length,
       wins,
       losses,
       draws,
@@ -66,8 +82,11 @@ export function computeOpponentHistory(results: CompetitionResult[]): OpponentSt
   })
 }
 
-export function computePersonalRecords(results: CompetitionResult[]): PersonalRecords {
-  const kumiteMatches = results
+export function computePersonalRecords(
+  matches: CompetitionMatchRecord[],
+  totalCompetitions: number
+): PersonalRecords {
+  const kumiteMatches = matches
     .filter(isScoredKumiteMatch)
     .slice()
     .sort((a, b) => a.date.localeCompare(b.date))
@@ -87,27 +106,31 @@ export function computePersonalRecords(results: CompetitionResult[]): PersonalRe
     ? Math.max(...kumiteMatches.map((m) => m.points_for))
     : null
 
-  const kataScores = results
-    .filter((r) => r.discipline === 'kata' && r.kata_technical_score != null)
-    .map((r) => r.kata_technical_score!)
+  const kataScores = matches
+    .filter((m) => m.discipline === 'kata' && m.kata_technical_score != null)
+    .map((m) => m.kata_technical_score!)
   const bestKataTechnicalScore = kataScores.length ? Math.max(...kataScores) : null
 
   return {
     longestWinStreak,
     highestPointsInMatch,
     bestKataTechnicalScore,
-    totalCompetitions: results.length,
+    totalCompetitions,
   }
 }
 
-export function computeDivisionHistory(results: CompetitionResult[]): DivisionEntry[] {
-  return results
-    .filter((r): r is CompetitionResult & { division: string } => r.division != null)
-    .map((r) => ({
-      division: r.division,
-      date: r.date,
-      discipline: r.discipline,
-      placement: r.placement,
+export function computeDivisionHistory(
+  competitions: { division: string | null; date: string; discipline: 'kata' | 'kumite'; placement: string | null }[]
+): DivisionEntry[] {
+  return competitions
+    .filter(
+      (c): c is typeof c & { division: string } => c.division != null
+    )
+    .map((c) => ({
+      division: c.division,
+      date: c.date,
+      discipline: c.discipline,
+      placement: c.placement,
     }))
     .sort((a, b) => a.date.localeCompare(b.date))
 }

@@ -1,12 +1,11 @@
-import { useCompetitionResults } from '../../hooks/useCompetitionResults'
-import { computeWinRate } from '../../lib/winRate'
+import { useCompetitionStats } from '../../hooks/useCompetitionStats'
 
 const RADIUS = 30
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS
 
 export function WinRateGauge() {
-  const { results, loading } = useCompetitionResults()
-  const { winRatePercent, totalMatches } = computeWinRate(results)
+  const { winRate, loading } = useCompetitionStats()
+  const { winRatePercent, totalMatches } = winRate
 
   if (loading || totalMatches === 0) {
     return (

@@ -1,10 +1,10 @@
 import { motion } from 'framer-motion'
-import { useCompetitionResults } from '../../hooks/useCompetitionResults'
+import { useCompetitions } from '../../hooks/useCompetitions'
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/card'
 import { Icon } from '../ui/icon'
 
 export function CompetitionTimeline() {
-  const { results, loading } = useCompetitionResults()
+  const { competitions, loading } = useCompetitions()
 
   return (
     <Card>
@@ -15,7 +15,7 @@ export function CompetitionTimeline() {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        {!loading && results.length === 0 ? (
+        {!loading && competitions.length === 0 ? (
           <motion.p
             className="text-sm text-muted-foreground"
             initial={{ opacity: 0 }}
@@ -26,11 +26,11 @@ export function CompetitionTimeline() {
           </motion.p>
         ) : (
           <ul className="flex flex-col gap-2">
-            {results.map((r) => (
-              <li key={r.id} className="flex justify-between text-sm">
-                <span>{r.event}</span>
+            {competitions.map((c) => (
+              <li key={c.id} className="flex justify-between text-sm">
+                <span>{c.event}</span>
                 <span className="text-muted-foreground">
-                  {r.date} · {r.placement ?? '—'}
+                  {c.date} · {c.placement ?? '—'}
                 </span>
               </li>
             ))}

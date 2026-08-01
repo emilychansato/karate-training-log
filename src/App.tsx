@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { Login } from './pages/Login'
 import { TrainingLog } from './pages/TrainingLog'
 import { Competitions } from './pages/Competitions'
+import { CompetitionDetail } from './pages/CompetitionDetail'
 import { Dashboard } from './pages/Dashboard'
 import { Records } from './pages/Records'
 import { Techniques } from './pages/Techniques'
@@ -39,6 +40,16 @@ function App() {
             <AuthGate>
               <AppShell>
                 <Competitions />
+              </AppShell>
+            </AuthGate>
+          }
+        />
+        <Route
+          path="/competitions/:id"
+          element={
+            <AuthGate>
+              <AppShell>
+                <CompetitionDetail />
               </AppShell>
             </AuthGate>
           }

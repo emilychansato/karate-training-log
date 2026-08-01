@@ -178,6 +178,25 @@ scrape specifically because of that bot protection — sessions/cookies from the
 need to be carried through. Worth a manual look (open it in an actual browser, use devtools to
 watch the network request when picking a country) before writing any scraping code.
 
+**Update 2026-08-02 — approach comparison (Emily asked how other sites do this):**
+Four real patterns exist: (1) official API/feed — doesn't exist for karate; (2) scrape one
+known site (sportdata.org, a federation page) — brittle, and sportdata.org specifically is
+behind Cloudflare bot-check, raising this from "simple script" to "needs a headless browser
+that can pass the challenge"; (3) manual/crowdsourced entry — what `planned_competitions`
+already is; (4) an AI-driven loop — periodic search-API calls (e.g. "karate tournaments Canada
+2026") feeding results to an LLM to extract structured fields. Important nuance on (4): it does
+NOT avoid scraping — the LLM still has to read the same underlying pages the search turns up,
+it just automates *which* pages to look at instead of hardcoding one source. Real tradeoffs:
+per-run cost (search API + LLM calls, unlike a free-after-built fixed scraper), hallucination
+risk (a wrong date/misread page — needs a human review/approval queue before anything
+auto-publishes, never blind auto-insert), and it needs a scheduled-job runner this app doesn't
+have yet (Supabase Edge Functions + `pg_cron`, or a scheduled GitHub Actions workflow, writing
+into `planned_competitions`). Upside of (4) over (2): generalizes to "any country" without
+hand-coding each federation's HTML, which matches the actual want (broad/country-filterable
+coverage) better than one hardcoded source would. Recommendation when this is picked up: (3)
+ships immediately with zero dependency (already being built 2026-08-02); if/when auto-sourcing
+gets built, lean toward (4) over (2) for coverage, gated behind a review queue.
+
 ## Technique detail page (video + notes + kata competition-order planner)
 
 Two related asks bundled into "click into a technique":
