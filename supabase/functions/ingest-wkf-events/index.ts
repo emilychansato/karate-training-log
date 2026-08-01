@@ -123,6 +123,7 @@ Deno.serve(async () => {
     const events = parseEvents(html)
 
     let inserted = 0
+    const errors: string[] = []
     for (const e of events) {
       const sourceHash = await hashKey(`${e.name}|${e.dateStart}|${e.location}`)
       const { error, data } = await supabase
@@ -136,14 +137,15 @@ Deno.serve(async () => {
             category: e.category,
             source_hash: sourceHash,
           },
-          { onConflict: 'source_hash', ignoreDuplicates: true }
+          { onConflict: 'source_hash' }
         )
         .select()
-      if (!error && data && data.length > 0) inserted++
+      if (error) errors.push(error.message)
+      else if (data && data.length > 0) inserted++
     }
 
     return new Response(
-      JSON.stringify({ parsed: events.length, inserted }),
+      JSON.stringify({ parsed: events.length, inserted, errors: errors.slice(0, 3) }),
       { headers: { 'Content-Type': 'application/json' } }
     )
   } catch (err) {
