@@ -23,6 +23,9 @@ vi.mock('../lib/supabaseClient', () => {
   return {
     supabase: {
       from: vi.fn(() => ({ select, insert, delete: deleteFn, update })),
+      auth: {
+        getClaims: vi.fn().mockResolvedValue({ data: { claims: { sub: 'user-1' } } }),
+      },
     },
   }
 })
@@ -46,6 +49,10 @@ describe('useUserTechniques', () => {
       await result.current.addBookmark('t2', 'my combo')
     })
     const insertCall = vi.mocked(supabase.from).mock.results[0].value.insert
-    expect(insertCall).toHaveBeenCalledWith({ technique_id: 't2', nickname: 'my combo' })
+    expect(insertCall).toHaveBeenCalledWith({
+      user_id: 'user-1',
+      technique_id: 't2',
+      nickname: 'my combo',
+    })
   })
 })

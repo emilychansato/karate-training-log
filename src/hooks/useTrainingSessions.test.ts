@@ -26,6 +26,9 @@ vi.mock('../lib/supabaseClient', () => {
   return {
     supabase: {
       from: vi.fn(() => ({ select, insert, delete: deleteFn })),
+      auth: {
+        getClaims: vi.fn().mockResolvedValue({ data: { claims: { sub: 'user-1' } } }),
+      },
     },
   }
 })
@@ -54,5 +57,9 @@ describe('useTrainingSessions', () => {
       })
     })
     expect(response.error).toBeNull()
+    const insertCall = vi.mocked(supabase.from).mock.results[0].value.insert
+    expect(insertCall).toHaveBeenCalledWith(
+      expect.objectContaining({ user_id: 'user-1', date: '2026-08-02' })
+    )
   })
 })

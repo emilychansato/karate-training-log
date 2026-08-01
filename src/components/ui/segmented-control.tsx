@@ -32,7 +32,7 @@ export function SegmentedControl<T extends string>({
             onClick={() => onChange(opt.value)}
             className={cn(
               'label-caps relative flex-1 py-2.5 transition-colors duration-150',
-              isActive ? 'text-background' : 'text-muted-foreground hover:text-foreground'
+              isActive ? 'text-background' : 'text-foreground/55 hover:text-foreground'
             )}
           >
             {isActive && (

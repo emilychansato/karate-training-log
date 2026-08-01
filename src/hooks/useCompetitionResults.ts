@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
+import { getCurrentUserId } from '../lib/getCurrentUserId'
 
 export type WinMethod =
   | 'ippon'
@@ -85,10 +86,13 @@ export function useCompetitionResults() {
   }, [load])
 
   async function createResult(input: NewCompetitionResult) {
+    const userId = await getCurrentUserId()
+    if (!userId) return { error: 'Not signed in' }
+
     const { points_for, points_against } = computePoints(input)
     const { error } = await supabase
       .from('competition_results')
-      .insert({ ...input, points_for, points_against })
+      .insert({ ...input, user_id: userId, points_for, points_against })
     if (!error) await load()
     return { error: error?.message ?? null }
   }

@@ -164,6 +164,20 @@ Recommendation when this gets picked up: build (1) first since it's real, ships 
 no external dependency; treat (2)/(3) as a later enhancement layered on top of the same table
 rather than a blocker.
 
+**Update 2026-08-02** — Emily found a real, concrete source:
+`sportdata.org/karate/set-online/eventnews_main.php?active_menu=eventnews`. This is
+sportdata.org's karate event-management platform, which many national federations actually use
+to run their tournament registration, so this is a genuinely promising lead, better than a
+generic "does an API exist" guess. Checked it: the page sits behind active bot-verification
+(a Cloudflare-style "verifying you are not a robot" challenge), so a plain fetch can't see the
+actual event list or find the country-filter mechanism (dropdown vs URL query param — unknown
+from here). Two implications for whoever picks this up: (a) it needs a real browser (headed or
+headless) to get past the challenge and inspect the actual filter UI/URL structure, not a script
+fetch; (b) if it does turn out to be scrapable, it's more fragile than a typical static page
+scrape specifically because of that bot protection — sessions/cookies from the challenge may
+need to be carried through. Worth a manual look (open it in an actual browser, use devtools to
+watch the network request when picking a country) before writing any scraping code.
+
 ## Technique detail page (video + notes + kata competition-order planner)
 
 Two related asks bundled into "click into a technique":
@@ -184,3 +198,67 @@ name e.g. "Nationals 2026 rotation", optionally `competition_id` if tied to a sp
 competition) plus `kata_plan_entries` (`plan_id`, `round_label` e.g. "Round 1"/"Semifinal"/"Final",
 `technique_id`, `position`). Depends on `techniques` already existing (it does) and optionally on
 the planned-competitions table above if tying a plan to a specific upcoming event.
+
+## Records page drill-down (flagged 2026-08-02, needs clarification before scoping)
+
+Emily wants Personal Records, Opponent History, and Division Progression to each be clickable
+into more detail. Before this can be scoped properly, need to know *what* "more detail" means
+per section, since it's genuinely different data in each case:
+- **Personal records** — the four stat tiles (win streak, best match points, best kata score,
+  total competitions) are already single numbers; there's nothing "under" a number except the
+  competitions that produced it. Likely: clicking "win streak" shows the actual streak of
+  competitions that made it up.
+- **Opponent history** — already has real per-opponent rows; "diving in" naturally means a
+  per-opponent detail page: full match history against that one opponent, not just the
+  aggregate W/L/D + averages currently shown.
+- **Division progression** — already a chronological list; diving in could mean grouping
+  by division (show every competition within one division together) rather than one flat
+  timeline.
+Ask Emily which of these (or something else) she actually means before building — don't guess
+three different interaction patterns and build the wrong one.
+
+## Mental health / reflection journal ("mental diary" — name TBD, brainstorm better ones)
+
+A private, separate section for free-form reflection — nervousness before a competition, how
+training is affecting mood, general thoughts — distinct from the factual training/competition
+logs. Emily's own framing: "spit out your thoughts," not a structured form. Name candidates to
+revisit with her: "Headspace" (taken by an app), "Mindset Log," "Athlete Journal," "Clarity,"
+"The Locker Room" (private/personal connotation), or just "Journal."
+
+Rough shape: a `journal_entries` table (`id`, `user_id`, `date`/`created_at`, `mood` — maybe a
+simple 1-5 or emoji-scale rather than a required field, `entry text`, optionally
+`linked_session_id`/`linked_competition_id` if she ever wants an entry tied to a specific
+event). RLS identical to every other table here (`user_id = auth.uid()`), and this one
+especially should never be a shared/social feature — treat as more private than training data,
+not less.
+
+**Explicitly future (per Emily, not this phase):** an AI layer that reads entries and responds
+with comfort/advice, referencing apps like Daimon for tone. This depends on the journal existing
+first, and raises real product questions before it's just "add an LLM call" — how much should
+it initiate vs. only respond, what tone avoids sounding clinical/hollow, and whether responses
+should ever reference patterns across entries (which raises different privacy stakes than a
+one-off reply). Worth a dedicated design conversation when the journal itself is built, not
+bolted on as an afterthought.
+
+## Comprehensive competition logging (flagged 2026-08-02)
+
+Current `competition_results` covers the factual/scoring side well (event, date, division,
+discipline, full kumite point breakdown, kata sub-scores, placement, opponent name, one free
+`notes` field) but Emily wants the *reflective* side to be real, not an afterthought — matching
+how seriously the app already treats the data side. Concretely, she wants separate places for:
+- **Coach's notes** — already logged above under the competition-timeline idea
+  (`coach_notes text`), different author/voice than the athlete's own reflection.
+- **What went well / what to improve** — two distinct fields, not one blended `notes` blob,
+  since they serve different re-read purposes (reinforcing vs. correcting).
+- **How you felt afterwards** — the emotional read on the result, separate from the technical
+  self-assessment above (a bad technical performance and a good emotional recovery from a loss
+  are both worth capturing, and conflating them loses information).
+- **Note to future self** — explicitly forward-looking, meant to be re-read before the *next*
+  competition, not a retrospective field.
+Rough shape: extend `competition_results` with `coach_notes text`, `what_went_well text`,
+`what_to_improve text`, `post_competition_feelings text`, `note_to_future_self text` — all
+nullable, all optional at submit time (a quick log right after a match shouldn't force five
+essay fields before it saves). The existing `CompetitionForm`/`Competitions` page would need a
+genuinely different layout to hold this much reflective content without becoming a wall of
+textareas — likely a expandable "reflection" section separate from the score-entry section,
+matching how this session already separated AKA/AO score columns from everything else.

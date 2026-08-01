@@ -48,7 +48,7 @@ export function Dashboard() {
       >
         <div>
           <span className="label-caps mb-1 block text-aka">Dojo Dashboard</span>
-          <h1 className="font-heading-hero text-4xl italic">Training snapshot.</h1>
+          <h1 className="font-heading-hero text-4xl">This week, at a glance</h1>
         </div>
         <div className="flex gap-8">
           <TelemetryStat label="This week" value={stats.hoursThisWeek} suffix="h" accent="ao" />

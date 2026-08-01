@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
+import { getCurrentUserId } from '../lib/getCurrentUserId'
 
 export interface TrainingSession {
   id: string
@@ -48,7 +49,12 @@ export function useTrainingSessions() {
   }, [load])
 
   async function createSession(input: NewTrainingSession) {
-    const { error } = await supabase.from('training_sessions').insert(input)
+    const userId = await getCurrentUserId()
+    if (!userId) return { error: 'Not signed in' }
+
+    const { error } = await supabase
+      .from('training_sessions')
+      .insert({ ...input, user_id: userId })
     if (!error) await load()
     return { error: error?.message ?? null }
   }

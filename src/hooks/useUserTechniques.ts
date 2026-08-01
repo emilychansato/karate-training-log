@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
+import { getCurrentUserId } from '../lib/getCurrentUserId'
 
 export interface TechniqueBookmark {
   id: string
@@ -44,9 +45,12 @@ export function useUserTechniques() {
   }, [load])
 
   async function addBookmark(techniqueId: string, nickname?: string) {
+    const userId = await getCurrentUserId()
+    if (!userId) return { error: 'Not signed in' }
+
     const { error } = await supabase
       .from('user_techniques')
-      .insert({ technique_id: techniqueId, nickname: nickname ?? null })
+      .insert({ user_id: userId, technique_id: techniqueId, nickname: nickname ?? null })
     if (!error) await load()
     return { error: error?.message ?? null }
   }
