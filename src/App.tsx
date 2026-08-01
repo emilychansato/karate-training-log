@@ -4,6 +4,7 @@ import { TrainingLog } from './pages/TrainingLog'
 import { Competitions } from './pages/Competitions'
 import { Dashboard } from './pages/Dashboard'
 import { Records } from './pages/Records'
+import { Techniques } from './pages/Techniques'
 import { AuthGate } from './components/layout/AuthGate'
 import { AppShell } from './components/layout/AppShell'
 
@@ -48,6 +49,16 @@ function App() {
             <AuthGate>
               <AppShell>
                 <Records />
+              </AppShell>
+            </AuthGate>
+          }
+        />
+        <Route
+          path="/techniques"
+          element={
+            <AuthGate>
+              <AppShell>
+                <Techniques />
               </AppShell>
             </AuthGate>
           }

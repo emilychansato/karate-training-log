@@ -1,0 +1,97 @@
+import { useState } from 'react'
+import { useTechniques } from '../hooks/useTechniques'
+import { useUserTechniques } from '../hooks/useUserTechniques'
+import { TechniquePortfolio } from '../components/techniques/TechniquePortfolio'
+import { Input } from '../components/ui/input'
+import { Button } from '../components/ui/button'
+import { Icon } from '../components/ui/icon'
+import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/card'
+
+export function Techniques() {
+  const { techniques, loading } = useTechniques()
+  const { bookmarks, addBookmark } = useUserTechniques()
+  const [search, setSearch] = useState('')
+
+  const bookmarkedIds = new Set(bookmarks.map((b) => b.technique_id))
+  const filtered = techniques.filter((t) =>
+    t.name.toLowerCase().includes(search.toLowerCase())
+  )
+
+  return (
+    <div className="flex flex-col gap-6">
+      <div className="border-b border-border pb-6">
+        <span className="label-caps mb-1 block text-aka">Karate OS</span>
+        <h1 className="font-heading-hero text-4xl">Techniques</h1>
+      </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 font-heading text-lg">
+            <Icon name="target" />
+            Catalog
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="relative mb-4">
+            <Icon
+              name="search"
+              className="pointer-events-none absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
+            />
+            <Input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search katas and kumite combos…"
+              className="pl-8"
+            />
+          </div>
+
+          {loading ? (
+            <p className="text-sm text-muted-foreground">Loading…</p>
+          ) : (
+            <ul className="flex max-h-80 flex-col gap-1 overflow-y-auto">
+              {filtered.map((t) => {
+                const isBookmarked = bookmarkedIds.has(t.id)
+                return (
+                  <li
+                    key={t.id}
+                    className="flex items-center justify-between border-b border-border py-2 text-sm last:border-b-0"
+                  >
+                    <div>
+                      <p>{t.name}</p>
+                      <p className="label-caps text-muted-foreground">{t.category}</p>
+                    </div>
+                    <Button
+                      variant={isBookmarked ? 'ghost' : 'outline'}
+                      size="sm"
+                      disabled={isBookmarked}
+                      onClick={() => addBookmark(t.id)}
+                    >
+                      {isBookmarked ? 'Bookmarked' : 'Bookmark'}
+                    </Button>
+                  </li>
+                )
+              })}
+              {filtered.length === 0 && (
+                <p className="py-4 text-center text-sm text-muted-foreground">
+                  No techniques match "{search}".
+                </p>
+              )}
+            </ul>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 font-heading text-lg">
+            <Icon name="award" />
+            Your bookmarks
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <TechniquePortfolio />
+        </CardContent>
+      </Card>
+    </div>
+  )
+}
