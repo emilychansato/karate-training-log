@@ -13,6 +13,14 @@ Full MVP in one pass: auth (Step 10 onward) + CRUD for training sessions and com
 - Form validation: `react-hook-form` + `zod`, used for `SessionForm` and `CompetitionForm`'s conditional kata/kumite fields (`.refine()` for "kata fields required only if discipline=kata" logic).
 - Auth pattern: structurally informed by `jlumbroso/supabase-react-example` (Apache-2.0) for `useAuth.ts` and protected routes — not copy-pasted, written fresh against this app's schema.
 
+### Auth implementation note (cross-checked against current Supabase docs, 2026-07-31)
+
+`jlumbroso`'s repo hasn't been touched since 2022, so its structural pattern was cross-checked against Supabase's current JS client docs before relying on it:
+
+- **Still valid, no drift:** `supabase.auth.onAuthStateChange(callback)` inside a `useEffect`, with `subscription.unsubscribe()` in the cleanup, is still the current recommended pattern for tracking session state in React. Event types (`SIGNED_IN`, `SIGNED_OUT`, `TOKEN_REFRESHED`, `USER_UPDATED`) are unchanged. `createClient(url, anonKey)` is unchanged (already matches this project's `supabaseClient.ts`).
+- **One real API improvement since 2022:** use `getClaims()` rather than `getUser()` for the protected-route "is someone logged in" check. `getClaims()` verifies the JWT locally against cached public keys instead of hitting the Auth server on every call — a meaningful performance win for something that runs on every protected page load. `getSession()`/`getUser()` are not deprecated, but `getClaims()` is now the preferred method for this specific check.
+- **Build `useAuth.ts` as:** the `onAuthStateChange` subscribe/unsubscribe skeleton from the `jlumbroso` pattern, but swap in `getClaims()` where the reference repo would have used `getUser()`.
+
 ## Dashboard chart behavior
 
 Before any real data exists, all 3 dashboard charts (hours/week, self-rating trend, competition timeline) show a **"no data yet" empty state**, not sample/placeholder data. Rationale: placeholder data on a personal tracker risks being mistaken for real numbers, and "no data yet" is a truthful, simple state to design for.
