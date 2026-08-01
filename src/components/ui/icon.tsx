@@ -11,6 +11,7 @@ import {
   Award,
   Users,
   Layers,
+  Sparkles,
   type LucideIcon,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -28,6 +29,7 @@ const ICONS = {
   award: Award,
   users: Users,
   layers: Layers,
+  sparkles: Sparkles,
 } satisfies Record<string, LucideIcon>
 
 export type IconName = keyof typeof ICONS
