@@ -6,16 +6,23 @@ import { Input } from '../components/ui/input'
 import { Button } from '../components/ui/button'
 import { Icon } from '../components/ui/icon'
 import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/card'
+import { SegmentedControl } from '../components/ui/segmented-control'
+
+const CATEGORY_TABS: { value: 'kata' | 'kumite_combo'; label: string }[] = [
+  { value: 'kata', label: 'KATA' },
+  { value: 'kumite_combo', label: 'KUMITE' },
+]
 
 export function Techniques() {
   const { techniques, loading } = useTechniques()
   const { bookmarks, addBookmark } = useUserTechniques()
   const [search, setSearch] = useState('')
+  const [category, setCategory] = useState<'kata' | 'kumite_combo'>('kata')
 
   const bookmarkedIds = new Set(bookmarks.map((b) => b.technique_id))
-  const filtered = techniques.filter((t) =>
-    t.name.toLowerCase().includes(search.toLowerCase())
-  )
+  const filtered = techniques
+    .filter((t) => t.category === category)
+    .filter((t) => t.name.toLowerCase().includes(search.toLowerCase()))
 
   return (
     <div className="flex flex-col gap-6">
@@ -32,6 +39,13 @@ export function Techniques() {
           </CardTitle>
         </CardHeader>
         <CardContent>
+          <SegmentedControl
+            name="category"
+            options={CATEGORY_TABS}
+            value={category}
+            onChange={setCategory}
+            className="mb-4"
+          />
           <div className="relative mb-4">
             <Icon
               name="search"
