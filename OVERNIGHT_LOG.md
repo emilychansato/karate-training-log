@@ -72,8 +72,48 @@ a generic style that would need to be re-themed anyway.
 
 ## Decisions made autonomously (safe-default judgment calls)
 
-(appended as they happen)
+- Used Framer Motion (approved) for orchestrated/compositional animation
+  (lists, page transitions, count-ups, celebration burst) but plain CSS
+  transitions for Button/Input/Checkbox — wrapping Base UI's primitives in
+  framer-motion's `motion()` ref-forwarding factory is riskier for
+  low-level components than composing motion.div/li/ul around plain divs,
+  and CSS spring-overshoot easing gets the same "poppy" feel with less risk.
+- Celebration burst only fires at win streak >= 3, not on every logged
+  competition — a streak of 1-2 isn't a real milestone, and firing an
+  animation on every single save would get old fast and read as noisy
+  rather than delightful.
+- Did not install any literal 21st Dev/ReactBits component code (see MCP
+  usage above) — used them for pattern validation only, kept everything
+  hand-built and matched to our actual tokens.
+- Dispatched Phase 3 and Phase 4 to background subagents in parallel
+  because their file sets are fully disjoint (SessionList/Competitions/
+  TrainingLog vs. Dashboard/Records/chart components) — did Phase 1/2
+  (shared primitives, nav, Login) myself first since those establish
+  conventions everything else depends on.
+- Did NOT touch `main`, did NOT open/merge a PR beyond pushing to the
+  existing `feature/mvp-step10` branch (PR #1 already open) — per explicit
+  instruction, no merge without approval.
 
 ## Status
 
-In progress.
+**Complete.** All 6 phases done, 4 commits pushed to `feature/mvp-step10`
+(PR #1): `b406ee3`, `2b63338`, `22399bb`, `6f0705b`. Full test suite green
+(30/30) and production build clean after every commit. Dev server verified
+running cleanly on the expected port 5173.
+
+### What to check when you wake up
+- `/login` — card entrance, sign-in/sign-up toggle crossfade, error shake
+  (try a wrong password to see it)
+- Bottom nav / top nav — sliding active-tab indicator between pages
+- `/log`, `/competitions` — cards fall into place staggered, delete a row
+  to see the exit animation, empty state has a gently floating icon
+- `/records` — stat numbers count up on load; log 3+ kumite wins in a row
+  to see the celebration burst on the win-streak tile
+- Dashboard — chart entrance animation, hero fade-in
+- Try enabling "reduce motion" in your OS accessibility settings and
+  reload — everything above should render instantly/statically instead,
+  no crashes
+- Still outstanding from earlier in the session: rotate the leaked
+  Supabase CLI token at supabase.com/dashboard/account/tokens
+- Nothing has been merged to `main` — PR #1 is ready for your review
+  whenever you want to merge it yourself
