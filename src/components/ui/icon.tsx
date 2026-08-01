@@ -8,6 +8,9 @@ import {
   BarChart3,
   TrendingUp,
   Star,
+  Award,
+  Users,
+  Layers,
   type LucideIcon,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -22,6 +25,9 @@ const ICONS = {
   analytics: BarChart3,
   monitoring: TrendingUp,
   star: Star,
+  award: Award,
+  users: Users,
+  layers: Layers,
 } satisfies Record<string, LucideIcon>
 
 export type IconName = keyof typeof ICONS

@@ -3,6 +3,7 @@ import { Login } from './pages/Login'
 import { TrainingLog } from './pages/TrainingLog'
 import { Competitions } from './pages/Competitions'
 import { Dashboard } from './pages/Dashboard'
+import { Records } from './pages/Records'
 import { AuthGate } from './components/layout/AuthGate'
 import { AppShell } from './components/layout/AppShell'
 
@@ -37,6 +38,16 @@ function App() {
             <AuthGate>
               <AppShell>
                 <Competitions />
+              </AppShell>
+            </AuthGate>
+          }
+        />
+        <Route
+          path="/records"
+          element={
+            <AuthGate>
+              <AppShell>
+                <Records />
               </AppShell>
             </AuthGate>
           }
