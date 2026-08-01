@@ -1,7 +1,7 @@
 import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { useCompetitionMatches, type WinMethod } from '../../hooks/useCompetitionMatches'
+import type { WinMethod, NewCompetitionMatch } from '../../hooks/useCompetitionMatches'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
 import { Label } from '../ui/label'
@@ -40,15 +40,14 @@ type FormInput = z.input<typeof schema>
 type FormOutput = z.output<typeof schema>
 
 export function MatchForm({
-  competitionId,
   discipline,
+  createMatch,
   onSuccess,
 }: {
-  competitionId: string
   discipline: 'kata' | 'kumite'
+  createMatch: (input: NewCompetitionMatch) => Promise<{ error: string | null }>
   onSuccess: () => void
 }) {
-  const { createMatch } = useCompetitionMatches(competitionId)
   const {
     register,
     control,

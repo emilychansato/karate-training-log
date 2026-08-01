@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { useTrainingSessions } from '../../hooks/useTrainingSessions'
+import type { TrainingSession } from '../../hooks/useTrainingSessions'
 import { useReducedMotion } from '../../hooks/useReducedMotion'
 import { popIn, staggerContainer, springy } from '../../lib/motion'
 import { Button } from '../ui/button'
@@ -14,13 +14,18 @@ const TYPE_STYLES: Record<string, string> = {
 }
 
 export function SessionList({
+  sessions,
+  loading,
+  deleteSession,
   searchQuery = '',
   typeFilter = 'all',
 }: {
+  sessions: TrainingSession[]
+  loading: boolean
+  deleteSession: (id: string) => Promise<{ error: string | null }>
   searchQuery?: string
   typeFilter?: string
 }) {
-  const { sessions, loading, deleteSession } = useTrainingSessions()
   const reducedMotion = useReducedMotion()
 
   if (loading) return <CardSkeletonList />

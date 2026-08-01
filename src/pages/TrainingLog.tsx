@@ -5,7 +5,7 @@ import { SessionList } from '../components/log/SessionList'
 import { Icon } from '../components/ui/icon'
 import { Input } from '../components/ui/input'
 import { useReducedMotion } from '../hooks/useReducedMotion'
-import { useTrainingSessions } from '../hooks/useTrainingSessions'
+import { useTrainingSessions, type TrainingSession } from '../hooks/useTrainingSessions'
 import { computeSessionStats } from '../lib/trainingStats'
 import { springy } from '../lib/motion'
 import { cn } from '@/lib/utils'
@@ -63,8 +63,7 @@ function FilterBar({
   )
 }
 
-function StatStrip() {
-  const { sessions } = useTrainingSessions()
+function StatStrip({ sessions }: { sessions: TrainingSession[] }) {
   const stats = computeSessionStats(sessions, new Date())
 
   return (
@@ -92,6 +91,7 @@ export function TrainingLog() {
   const [searchQuery, setSearchQuery] = useState('')
   const [typeFilter, setTypeFilter] = useState('all')
   const reducedMotion = useReducedMotion()
+  const { sessions, loading, createSession, deleteSession } = useTrainingSessions()
 
   return (
     <div className="flex flex-col gap-6">
@@ -107,15 +107,23 @@ export function TrainingLog() {
           {showForm ? 'Cancel' : '+ New session'}
         </button>
       </div>
-      <StatStrip />
-      {showForm && <SessionForm onSuccess={() => setShowForm(false)} />}
+      <StatStrip sessions={sessions} />
+      {showForm && (
+        <SessionForm createSession={createSession} onSuccess={() => setShowForm(false)} />
+      )}
       <FilterBar
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
         typeFilter={typeFilter}
         onTypeFilterChange={setTypeFilter}
       />
-      <SessionList searchQuery={searchQuery} typeFilter={typeFilter} />
+      <SessionList
+        sessions={sessions}
+        loading={loading}
+        deleteSession={deleteSession}
+        searchQuery={searchQuery}
+        typeFilter={typeFilter}
+      />
 
       {/* FAB */}
       <motion.button

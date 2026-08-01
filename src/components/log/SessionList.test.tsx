@@ -2,10 +2,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { SessionList } from './SessionList'
-import { useTrainingSessions } from '../../hooks/useTrainingSessions'
 import type { TrainingSession } from '../../hooks/useTrainingSessions'
-
-vi.mock('../../hooks/useTrainingSessions')
 
 const session: TrainingSession = {
   id: 's1',
@@ -22,15 +19,7 @@ const session: TrainingSession = {
 describe('SessionList', () => {
   it('renders a row per session and calls deleteSession on delete click', async () => {
     const deleteSession = vi.fn().mockResolvedValue({ error: null })
-    vi.mocked(useTrainingSessions).mockReturnValue({
-      sessions: [session],
-      loading: false,
-      error: null,
-      createSession: vi.fn(),
-      deleteSession,
-    })
-
-    render(<SessionList />)
+    render(<SessionList sessions={[session]} loading={false} deleteSession={deleteSession} />)
     expect(screen.getByText('kumite')).toBeInTheDocument()
     expect(screen.getByText('60 min')).toBeInTheDocument()
 
@@ -40,14 +29,7 @@ describe('SessionList', () => {
   })
 
   it('shows an empty state when there are no sessions', () => {
-    vi.mocked(useTrainingSessions).mockReturnValue({
-      sessions: [],
-      loading: false,
-      error: null,
-      createSession: vi.fn(),
-      deleteSession: vi.fn(),
-    })
-    render(<SessionList />)
+    render(<SessionList sessions={[]} loading={false} deleteSession={vi.fn()} />)
     expect(screen.getByText(/no sessions logged yet/i)).toBeInTheDocument()
   })
 })

@@ -1,7 +1,7 @@
 import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { useTrainingSessions } from '../../hooks/useTrainingSessions'
+import type { NewTrainingSession } from '../../hooks/useTrainingSessions'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
 import { Label } from '../ui/label'
@@ -38,8 +38,13 @@ const schema = z.object({
 type FormInput = z.input<typeof schema>
 type FormOutput = z.output<typeof schema>
 
-export function SessionForm({ onSuccess }: { onSuccess: () => void }) {
-  const { createSession } = useTrainingSessions()
+export function SessionForm({
+  onSuccess,
+  createSession,
+}: {
+  onSuccess: () => void
+  createSession: (input: NewTrainingSession) => Promise<{ error: string | null }>
+}) {
   const {
     register,
     control,

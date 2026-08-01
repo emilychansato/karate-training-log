@@ -13,7 +13,7 @@ import { popIn, staggerContainer, springy } from '../lib/motion'
 export function CompetitionDetail() {
   const { id } = useParams<{ id: string }>()
   const { competitions, loading: competitionsLoading } = useCompetitions()
-  const { matches, loading: matchesLoading, deleteMatch } = useCompetitionMatches(id ?? '')
+  const { matches, loading: matchesLoading, createMatch, deleteMatch } = useCompetitionMatches(id ?? '')
   const [showForm, setShowForm] = useState(false)
   const reducedMotion = useReducedMotion()
 
@@ -68,8 +68,8 @@ export function CompetitionDetail() {
 
       {showForm && (
         <MatchForm
-          competitionId={competition.id}
           discipline={competition.discipline}
+          createMatch={createMatch}
           onSuccess={() => setShowForm(false)}
         />
       )}
