@@ -1,12 +1,55 @@
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { Login } from './pages/Login'
+import { AuthGate } from './components/layout/AuthGate'
+import { AppShell } from './components/layout/AppShell'
+
+function DashboardStub() {
+  return <p>Dashboard — built in Task 13</p>
+}
+function TrainingLogStub() {
+  return <p>Training Log — built in Task 10</p>
+}
+function CompetitionsStub() {
+  return <p>Competitions — built in Task 12</p>
+}
+
 function App() {
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col items-center justify-center gap-4 p-4">
-      <h1 className="text-3xl font-heading">Karate Training Log</h1>
-      <p className="text-muted-foreground font-mono tabular-mono">
-        AKA <span className="text-aka">1-0-2</span> / AO{" "}
-        <span className="text-ao">0-1-0</span>
-      </p>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route
+          path="/"
+          element={
+            <AuthGate>
+              <AppShell>
+                <DashboardStub />
+              </AppShell>
+            </AuthGate>
+          }
+        />
+        <Route
+          path="/log"
+          element={
+            <AuthGate>
+              <AppShell>
+                <TrainingLogStub />
+              </AppShell>
+            </AuthGate>
+          }
+        />
+        <Route
+          path="/competitions"
+          element={
+            <AuthGate>
+              <AppShell>
+                <CompetitionsStub />
+              </AppShell>
+            </AuthGate>
+          }
+        />
+      </Routes>
+    </BrowserRouter>
   )
 }
 
