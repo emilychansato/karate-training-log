@@ -65,4 +65,23 @@ describe('Login', () => {
     expect(signUp).toHaveBeenCalledWith('new@example.com', 'secret123')
     expect(signIn).not.toHaveBeenCalled()
   })
+
+  it('shows a check-your-email message after a successful sign-up', async () => {
+    vi.mocked(useAuth).mockReturnValue({
+      user: null,
+      loading: false,
+      signUp: vi.fn().mockResolvedValue({ error: null }),
+      signIn: vi.fn(),
+      signOut: vi.fn(),
+    })
+
+    render(<Login />)
+    const user = userEvent.setup()
+    await user.click(screen.getByRole('button', { name: /create an account/i }))
+    await user.type(screen.getByLabelText(/email/i), 'new@example.com')
+    await user.type(screen.getByLabelText(/password/i), 'secret123')
+    await user.click(screen.getByRole('button', { name: /sign up/i }))
+
+    expect(await screen.findByText(/check your email/i)).toBeInTheDocument()
+  })
 })
