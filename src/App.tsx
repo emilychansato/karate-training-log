@@ -1,13 +1,11 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { Login } from './pages/Login'
+import { TrainingLog } from './pages/TrainingLog'
 import { AuthGate } from './components/layout/AuthGate'
 import { AppShell } from './components/layout/AppShell'
 
 function DashboardStub() {
   return <p>Dashboard — built in Task 13</p>
-}
-function TrainingLogStub() {
-  return <p>Training Log — built in Task 10</p>
 }
 function CompetitionsStub() {
   return <p>Competitions — built in Task 12</p>
@@ -33,7 +31,7 @@ function App() {
           element={
             <AuthGate>
               <AppShell>
-                <TrainingLogStub />
+                <TrainingLog />
               </AppShell>
             </AuthGate>
           }
