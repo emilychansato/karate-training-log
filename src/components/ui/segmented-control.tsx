@@ -38,11 +38,11 @@ export function SegmentedControl<T extends string>({
             {isActive && (
               <motion.span
                 layoutId={`segmented-${name}`}
-                className="glow-primary absolute inset-0 -z-10 bg-foreground"
+                className="glow-primary absolute inset-0 bg-foreground"
                 transition={snappy}
               />
             )}
-            {opt.label}
+            <span className="relative z-10">{opt.label}</span>
           </button>
         )
       })}
