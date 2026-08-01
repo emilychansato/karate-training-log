@@ -1,6 +1,7 @@
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts'
 import { useTrainingSessions } from '../../hooks/useTrainingSessions'
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/card'
+import { Icon } from '../ui/icon'
 
 export function RatingTrendChart() {
   const { sessions, loading } = useTrainingSessions()
@@ -12,7 +13,10 @@ export function RatingTrendChart() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-sm">Self-rating trend</CardTitle>
+        <CardTitle className="flex items-center gap-2 font-heading text-lg">
+          <Icon name="monitoring" />
+          Self-rating trend
+        </CardTitle>
       </CardHeader>
       <CardContent>
         {!loading && rated.length === 0 ? (
@@ -24,7 +28,7 @@ export function RatingTrendChart() {
                 <XAxis dataKey="date" tick={{ fontSize: 11 }} />
                 <YAxis domain={[1, 5]} tick={{ fontSize: 11 }} />
                 <Tooltip />
-                <Line type="monotone" dataKey="self_rating" stroke="currentColor" dot />
+                <Line type="monotone" dataKey="self_rating" stroke="var(--aka)" dot />
               </LineChart>
             </ResponsiveContainer>
           </div>

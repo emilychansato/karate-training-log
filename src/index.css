@@ -1,9 +1,15 @@
 @import "tailwindcss";
 
-/* Self-hosted fonts (no external CDN) — Disciplined Craft typography */
-@import "@fontsource/archivo-narrow/700.css";
-@import "@fontsource/geist-sans/400.css";
-@import "@fontsource/geist-sans/500.css";
+/* Self-hosted fonts (no external CDN) — Disciplined Craft typography,
+   matched to the actual Stitch "Disciplined Craft" mockups: Bodoni Moda
+   serif for headlines, Inter for body/UI, JetBrains Mono for data. */
+@import "@fontsource/bodoni-moda/400.css";
+@import "@fontsource/bodoni-moda/400-italic.css";
+@import "@fontsource/bodoni-moda/700.css";
+@import "@fontsource/inter/400.css";
+@import "@fontsource/inter/500.css";
+@import "@fontsource/inter/600.css";
+@import "@fontsource/inter/700.css";
 @import "@fontsource/jetbrains-mono/500.css";
 
 @theme inline {
@@ -30,8 +36,8 @@
   --color-ao: var(--ao);
   --color-ao-score: var(--ao-score);
 
-  --font-sans: "Geist", -apple-system, "Segoe UI", sans-serif;
-  --font-heading: "Archivo Narrow", "Arial Narrow", sans-serif;
+  --font-sans: "Inter", -apple-system, "Segoe UI", sans-serif;
+  --font-heading: "Bodoni Moda", "Times New Roman", serif;
   --font-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
 
   --radius-sm: var(--radius);
@@ -83,13 +89,21 @@ body {
   font-family: var(--font-sans);
 }
 
-h1, h2, h3, .font-heading {
+.font-heading {
   font-family: var(--font-heading);
+  letter-spacing: -0.01em;
+}
+
+.label-caps {
+  font-family: var(--font-sans);
+  font-size: 0.6875rem;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.01em;
+  letter-spacing: 0.15em;
 }
 
 .font-mono, .tabular-mono {
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
 }
+

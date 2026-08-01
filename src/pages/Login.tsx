@@ -41,9 +41,10 @@ export function Login() {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-background">
-      <Card className="w-full sm:max-w-sm">
+      <Card className="w-full border-border bg-card sm:max-w-sm">
         <CardHeader>
-          <CardTitle className="font-heading">Karate Training Log</CardTitle>
+          <span className="label-caps mb-1 block text-aka">Karate OS</span>
+          <CardTitle className="font-heading text-3xl">Training Log</CardTitle>
           <CardDescription>
             {mode === 'sign-in' ? 'Sign in to your account' : 'Create a new account'}
           </CardDescription>

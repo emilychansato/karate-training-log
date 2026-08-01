@@ -1,5 +1,6 @@
 import { useCompetitionResults } from '../../hooks/useCompetitionResults'
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/card'
+import { Icon } from '../ui/icon'
 
 export function CompetitionTimeline() {
   const { results, loading } = useCompetitionResults()
@@ -7,7 +8,10 @@ export function CompetitionTimeline() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-sm">Competition timeline</CardTitle>
+        <CardTitle className="flex items-center gap-2 font-heading text-lg">
+          <Icon name="trophy" />
+          Competition timeline
+        </CardTitle>
       </CardHeader>
       <CardContent>
         {!loading && results.length === 0 ? (

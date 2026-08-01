@@ -1,6 +1,7 @@
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts'
 import { useTrainingSessions } from '../../hooks/useTrainingSessions'
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/card'
+import { Icon } from '../ui/icon'
 
 function toWeeklyHours(sessions: { date: string; duration_min: number }[]) {
   const byWeek = new Map<string, number>()
@@ -22,7 +23,10 @@ export function HoursChart() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-sm">Hours per week</CardTitle>
+        <CardTitle className="flex items-center gap-2 font-heading text-lg">
+          <Icon name="analytics" />
+          Hours per week
+        </CardTitle>
       </CardHeader>
       <CardContent>
         {!loading && sessions.length === 0 ? (
@@ -34,7 +38,7 @@ export function HoursChart() {
                 <XAxis dataKey="week" tick={{ fontSize: 11 }} />
                 <YAxis tick={{ fontSize: 11 }} />
                 <Tooltip />
-                <Bar dataKey="hours" fill="currentColor" radius={4} />
+                <Bar dataKey="hours" fill="var(--aka)" radius={0} />
               </BarChart>
             </ResponsiveContainer>
           </div>

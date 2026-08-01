@@ -1,59 +1,70 @@
 import type { ReactNode } from 'react'
 import { NavLink } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
+import { Icon, type IconName } from '../ui/icon'
 
-const NAV_ITEMS = [
-  { to: '/', label: 'Dashboard' },
-  { to: '/log', label: 'Training Log' },
-  { to: '/competitions', label: 'Competitions' },
+const NAV_ITEMS: { to: string; label: string; icon: IconName }[] = [
+  { to: '/', label: 'Dashboard', icon: 'dashboard' },
+  { to: '/log', label: 'Logs', icon: 'event_note' },
+  { to: '/competitions', label: 'Comps', icon: 'trophy' },
 ]
 
 export function AppShell({ children }: { children: ReactNode }) {
   const { signOut } = useAuth()
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row bg-background text-foreground">
-      {/* Desktop sidebar - hidden on mobile */}
-      <nav className="hidden md:flex md:w-56 md:flex-col md:border-r md:border-border md:p-4 md:gap-1">
-        <p className="px-2 pb-4 font-heading text-sm">Karate Training Log</p>
-        {NAV_ITEMS.map((item) => (
-          <NavLink
-            key={item.to}
-            to={item.to}
-            end={item.to === '/'}
-            className={({ isActive }) =>
-              `px-2 py-1.5 text-sm ${
-                isActive ? 'bg-muted font-medium text-foreground' : 'text-muted-foreground'
-              }`
-            }
-          >
-            {item.label}
-          </NavLink>
-        ))}
+    <div className="min-h-screen flex flex-col bg-background text-foreground">
+      {/* TopAppBar */}
+      <header className="sticky top-0 z-40 flex items-center justify-between border-b border-border bg-background px-5 py-4">
+        <div className="flex items-center gap-2">
+          <Icon name="sports_martial_arts" />
+          <h1 className="text-sm font-bold uppercase tracking-widest">Karate OS</h1>
+        </div>
+        <nav className="hidden md:flex md:items-center md:gap-1">
+          {NAV_ITEMS.map((item) => (
+            <NavLink
+              key={item.to}
+              to={item.to}
+              end={item.to === '/'}
+              className={({ isActive }) =>
+                `label-caps px-3 py-2 ${
+                  isActive ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'
+                }`
+              }
+            >
+              {item.label}
+            </NavLink>
+          ))}
+        </nav>
         <button
           onClick={() => signOut()}
-          className="mt-auto px-2 py-1.5 text-left text-sm text-muted-foreground"
+          className="label-caps text-muted-foreground hover:text-foreground"
         >
           Sign out
         </button>
-      </nav>
+      </header>
 
-      <main className="flex-1 p-4 pb-20 md:pb-4 overflow-x-auto">{children}</main>
+      <main className="mx-auto w-full max-w-3xl flex-1 p-4 pb-24 md:pb-8">{children}</main>
 
-      {/* Mobile bottom tab bar - hidden on desktop */}
-      <nav className="fixed bottom-0 left-0 right-0 flex border-t border-border bg-background md:hidden">
+      {/* Mobile bottom tab bar */}
+      <nav className="fixed bottom-0 left-0 right-0 z-40 flex border-t border-border bg-background md:hidden">
         {NAV_ITEMS.map((item) => (
           <NavLink
             key={item.to}
             to={item.to}
             end={item.to === '/'}
             className={({ isActive }) =>
-              `flex-1 py-3 text-center text-xs ${
-                isActive ? 'font-medium text-foreground' : 'text-muted-foreground'
+              `flex flex-1 flex-col items-center gap-1 py-2.5 ${
+                isActive ? 'text-aka' : 'text-muted-foreground'
               }`
             }
           >
-            {item.label}
+            {({ isActive }) => (
+              <>
+                <Icon name={item.icon} filled={isActive} />
+                <span className="label-caps text-[9px] tracking-widest">{item.label}</span>
+              </>
+            )}
           </NavLink>
         ))}
       </nav>
