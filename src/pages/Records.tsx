@@ -14,7 +14,7 @@ export function Records() {
     <div className="flex flex-col gap-6">
       <div className="border-b border-border pb-6">
         <span className="label-caps mb-1 block text-aka">Karate OS</span>
-        <h1 className="font-heading text-4xl">Records</h1>
+        <h1 className="font-heading-hero text-4xl">Records</h1>
       </div>
 
       {loading ? (

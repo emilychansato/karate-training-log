@@ -6,6 +6,7 @@ import { Icon } from '../components/ui/icon'
 import { useReducedMotion } from '../hooks/useReducedMotion'
 import { popIn, staggerContainer, springy } from '../lib/motion'
 import { CardSkeletonList } from '../components/ui/skeleton'
+import { WinRateGauge } from '../components/dashboard/WinRateGauge'
 
 export function Competitions() {
   const [showForm, setShowForm] = useState(false)
@@ -17,14 +18,17 @@ export function Competitions() {
       <div className="flex items-end justify-between border-b border-border pb-6">
         <div>
           <span className="label-caps mb-1 block text-aka">Karate OS</span>
-          <h1 className="font-heading text-4xl">Competitions</h1>
+          <h1 className="font-heading-hero text-4xl">Competitions</h1>
         </div>
-        <button
-          onClick={() => setShowForm((v) => !v)}
-          className="label-caps hidden text-muted-foreground hover:text-foreground md:block"
-        >
-          {showForm ? 'Cancel' : '+ New result'}
-        </button>
+        <div className="flex items-end gap-4">
+          <WinRateGauge />
+          <button
+            onClick={() => setShowForm((v) => !v)}
+            className="label-caps hidden text-muted-foreground hover:text-foreground md:block"
+          >
+            {showForm ? 'Cancel' : '+ New result'}
+          </button>
+        </div>
       </div>
       {showForm && <CompetitionForm onSuccess={() => setShowForm(false)} />}
       {loading && <CardSkeletonList />}
@@ -76,7 +80,7 @@ export function Competitions() {
                   </span>
                   <h3 className="font-heading text-xl">{r.event}</h3>
                 </div>
-                <p className="label-caps text-muted-foreground opacity-60">{r.date}</p>
+                <p className="label-caps text-muted-foreground">{r.date}</p>
               </div>
               <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
                 <Icon name="trophy" className="size-4" />

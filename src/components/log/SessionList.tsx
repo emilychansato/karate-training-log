@@ -13,11 +13,27 @@ const TYPE_STYLES: Record<string, string> = {
   other: 'bg-muted text-muted-foreground',
 }
 
-export function SessionList() {
+export function SessionList({
+  searchQuery = '',
+  typeFilter = 'all',
+}: {
+  searchQuery?: string
+  typeFilter?: string
+}) {
   const { sessions, loading, deleteSession } = useTrainingSessions()
   const reducedMotion = useReducedMotion()
 
   if (loading) return <CardSkeletonList />
+
+  const filtered = sessions.filter((s) => {
+    if (typeFilter !== 'all' && s.type !== typeFilter) return false
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase()
+      const haystack = `${s.notes ?? ''} ${s.type} ${s.improved.join(' ')} ${s.struggled.join(' ')}`
+      if (!haystack.toLowerCase().includes(q)) return false
+    }
+    return true
+  })
 
   if (sessions.length === 0) {
     return (
@@ -42,6 +58,10 @@ export function SessionList() {
     )
   }
 
+  if (filtered.length === 0) {
+    return <p className="py-10 text-center text-sm text-muted-foreground">No sessions match your filters.</p>
+  }
+
   return (
     <motion.ul
       className="flex flex-col gap-4"
@@ -50,7 +70,7 @@ export function SessionList() {
       animate={reducedMotion ? undefined : 'show'}
     >
       <AnimatePresence mode="popLayout">
-        {sessions.map((s) => (
+        {filtered.map((s) => (
           <motion.li
             key={s.id}
             className="card-elevated border border-border bg-card p-5"
@@ -72,7 +92,7 @@ export function SessionList() {
                 </h3>
               </div>
               <div className="text-right">
-                <p className="label-caps text-muted-foreground opacity-60">{s.date}</p>
+                <p className="label-caps text-muted-foreground">{s.date}</p>
                 <p className="font-mono tabular-mono mt-1 text-xs font-bold">
                   {s.duration_min} min
                 </p>

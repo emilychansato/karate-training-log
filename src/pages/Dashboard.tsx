@@ -15,7 +15,7 @@ export function Dashboard() {
         animate="show"
       >
         <span className="label-caps mb-1 block text-aka">Dojo Dashboard</span>
-        <h1 className="font-heading text-4xl italic">Welcome back, Athlete.</h1>
+        <h1 className="font-heading-hero text-4xl italic">Training snapshot.</h1>
       </motion.div>
 
       {/* Bento grid: asymmetric so the primary chart reads first */}
