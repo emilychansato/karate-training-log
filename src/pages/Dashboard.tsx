@@ -3,6 +3,7 @@ import { HoursChart } from '../components/dashboard/HoursChart'
 import { RatingTrendChart } from '../components/dashboard/RatingTrendChart'
 import { CompetitionTimeline } from '../components/dashboard/CompetitionTimeline'
 import { RecentActivity } from '../components/dashboard/RecentActivity'
+import { NextCompetitionGoals } from '../components/dashboard/NextCompetitionGoals'
 import { AnimatedNumber } from '../components/ui/animated-number'
 import { useTrainingSessions } from '../hooks/useTrainingSessions'
 import { computeSessionStats } from '../lib/trainingStats'
@@ -79,6 +80,8 @@ export function Dashboard() {
           <CompetitionTimeline />
         </div>
       </div>
+
+      <NextCompetitionGoals />
     </div>
   )
 }

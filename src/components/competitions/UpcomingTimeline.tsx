@@ -15,17 +15,15 @@ import { popIn, staggerContainer, springy } from '../../lib/motion'
 
 type Kind = 'competition' | 'event'
 
-interface TimelineItem {
+interface DiscoverItem {
   key: string
   name: string
   date: string
   dateEnd: string | null
   location: string | null
   kind: Kind
-  isMine: boolean
-  plannedId?: string
-  sourceType?: 'wkf' | 'kbc'
-  sourceId?: string
+  sourceType: 'wkf' | 'kbc'
+  sourceId: string
 }
 
 function todayIso() {
@@ -50,20 +48,11 @@ export function UpcomingTimeline() {
   const alreadyAdded = (sourceType: 'wkf' | 'kbc', sourceId: string) =>
     planned.some((p) => p.source_type === sourceType && p.source_id === sourceId)
 
-  const mineItems: TimelineItem[] = planned
+  const mine = planned
     .filter((p) => p.date >= today)
-    .map((p) => ({
-      key: `mine-${p.id}`,
-      name: p.event,
-      date: p.date,
-      dateEnd: null,
-      location: p.location,
-      kind: p.kind,
-      isMine: true,
-      plannedId: p.id,
-    }))
+    .sort((a, b) => a.date.localeCompare(b.date))
 
-  const wkfItems: TimelineItem[] = wkfEvents
+  const wkfItems: DiscoverItem[] = wkfEvents
     .filter((e) => e.date_start >= today && !alreadyAdded('wkf', e.id))
     .map((e) => ({
       key: `wkf-${e.id}`,
@@ -72,12 +61,11 @@ export function UpcomingTimeline() {
       dateEnd: e.date_end,
       location: e.location,
       kind: 'competition',
-      isMine: false,
       sourceType: 'wkf',
       sourceId: e.id,
     }))
 
-  const kbcItems: TimelineItem[] = kbcEvents
+  const kbcItems: DiscoverItem[] = kbcEvents
     .filter((e) => e.date_start >= today && !alreadyAdded('kbc', e.id))
     .map((e) => ({
       key: `kbc-${e.id}`,
@@ -86,16 +74,15 @@ export function UpcomingTimeline() {
       dateEnd: e.date_end,
       location: e.location,
       kind: e.kind,
-      isMine: false,
       sourceType: 'kbc',
       sourceId: e.id,
     }))
 
-  const items = [...mineItems, ...wkfItems, ...kbcItems]
+  const discoverItems = [...wkfItems, ...kbcItems]
     .filter((i) => (i.kind === 'competition' ? showComps : showEvents))
     .sort((a, b) => a.date.localeCompare(b.date))
 
-  async function handleAdd(item: TimelineItem) {
+  async function handleAdd(item: DiscoverItem) {
     await addPlanned({
       event: item.name,
       date: item.date,
@@ -119,110 +106,58 @@ export function UpcomingTimeline() {
   }
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex gap-2">
-          <ToggleChip label="Competitions" accent="aka" selected={showComps} onClick={() => setShowComps((v) => !v)} />
-          <ToggleChip label="Events" accent="ao" selected={showEvents} onClick={() => setShowEvents((v) => !v)} />
-        </div>
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => syncWkf()}
-            disabled={wkfSyncing}
-            className="label-caps flex items-center gap-1 text-muted-foreground hover:text-foreground disabled:opacity-50"
-          >
-            <Icon name="monitoring" className="size-3.5" />
-            {wkfSyncing ? 'Syncing WKF…' : 'Sync WKF'}
-          </button>
-          <button
-            onClick={() => syncKbc()}
-            disabled={kbcSyncing}
-            className="label-caps flex items-center gap-1 text-muted-foreground hover:text-foreground disabled:opacity-50"
-          >
-            <Icon name="monitoring" className="size-3.5" />
-            {kbcSyncing ? 'Syncing BC…' : 'Sync BC'}
-          </button>
-        </div>
-      </div>
-
-      {loading ? (
-        <CardSkeletonList count={3} />
-      ) : items.length === 0 ? (
-        <p className="py-6 text-center text-sm text-muted-foreground">
-          Nothing upcoming yet — sync the calendars above or add your own.
-        </p>
-      ) : (
-        <motion.ul
-          className="flex flex-col gap-3"
-          variants={reducedMotion ? undefined : staggerContainer()}
-          initial={reducedMotion ? undefined : 'hidden'}
-          animate={reducedMotion ? undefined : 'show'}
-        >
-          <AnimatePresence mode="popLayout">
-            {items.map((item) => (
-              <motion.li
-                key={item.key}
+    <div className="flex flex-col gap-8">
+      <div className="flex flex-col gap-3">
+        <span className="label-caps text-muted-foreground">Your upcoming</span>
+        {loading ? (
+          <CardSkeletonList count={2} />
+        ) : mine.length === 0 ? (
+          <p className="py-4 text-center text-sm text-muted-foreground">
+            Nothing saved yet — add your own below or grab one from Discover.
+          </p>
+        ) : (
+          <ul className="flex flex-col gap-3">
+            {mine.map((p) => (
+              <li
+                key={p.id}
                 className="card-elevated flex items-center justify-between gap-3 border border-border bg-card p-4"
-                variants={reducedMotion ? undefined : popIn}
-                exit={reducedMotion ? undefined : 'exit'}
-                layout={!reducedMotion}
-                transition={springy}
               >
                 <div className="flex items-start gap-3">
                   <span
                     className={`mt-1.5 size-2 flex-shrink-0 rounded-full ${
-                      item.kind === 'competition' ? 'bg-aka' : 'bg-ao'
+                      p.kind === 'competition' ? 'bg-aka' : 'bg-ao'
                     }`}
                   />
                   <div>
-                    {item.isMine && item.kind === 'competition' ? (
-                      <Link to={`/competitions/upcoming/${item.plannedId}`} className="font-heading text-lg hover:underline">
-                        {item.name}
+                    {p.kind === 'competition' ? (
+                      <Link to={`/competitions/upcoming/${p.id}`} className="font-heading text-lg hover:underline">
+                        {p.event}
                       </Link>
                     ) : (
-                      <p className="font-heading text-lg">{item.name}</p>
+                      <p className="font-heading text-lg">{p.event}</p>
                     )}
                     <p className="label-caps text-muted-foreground">
-                      {item.date}
-                      {item.dateEnd ? ` – ${item.dateEnd}` : ''}
-                      {item.location ? ` · ${item.location}` : ''}
+                      {p.date}
+                      {p.location ? ` · ${p.location}` : ''}
                     </p>
                   </div>
                 </div>
-                {item.isMine ? (
-                  <div className="flex items-center gap-2">
-                    {item.kind === 'competition' && (
-                      <Link to={`/competitions/upcoming/${item.plannedId}`} className="label-caps text-aka hover:underline">
-                        Prep
-                      </Link>
-                    )}
-                    <Button variant="ghost" size="sm" onClick={() => removePlanned(item.plannedId!)}>
-                      Remove
-                    </Button>
-                  </div>
-                ) : (
-                  <Button variant="outline" size="sm" onClick={() => handleAdd(item)}>
-                    Add
+                <div className="flex items-center gap-2">
+                  {p.kind === 'competition' && (
+                    <Link to={`/competitions/upcoming/${p.id}`} className="label-caps text-aka hover:underline">
+                      Prep
+                    </Link>
+                  )}
+                  <Button variant="ghost" size="sm" onClick={() => removePlanned(p.id)}>
+                    Remove
                   </Button>
-                )}
-              </motion.li>
+                </div>
+              </li>
             ))}
-          </AnimatePresence>
-        </motion.ul>
-      )}
+          </ul>
+        )}
 
-      <div className="flex flex-col gap-3 border-t border-border pt-6">
-        <div className="flex items-center justify-between">
-          <span className="label-caps text-muted-foreground">Add your own</span>
-          <button
-            onClick={() => setShowForm((v) => !v)}
-            className="label-caps text-muted-foreground hover:text-foreground"
-          >
-            {showForm ? 'Cancel' : '+ Add'}
-          </button>
-        </div>
-
-        {showForm && (
+        {showForm ? (
           <form
             onSubmit={handleManualAdd}
             className="card-elevated flex flex-col gap-3 border border-border bg-card p-4"
@@ -234,10 +169,97 @@ export function UpcomingTimeline() {
               value={location}
               onChange={(e) => setLocation(e.target.value)}
             />
-            <Button type="submit" className="glow-primary">
-              Save
-            </Button>
+            <div className="flex gap-2">
+              <Button type="submit" className="glow-primary">
+                Save
+              </Button>
+              <Button type="button" variant="ghost" onClick={() => setShowForm(false)}>
+                Cancel
+              </Button>
+            </div>
           </form>
+        ) : (
+          <button
+            onClick={() => setShowForm(true)}
+            className="label-caps self-start text-muted-foreground hover:text-foreground"
+          >
+            + Add your own
+          </button>
+        )}
+      </div>
+
+      <div className="flex flex-col gap-4 border-t border-border pt-6">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <span className="label-caps text-muted-foreground">Discover</span>
+          <div className="flex gap-2">
+            <ToggleChip label="Competitions" accent="aka" selected={showComps} onClick={() => setShowComps((v) => !v)} />
+            <ToggleChip label="Events" accent="ao" selected={showEvents} onClick={() => setShowEvents((v) => !v)} />
+          </div>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => syncWkf()}
+              disabled={wkfSyncing}
+              className="label-caps flex items-center gap-1 text-muted-foreground hover:text-foreground disabled:opacity-50"
+            >
+              <Icon name="monitoring" className="size-3.5" />
+              {wkfSyncing ? 'Syncing WKF…' : 'Sync WKF'}
+            </button>
+            <button
+              onClick={() => syncKbc()}
+              disabled={kbcSyncing}
+              className="label-caps flex items-center gap-1 text-muted-foreground hover:text-foreground disabled:opacity-50"
+            >
+              <Icon name="monitoring" className="size-3.5" />
+              {kbcSyncing ? 'Syncing BC…' : 'Sync BC'}
+            </button>
+          </div>
+        </div>
+
+        {loading ? (
+          <CardSkeletonList count={3} />
+        ) : discoverItems.length === 0 ? (
+          <p className="py-6 text-center text-sm text-muted-foreground">
+            Nothing to discover yet — tap "Sync WKF" or "Sync BC" above.
+          </p>
+        ) : (
+          <motion.ul
+            className="flex flex-col gap-3"
+            variants={reducedMotion ? undefined : staggerContainer()}
+            initial={reducedMotion ? undefined : 'hidden'}
+            animate={reducedMotion ? undefined : 'show'}
+          >
+            <AnimatePresence mode="popLayout">
+              {discoverItems.map((item) => (
+                <motion.li
+                  key={item.key}
+                  className="card-elevated flex items-center justify-between gap-3 border border-border bg-card p-4"
+                  variants={reducedMotion ? undefined : popIn}
+                  exit={reducedMotion ? undefined : 'exit'}
+                  layout={!reducedMotion}
+                  transition={springy}
+                >
+                  <div className="flex items-start gap-3">
+                    <span
+                      className={`mt-1.5 size-2 flex-shrink-0 rounded-full ${
+                        item.kind === 'competition' ? 'bg-aka' : 'bg-ao'
+                      }`}
+                    />
+                    <div>
+                      <p className="font-heading text-lg">{item.name}</p>
+                      <p className="label-caps text-muted-foreground">
+                        {item.date}
+                        {item.dateEnd ? ` – ${item.dateEnd}` : ''}
+                        {item.location ? ` · ${item.location}` : ''}
+                      </p>
+                    </div>
+                  </div>
+                  <Button variant="outline" size="sm" onClick={() => handleAdd(item)}>
+                    Add
+                  </Button>
+                </motion.li>
+              ))}
+            </AnimatePresence>
+          </motion.ul>
         )}
       </div>
     </div>
