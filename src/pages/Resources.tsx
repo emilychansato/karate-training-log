@@ -1,5 +1,6 @@
 import { RESOURCE_GROUPS } from '../lib/resources'
 import { Icon } from '../components/ui/icon'
+import { ResourcesAssistant } from '../components/resources/ResourcesAssistant'
 
 export function Resources() {
   return (
@@ -11,6 +12,8 @@ export function Resources() {
           Official WKF and Karate Canada rulebooks, grading guidelines, and policy documents.
         </p>
       </div>
+
+      <ResourcesAssistant />
 
       <div className="flex flex-col gap-8">
         {RESOURCE_GROUPS.map((group) => (
