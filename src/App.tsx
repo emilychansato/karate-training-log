@@ -4,8 +4,7 @@ import { TrainingLog } from './pages/TrainingLog'
 import { Competitions } from './pages/Competitions'
 import { CompetitionDetail } from './pages/CompetitionDetail'
 import { Dashboard } from './pages/Dashboard'
-import { Records } from './pages/Records'
-import { Techniques } from './pages/Techniques'
+import { Profile } from './pages/Profile'
 import { TechniqueDetail } from './pages/TechniqueDetail'
 import { Resources } from './pages/Resources'
 import { TournamentPrep } from './pages/TournamentPrep'
@@ -58,21 +57,11 @@ function App() {
           }
         />
         <Route
-          path="/records"
+          path="/profile"
           element={
             <AuthGate>
               <AppShell>
-                <Records />
-              </AppShell>
-            </AuthGate>
-          }
-        />
-        <Route
-          path="/techniques"
-          element={
-            <AuthGate>
-              <AppShell>
-                <Techniques />
+                <Profile />
               </AppShell>
             </AuthGate>
           }

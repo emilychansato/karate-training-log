@@ -1,21 +1,21 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { useTechniques } from '../hooks/useTechniques'
-import { useUserTechniques } from '../hooks/useUserTechniques'
-import { classifyKumiteTechnique } from '../lib/techniqueClassification'
-import { TechniquePortfolio } from '../components/techniques/TechniquePortfolio'
-import { Input } from '../components/ui/input'
-import { Button } from '../components/ui/button'
-import { Icon } from '../components/ui/icon'
-import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/card'
-import { SegmentedControl } from '../components/ui/segmented-control'
+import { useTechniques } from '../../hooks/useTechniques'
+import { useUserTechniques } from '../../hooks/useUserTechniques'
+import { classifyKumiteTechnique } from '../../lib/techniqueClassification'
+import { TechniquePortfolio } from '../techniques/TechniquePortfolio'
+import { Input } from '../ui/input'
+import { Button } from '../ui/button'
+import { Icon } from '../ui/icon'
+import { Card, CardHeader, CardTitle, CardContent } from '../ui/card'
+import { SegmentedControl } from '../ui/segmented-control'
 
 const CATEGORY_TABS: { value: 'kata' | 'kumite_combo'; label: string }[] = [
   { value: 'kata', label: 'KATA' },
   { value: 'kumite_combo', label: 'KUMITE' },
 ]
 
-export function Techniques() {
+export function TechniquesPanel() {
   const { techniques, loading } = useTechniques()
   const { bookmarks, loading: bookmarksLoading, addBookmark, removeBookmark } =
     useUserTechniques()
@@ -28,12 +28,7 @@ export function Techniques() {
     .filter((t) => t.name.toLowerCase().includes(search.toLowerCase()))
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="border-b border-border pb-6">
-        <span className="label-caps mb-1 block text-aka">Karate OS</span>
-        <h1 className="font-heading-hero text-4xl">Techniques</h1>
-      </div>
-
+    <div className="flex flex-col gap-4">
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 font-heading text-lg">

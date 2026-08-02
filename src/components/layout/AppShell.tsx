@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { NavLink, useLocation } from 'react-router-dom'
+import { NavLink, Link, useLocation } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useAuth } from '../../hooks/useAuth'
 import { useReducedMotion } from '../../hooks/useReducedMotion'
@@ -24,9 +24,7 @@ const NAV_ITEMS: { to: string; label: string; icon: IconName }[] = [
   { to: '/', label: 'Dashboard', icon: 'dashboard' },
   { to: '/log', label: 'Logs', icon: 'event_note' },
   { to: '/competitions', label: 'Comps', icon: 'trophy' },
-  { to: '/records', label: 'Records', icon: 'award' },
-  { to: '/techniques', label: 'Techniques', icon: 'target' },
-  { to: '/resources', label: 'Resources', icon: 'resources' },
+  { to: '/profile', label: 'Profile', icon: 'profile' },
 ]
 
 export function AppShell({ children }: { children: ReactNode }) {
@@ -70,6 +68,13 @@ export function AppShell({ children }: { children: ReactNode }) {
           ))}
         </nav>
         <div className="flex items-center gap-1">
+          <Link
+            to="/resources"
+            aria-label="Resources"
+            className="flex size-9 items-center justify-center text-muted-foreground transition-colors duration-150 hover:text-foreground"
+          >
+            <Icon name="resources" className="size-4" />
+          </Link>
           <ThemeToggle />
           <button
             onClick={() => signOut()}

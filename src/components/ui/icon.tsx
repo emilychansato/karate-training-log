@@ -23,6 +23,7 @@ import {
   BookOpen,
   Sun,
   Moon,
+  CircleUserRound,
   type LucideIcon,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -52,6 +53,7 @@ const ICONS = {
   resources: BookOpen,
   sun: Sun,
   moon: Moon,
+  profile: CircleUserRound,
 } satisfies Record<string, LucideIcon>
 
 export type IconName = keyof typeof ICONS
