@@ -62,6 +62,14 @@ name + category + tagging.
 
 ## Opponent intelligence / fight scouting
 
+**Partially built (2026-08-03):** OpponentDetail.tsx (/profile/opponents/:name) now shows
+head-to-head record, full match history (linking back to the real competition), and a free-text
+notes field per opponent (`opponent_notes` table, keyed by name since matches don't have a real
+`opponent_id` yet). What's still open from the original idea below: known-techniques with a
+personal threat rating, and a dedicated "prepare for opponent" pre-fight-briefing view (today it's
+a straight history + notes page, not a summarized briefing). Would need the fuller `opponents`/
+`opponent_techniques` schema sketched below if threat-rated techniques get built.
+
 Digitize competitive scouting: a per-opponent profile with head-to-head record, match history
 (result, score breakdown, notes, optional video link), known techniques with a personal threat
 rating, and free-text strengths/weaknesses/strategy notes. A "prepare for opponent" view before a
@@ -242,7 +250,20 @@ competition) plus `kata_plan_entries` (`plan_id`, `round_label` e.g. "Round 1"/"
 `technique_id`, `position`). Depends on `techniques` already existing (it does) and optionally on
 the planned-competitions table above if tying a plan to a specific upcoming event.
 
-## Records page drill-down (flagged 2026-08-02, needs clarification before scoping)
+## Records page drill-down (built 2026-08-03)
+
+**Built:** all three sections now drill in, using the exact interpretation guessed below (never
+confirmed with Emily explicitly, but low-risk/reversible enough to just build per the working
+agreement's calibration guidance):
+- Personal records: clicking Win streak / Best match points / Best kata score expands an inline
+  panel showing the actual competitions behind the number (via new `computeWinStreakMatches()` in
+  competitionStats.ts + the already-fetched match list), each linking to the real competition.
+- Opponent history: now covered by the OpponentDetail page (see the Opponent intelligence entry
+  above) rather than an inline expansion.
+- Division progression: a "Group by division" toggle re-groups the flat chronological list by
+  division instead of a separate view.
+
+Original ask, kept for context:
 
 Emily wants Personal Records, Opponent History, and Division Progression to each be clickable
 into more detail. Before this can be scoped properly, need to know *what* "more detail" means

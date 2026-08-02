@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest'
 import {
   computeOpponentHistory,
   computePersonalRecords,
+  computeWinStreakMatches,
   computeDivisionHistory,
   type CompetitionMatchRecord,
 } from './competitionStats'
@@ -108,6 +109,25 @@ describe('computePersonalRecords', () => {
     expect(computePersonalRecords([], 0).bestKataTechnicalScore).toBeNull()
 
     expect(computePersonalRecords([], 2).totalCompetitions).toBe(2)
+  })
+})
+
+describe('computeWinStreakMatches', () => {
+  it('returns the matches making up the longest streak, chronologically', () => {
+    const matches = [
+      makeMatch({ matchId: 'm1', date: '2026-01-01', points_for: 5, points_against: 2 }),
+      makeMatch({ matchId: 'm2', date: '2026-01-02', points_for: 1, points_against: 4 }),
+      makeMatch({ matchId: 'm3', date: '2026-01-03', points_for: 3, points_against: 1 }),
+      makeMatch({ matchId: 'm4', date: '2026-01-04', points_for: 2, points_against: 1 }),
+      makeMatch({ matchId: 'm5', date: '2026-01-05', points_for: 4, points_against: 0 }),
+    ]
+
+    const streak = computeWinStreakMatches(matches)
+    expect(streak.map((m) => m.matchId)).toEqual(['m3', 'm4', 'm5'])
+  })
+
+  it('returns an empty list when there are no wins', () => {
+    expect(computeWinStreakMatches([])).toEqual([])
   })
 })
 

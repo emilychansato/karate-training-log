@@ -119,6 +119,27 @@ export function computePersonalRecords(
   }
 }
 
+/** The actual matches making up the longest win streak (first occurrence,
+ * if tied) - what "diving into" the win-streak stat shows. */
+export function computeWinStreakMatches(matches: CompetitionMatchRecord[]): CompetitionMatchRecord[] {
+  const kumiteMatches = matches
+    .filter(isScoredKumiteMatch)
+    .slice()
+    .sort((a, b) => a.date.localeCompare(b.date))
+
+  let best: CompetitionMatchRecord[] = []
+  let current: CompetitionMatchRecord[] = []
+  for (const m of kumiteMatches) {
+    if (outcome(m) === 'win') {
+      current.push(m)
+      if (current.length > best.length) best = current
+    } else {
+      current = []
+    }
+  }
+  return best
+}
+
 export function computeDivisionHistory(
   competitions: { division: string | null; date: string; discipline: 'kata' | 'kumite'; placement: string | null }[]
 ): DivisionEntry[] {

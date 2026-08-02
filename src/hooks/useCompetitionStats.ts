@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabaseClient'
 import {
   computeOpponentHistory,
   computePersonalRecords,
+  computeWinStreakMatches,
   computeDivisionHistory,
   type CompetitionMatchRecord,
 } from '../lib/competitionStats'
@@ -66,6 +67,7 @@ export function useCompetitionStats() {
     loading,
     matches: flatMatches,
     records: computePersonalRecords(flatMatches, competitions.length),
+    winStreakMatches: computeWinStreakMatches(flatMatches),
     opponents: computeOpponentHistory(flatMatches),
     divisionHistory: computeDivisionHistory(competitions),
     winRate: computeWinRate(flatMatches),
