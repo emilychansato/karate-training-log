@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import { usePlannedCompetitions } from '../../hooks/usePlannedCompetitions'
 import { useWkfEvents } from '../../hooks/useWkfEvents'
@@ -174,7 +175,13 @@ export function UpcomingTimeline() {
                     }`}
                   />
                   <div>
-                    <p className="font-heading text-lg">{item.name}</p>
+                    {item.isMine && item.kind === 'competition' ? (
+                      <Link to={`/competitions/upcoming/${item.plannedId}`} className="font-heading text-lg hover:underline">
+                        {item.name}
+                      </Link>
+                    ) : (
+                      <p className="font-heading text-lg">{item.name}</p>
+                    )}
                     <p className="label-caps text-muted-foreground">
                       {item.date}
                       {item.dateEnd ? ` – ${item.dateEnd}` : ''}
@@ -183,9 +190,16 @@ export function UpcomingTimeline() {
                   </div>
                 </div>
                 {item.isMine ? (
-                  <Button variant="ghost" size="sm" onClick={() => removePlanned(item.plannedId!)}>
-                    Remove
-                  </Button>
+                  <div className="flex items-center gap-2">
+                    {item.kind === 'competition' && (
+                      <Link to={`/competitions/upcoming/${item.plannedId}`} className="label-caps text-aka hover:underline">
+                        Prep
+                      </Link>
+                    )}
+                    <Button variant="ghost" size="sm" onClick={() => removePlanned(item.plannedId!)}>
+                      Remove
+                    </Button>
+                  </div>
                 ) : (
                   <Button variant="outline" size="sm" onClick={() => handleAdd(item)}>
                     Add

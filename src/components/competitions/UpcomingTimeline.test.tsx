@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { MemoryRouter } from 'react-router-dom'
 import { UpcomingTimeline } from './UpcomingTimeline'
 import { usePlannedCompetitions } from '../../hooks/usePlannedCompetitions'
 import { useWkfEvents } from '../../hooks/useWkfEvents'
@@ -58,7 +59,7 @@ describe('UpcomingTimeline', () => {
   })
 
   it('merges WKF and KBC raw events with planned items into one sorted list', () => {
-    render(<UpcomingTimeline />)
+    render(<UpcomingTimeline />, { wrapper: MemoryRouter })
     expect(screen.getByText('WKF Karate 1 Series A')).toBeInTheDocument()
     expect(screen.getByText('William Gomes Kumite Seminar')).toBeInTheDocument()
   })
@@ -84,7 +85,7 @@ describe('UpcomingTimeline', () => {
       addPlanned,
       removePlanned,
     })
-    render(<UpcomingTimeline />)
+    render(<UpcomingTimeline />, { wrapper: MemoryRouter })
 
     // Only one card for this event (the "mine" one, with Remove) - the raw
     // WKF card must not still be rendered separately showing "Add". The
@@ -95,7 +96,7 @@ describe('UpcomingTimeline', () => {
   })
 
   it('adding a raw event calls addPlanned with its source pointer', async () => {
-    render(<UpcomingTimeline />)
+    render(<UpcomingTimeline />, { wrapper: MemoryRouter })
     const user = userEvent.setup()
 
     await user.click(screen.getAllByRole('button', { name: 'Add' })[0])
@@ -108,7 +109,7 @@ describe('UpcomingTimeline', () => {
   })
 
   it('filter chips toggle competitions and events independently', async () => {
-    render(<UpcomingTimeline />)
+    render(<UpcomingTimeline />, { wrapper: MemoryRouter })
     const user = userEvent.setup()
 
     await user.click(screen.getByRole('checkbox', { name: 'Events' }))

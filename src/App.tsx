@@ -8,6 +8,7 @@ import { Records } from './pages/Records'
 import { Techniques } from './pages/Techniques'
 import { TechniqueDetail } from './pages/TechniqueDetail'
 import { Resources } from './pages/Resources'
+import { TournamentPrep } from './pages/TournamentPrep'
 import { AuthGate } from './components/layout/AuthGate'
 import { AppShell } from './components/layout/AppShell'
 
@@ -82,6 +83,16 @@ function App() {
             <AuthGate>
               <AppShell>
                 <TechniqueDetail />
+              </AppShell>
+            </AuthGate>
+          }
+        />
+        <Route
+          path="/competitions/upcoming/:id"
+          element={
+            <AuthGate>
+              <AppShell>
+                <TournamentPrep />
               </AppShell>
             </AuthGate>
           }
