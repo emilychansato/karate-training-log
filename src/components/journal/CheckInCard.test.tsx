@@ -30,4 +30,29 @@ describe('CheckInCard', () => {
     expect(screen.getByText('😄')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /update check-in/i })).toBeInTheDocument()
   })
+
+  it('shows a streak count when there are consecutive check-ins', () => {
+    const today = todayIso()
+    const yesterday = (() => {
+      const d = new Date()
+      d.setDate(d.getDate() - 1)
+      return d.toISOString().slice(0, 10)
+    })()
+
+    render(
+      <CheckInCard
+        entries={[
+          { id: 'j1', date: today, mood: 4, emotions: [], notes: null, created_at: '' },
+          { id: 'j2', date: yesterday, mood: 3, emotions: [], notes: null, created_at: '' },
+        ]}
+        checkIn={vi.fn()}
+      />
+    )
+    expect(screen.getByText('2 days in a row')).toBeInTheDocument()
+  })
+
+  it('shows no streak indicator when there are no entries', () => {
+    render(<CheckInCard entries={[]} checkIn={vi.fn()} />)
+    expect(screen.queryByText(/in a row/i)).not.toBeInTheDocument()
+  })
 })

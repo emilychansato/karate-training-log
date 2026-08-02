@@ -2,8 +2,10 @@ import { useState } from 'react'
 import type { JournalEntry } from '../../hooks/useJournalEntries'
 import { MOOD_EMOJI, MOOD_LEVELS, EMOTIONS } from '../../lib/journalConstants'
 import { todayIso, WEEKDAY_SHORT } from '../../lib/dateFormat'
+import { computeJournalStreak } from '../../lib/journalStreak'
 import { ToggleChip } from '../ui/toggle-chip'
 import { Button } from '../ui/button'
+import { Icon } from '../ui/icon'
 
 function thisWeekDates(): string[] {
   const now = new Date()
@@ -35,6 +37,7 @@ export function CheckInCard({
 
   const week = thisWeekDates()
   const entryByDate = new Map(entries.map((e) => [e.date, e]))
+  const streak = computeJournalStreak(entries)
 
   function toggleEmotion(emotion: string) {
     setEmotions((prev) => (prev.includes(emotion) ? prev.filter((e) => e !== emotion) : [...prev, emotion]))
@@ -47,6 +50,14 @@ export function CheckInCard({
 
   return (
     <div className="card-elevated flex flex-col gap-4 border border-border bg-card p-5">
+      {streak > 0 && (
+        <div className="flex items-center gap-1.5">
+          <Icon name="streak" className="size-4 text-aka" />
+          <span className="label-caps text-foreground">
+            {streak} day{streak === 1 ? '' : 's'} in a row
+          </span>
+        </div>
+      )}
       <div className="flex justify-between">
         {week.map((date, i) => {
           const entry = entryByDate.get(date)
