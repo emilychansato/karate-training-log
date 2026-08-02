@@ -56,25 +56,45 @@ export function RecordsPanel() {
             </motion.p>
           ) : (
             <>
-              <dl className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+              <dl className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                 <button
                   type="button"
-                  className="relative text-left"
+                  className={`group relative flex flex-col gap-1 border p-3 text-left transition-colors duration-150 ${
+                    drill === 'streak' ? 'border-aka' : 'border-border hover:border-ring'
+                  }`}
                   onClick={() => setDrill((d) => (d === 'streak' ? null : 'streak'))}
                 >
                   {hasStreak && <CelebrationBurst />}
-                  <dt className="label-caps text-muted-foreground">Win streak</dt>
-                  <dd className="font-mono tabular-mono mt-1 text-2xl font-bold text-aka">
+                  <dt className="label-caps flex items-center justify-between text-muted-foreground">
+                    Win streak
+                    <Icon
+                      name="chevron_down"
+                      className={`size-3.5 text-muted-foreground transition-transform duration-150 group-hover:text-foreground ${
+                        drill === 'streak' ? 'rotate-180' : ''
+                      }`}
+                    />
+                  </dt>
+                  <dd className="font-mono tabular-mono text-2xl font-bold text-aka">
                     <AnimatedNumber value={records.longestWinStreak} />
                   </dd>
                 </button>
                 <button
                   type="button"
-                  className="text-left"
+                  className={`flex flex-col gap-1 border p-3 text-left transition-colors duration-150 ${
+                    drill === 'points' ? 'border-aka' : 'border-border hover:border-ring'
+                  }`}
                   onClick={() => setDrill((d) => (d === 'points' ? null : 'points'))}
                 >
-                  <dt className="label-caps text-muted-foreground">Best match points</dt>
-                  <dd className="font-mono tabular-mono mt-1 text-2xl font-bold">
+                  <dt className="label-caps flex items-center justify-between text-muted-foreground">
+                    Best match points
+                    <Icon
+                      name="chevron_down"
+                      className={`size-3.5 transition-transform duration-150 ${
+                        drill === 'points' ? 'rotate-180' : ''
+                      }`}
+                    />
+                  </dt>
+                  <dd className="font-mono tabular-mono text-2xl font-bold">
                     {records.highestPointsInMatch != null ? (
                       <AnimatedNumber value={records.highestPointsInMatch} />
                     ) : (
@@ -84,11 +104,21 @@ export function RecordsPanel() {
                 </button>
                 <button
                   type="button"
-                  className="text-left"
+                  className={`flex flex-col gap-1 border p-3 text-left transition-colors duration-150 ${
+                    drill === 'kata' ? 'border-aka' : 'border-border hover:border-ring'
+                  }`}
                   onClick={() => setDrill((d) => (d === 'kata' ? null : 'kata'))}
                 >
-                  <dt className="label-caps text-muted-foreground">Best kata score</dt>
-                  <dd className="font-mono tabular-mono mt-1 text-2xl font-bold text-ao">
+                  <dt className="label-caps flex items-center justify-between text-muted-foreground">
+                    Best kata score
+                    <Icon
+                      name="chevron_down"
+                      className={`size-3.5 transition-transform duration-150 ${
+                        drill === 'kata' ? 'rotate-180' : ''
+                      }`}
+                    />
+                  </dt>
+                  <dd className="font-mono tabular-mono text-2xl font-bold text-ao">
                     {records.bestKataTechnicalScore != null ? (
                       <AnimatedNumber value={records.bestKataTechnicalScore} decimals={1} />
                     ) : (
@@ -96,9 +126,12 @@ export function RecordsPanel() {
                     )}
                   </dd>
                 </button>
-                <Link to="/competitions">
+                <Link
+                  to="/competitions"
+                  className="flex flex-col gap-1 border border-border p-3 transition-colors duration-150 hover:border-ring"
+                >
                   <dt className="label-caps text-muted-foreground">Total competitions</dt>
-                  <dd className="font-mono tabular-mono mt-1 text-2xl font-bold">
+                  <dd className="font-mono tabular-mono text-2xl font-bold">
                     <AnimatedNumber value={records.totalCompetitions} />
                   </dd>
                 </Link>
