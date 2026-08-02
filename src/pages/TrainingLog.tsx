@@ -2,13 +2,18 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { SessionForm } from '../components/forms/SessionForm'
 import { SessionList } from '../components/log/SessionList'
+import { SessionCalendar } from '../components/log/SessionCalendar'
+import { HoursChart } from '../components/dashboard/HoursChart'
 import { Icon } from '../components/ui/icon'
 import { Input } from '../components/ui/input'
+import { SegmentedControl } from '../components/ui/segmented-control'
 import { useReducedMotion } from '../hooks/useReducedMotion'
 import { useTrainingSessions, type TrainingSession } from '../hooks/useTrainingSessions'
 import { computeSessionStats } from '../lib/trainingStats'
 import { springy } from '../lib/motion'
 import { cn } from '@/lib/utils'
+
+type LogView = 'list' | 'chart' | 'calendar'
 
 const TYPE_FILTERS = [
   { value: 'all', label: 'ALL SESSIONS' },
@@ -90,6 +95,7 @@ export function TrainingLog() {
   const [showForm, setShowForm] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [typeFilter, setTypeFilter] = useState('all')
+  const [view, setView] = useState<LogView>('list')
   const reducedMotion = useReducedMotion()
   const { sessions, loading, createSession, deleteSession } = useTrainingSessions()
 
@@ -111,19 +117,37 @@ export function TrainingLog() {
       {showForm && (
         <SessionForm createSession={createSession} onSuccess={() => setShowForm(false)} />
       )}
-      <FilterBar
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
-        typeFilter={typeFilter}
-        onTypeFilterChange={setTypeFilter}
+      <SegmentedControl
+        name="log-view"
+        options={[
+          { value: 'list', label: 'LIST' },
+          { value: 'chart', label: 'CHART' },
+          { value: 'calendar', label: 'CALENDAR' },
+        ]}
+        value={view}
+        onChange={(v) => setView(v as LogView)}
+        className="max-w-xs"
       />
-      <SessionList
-        sessions={sessions}
-        loading={loading}
-        deleteSession={deleteSession}
-        searchQuery={searchQuery}
-        typeFilter={typeFilter}
-      />
+
+      {view === 'list' && (
+        <>
+          <FilterBar
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+            typeFilter={typeFilter}
+            onTypeFilterChange={setTypeFilter}
+          />
+          <SessionList
+            sessions={sessions}
+            loading={loading}
+            deleteSession={deleteSession}
+            searchQuery={searchQuery}
+            typeFilter={typeFilter}
+          />
+        </>
+      )}
+      {view === 'chart' && <HoursChart />}
+      {view === 'calendar' && <SessionCalendar sessions={sessions} />}
 
       {/* FAB */}
       <motion.button
