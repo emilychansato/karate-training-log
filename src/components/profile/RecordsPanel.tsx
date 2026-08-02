@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion'
+import { Link } from 'react-router-dom'
 import { useCompetitionStats } from '../../hooks/useCompetitionStats'
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/card'
 import { Icon } from '../ui/icon'
@@ -91,21 +92,23 @@ export function RecordsPanel() {
           ) : (
             <ul className="flex flex-col gap-3">
               {opponents.map((o) => (
-                <li
-                  key={o.opponentName}
-                  className="flex items-center justify-between border border-border p-3 text-sm"
-                >
-                  <div>
-                    <p className="font-medium">{o.opponentName}</p>
-                    <p className="font-mono tabular-mono text-xs text-muted-foreground">
-                      avg {o.avgPointsFor.toFixed(1)}–{o.avgPointsAgainst.toFixed(1)}
+                <li key={o.opponentName}>
+                  <Link
+                    to={`/profile/opponents/${encodeURIComponent(o.opponentName)}`}
+                    className="flex items-center justify-between border border-border p-3 text-sm hover:border-ring"
+                  >
+                    <div>
+                      <p className="font-medium">{o.opponentName}</p>
+                      <p className="font-mono tabular-mono text-xs text-muted-foreground">
+                        avg {o.avgPointsFor.toFixed(1)}–{o.avgPointsAgainst.toFixed(1)}
+                      </p>
+                    </div>
+                    <p className="font-mono tabular-mono text-right">
+                      <span className="text-ao">{o.wins}W</span>{' '}
+                      <span className="text-aka">{o.losses}L</span>{' '}
+                      <span className="text-muted-foreground">{o.draws}D</span>
                     </p>
-                  </div>
-                  <p className="font-mono tabular-mono text-right">
-                    <span className="text-ao">{o.wins}W</span>{' '}
-                    <span className="text-aka">{o.losses}L</span>{' '}
-                    <span className="text-muted-foreground">{o.draws}D</span>
-                  </p>
+                  </Link>
                 </li>
               ))}
             </ul>

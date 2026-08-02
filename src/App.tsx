@@ -5,6 +5,7 @@ import { Competitions } from './pages/Competitions'
 import { CompetitionDetail } from './pages/CompetitionDetail'
 import { Dashboard } from './pages/Dashboard'
 import { Profile } from './pages/Profile'
+import { OpponentDetail } from './pages/OpponentDetail'
 import { Unfiltered } from './pages/Unfiltered'
 import { TechniqueDetail } from './pages/TechniqueDetail'
 import { Resources } from './pages/Resources'
@@ -73,6 +74,16 @@ function App() {
             <AuthGate>
               <AppShell>
                 <Profile />
+              </AppShell>
+            </AuthGate>
+          }
+        />
+        <Route
+          path="/profile/opponents/:name"
+          element={
+            <AuthGate>
+              <AppShell>
+                <OpponentDetail />
               </AppShell>
             </AuthGate>
           }

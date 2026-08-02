@@ -7,6 +7,36 @@ import { useTheme } from '../theme/ThemeProvider'
 import { Icon, type IconName } from '../ui/icon'
 import { snappy, pageEnter } from '../../lib/motion'
 
+function ResourcesLink({ reducedMotion }: { reducedMotion: boolean }) {
+  return (
+    <Link
+      to="/resources"
+      aria-label="Resources"
+      className="flex size-9 items-center justify-center text-muted-foreground transition-colors duration-150 hover:text-foreground"
+    >
+      {reducedMotion ? (
+        <Icon name="resources" className="size-4" />
+      ) : (
+        <motion.span
+          animate={{
+            scale: [1, 1.15, 1],
+            rotate: [0, -8, 8, 0],
+            filter: [
+              'drop-shadow(0 0 0px rgba(255,59,74,0))',
+              'drop-shadow(0 0 6px rgba(255,59,74,0.7))',
+              'drop-shadow(0 0 0px rgba(255,59,74,0))',
+            ],
+          }}
+          transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
+          className="flex"
+        >
+          <Icon name="resources" className="size-4" />
+        </motion.span>
+      )}
+    </Link>
+  )
+}
+
 function ThemeToggle() {
   const { theme, toggleTheme } = useTheme()
   return (
@@ -74,13 +104,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           ))}
         </nav>
         <div className="flex items-center gap-1">
-          <Link
-            to="/resources"
-            aria-label="Resources"
-            className="flex size-9 items-center justify-center text-muted-foreground transition-colors duration-150 hover:text-foreground"
-          >
-            <Icon name="resources" className="size-4" />
-          </Link>
+          <ResourcesLink reducedMotion={reducedMotion} />
           <ThemeToggle />
           <button
             onClick={() => signOut()}

@@ -64,6 +64,7 @@ export function useCompetitionStats() {
 
   return {
     loading,
+    matches: flatMatches,
     records: computePersonalRecords(flatMatches, competitions.length),
     opponents: computeOpponentHistory(flatMatches),
     divisionHistory: computeDivisionHistory(competitions),
