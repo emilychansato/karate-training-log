@@ -23,6 +23,7 @@ describe('HoursChart', () => {
       sessions: [
         {
           id: 's1',
+          title: null,
           date: '2026-08-01',
           type: 'kumite',
           duration_min: 60,

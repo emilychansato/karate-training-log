@@ -6,6 +6,7 @@ import type { TrainingSession } from '../../hooks/useTrainingSessions'
 
 const session: TrainingSession = {
   id: 's1',
+  title: null,
   date: '2026-08-01',
   type: 'kumite',
   duration_min: 60,
@@ -22,10 +23,23 @@ describe('SessionList', () => {
     render(<SessionList sessions={[session]} loading={false} deleteSession={deleteSession} />)
     expect(screen.getByText('kumite')).toBeInTheDocument()
     expect(screen.getByText('60 min')).toBeInTheDocument()
+    expect(screen.getByText('Kumite session')).toBeInTheDocument()
 
     const user = userEvent.setup()
     await user.click(screen.getByRole('button', { name: /delete/i }))
     expect(deleteSession).toHaveBeenCalledWith('s1')
+  })
+
+  it('shows the nickname as the heading when the session has a title', () => {
+    render(
+      <SessionList
+        sessions={[{ ...session, title: 'Brutal sparring night' }]}
+        loading={false}
+        deleteSession={vi.fn()}
+      />
+    )
+    expect(screen.getByText('Brutal sparring night')).toBeInTheDocument()
+    expect(screen.queryByText('Kumite session')).not.toBeInTheDocument()
   })
 
   it('shows an empty state when there are no sessions', () => {

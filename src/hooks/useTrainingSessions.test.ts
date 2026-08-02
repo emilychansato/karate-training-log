@@ -6,6 +6,7 @@ import { supabase } from '../lib/supabaseClient'
 const { mockSession } = vi.hoisted(() => ({
   mockSession: {
     id: 's1',
+    title: null,
     date: '2026-08-01',
     type: 'kumite',
     duration_min: 60,

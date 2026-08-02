@@ -34,7 +34,7 @@ export function SessionList({
     if (typeFilter !== 'all' && s.type !== typeFilter) return false
     if (searchQuery) {
       const q = searchQuery.toLowerCase()
-      const haystack = `${s.notes ?? ''} ${s.type} ${s.improved.join(' ')} ${s.struggled.join(' ')}`
+      const haystack = `${s.title ?? ''} ${s.notes ?? ''} ${s.type} ${s.improved.join(' ')} ${s.struggled.join(' ')}`
       if (!haystack.toLowerCase().includes(q)) return false
     }
     return true
@@ -93,7 +93,7 @@ export function SessionList({
                   {s.type}
                 </span>
                 <h3 className="font-heading text-xl">
-                  {s.notes || `${s.type[0]?.toUpperCase()}${s.type.slice(1)} session`}
+                  {s.title || `${s.type[0]?.toUpperCase()}${s.type.slice(1)} session`}
                 </h3>
               </div>
               <div className="text-right">
@@ -103,6 +103,8 @@ export function SessionList({
                 </p>
               </div>
             </div>
+
+            {s.notes && <p className="mb-3 text-sm text-muted-foreground">{s.notes}</p>}
 
             {s.improved.length > 0 && (
               <div className="mb-4 flex flex-wrap gap-2">

@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -23,6 +24,7 @@ const STRUGGLED_OPTIONS = [
 ]
 
 const schema = z.object({
+  title: z.string().optional(),
   date: z.string().min(1, 'Date is required'),
   type: z.enum(SESSION_TYPES, { message: 'Type is required' }),
   duration_min: z.coerce.number({ message: 'Duration is required' }).positive('Duration is required'),
@@ -54,14 +56,28 @@ export function SessionForm({
     resolver: zodResolver(schema),
     defaultValues: { improved: [], struggled: [] },
   })
+  const [submitError, setSubmitError] = useState<string | null>(null)
 
   async function onSubmit(values: FormOutput) {
+    setSubmitError(null)
     const { error } = await createSession(values)
-    if (!error) onSuccess()
+    if (error) setSubmitError(error)
+    else onSuccess()
   }
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="card-elevated flex w-full flex-col gap-5 border border-border bg-card p-5">
+      {submitError && (
+        <p className="border-l-2 border-l-destructive bg-destructive/10 px-3 py-2 text-sm text-destructive">
+          {submitError}
+        </p>
+      )}
+
+      <div className="flex flex-col gap-1.5">
+        <Label htmlFor="title">Nickname (optional)</Label>
+        <Input id="title" placeholder="e.g. Brutal sparring night" {...register('title')} />
+      </div>
+
       <div className="flex flex-col gap-1.5">
         <Label htmlFor="date">Date</Label>
         <Input id="date" type="date" {...register('date')} />

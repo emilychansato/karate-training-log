@@ -4,6 +4,7 @@ import { getCurrentUserId } from '../lib/getCurrentUserId'
 
 export interface TrainingSession {
   id: string
+  title: string | null
   date: string
   type: string
   duration_min: number
@@ -15,6 +16,7 @@ export interface TrainingSession {
 }
 
 export interface NewTrainingSession {
+  title?: string
   date: string
   type: string
   duration_min: number
