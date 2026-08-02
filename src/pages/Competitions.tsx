@@ -11,6 +11,7 @@ import { popIn, staggerContainer, springy } from '../lib/motion'
 import { groupByTimeframe } from '../lib/groupByTimeframe'
 import { CardSkeletonList } from '../components/ui/skeleton'
 import { WinRateGauge } from '../components/dashboard/WinRateGauge'
+import { CompetitionThumbnail } from '../components/competitions/CompetitionThumbnail'
 
 export function Competitions() {
   const navigate = useNavigate()
@@ -131,6 +132,7 @@ export function Competitions() {
                               </div>
                               <p className="label-caps text-muted-foreground">{c.date}</p>
                             </div>
+                            <CompetitionThumbnail competitionId={c.id} />
                             <div className="flex items-center justify-between text-sm text-muted-foreground">
                               <div className="flex items-center gap-1.5">
                                 <Icon name="trophy" className="size-4" />

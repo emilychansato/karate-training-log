@@ -37,6 +37,7 @@ export function GoalsPanel() {
   const { competitions } = useCompetitions()
   const { history } = useRankHistory()
   const [showForm, setShowForm] = useState(false)
+  const [showWeight, setShowWeight] = useState(false)
   const [date, setDate] = useState(todayIso())
   const [weight, setWeight] = useState('')
 
@@ -133,6 +134,14 @@ export function GoalsPanel() {
         </div>
       )}
 
+      {!weightLoading && logs.length === 0 && !showWeight ? (
+        <button
+          onClick={() => setShowWeight(true)}
+          className="label-caps self-start text-muted-foreground hover:text-foreground"
+        >
+          + Log weight
+        </button>
+      ) : (
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 font-heading text-lg">
@@ -184,6 +193,7 @@ export function GoalsPanel() {
           )}
         </CardContent>
       </Card>
+      )}
     </div>
   )
 }
