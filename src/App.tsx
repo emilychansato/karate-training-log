@@ -10,6 +10,8 @@ import { Unfiltered } from './pages/Unfiltered'
 import { TechniqueDetail } from './pages/TechniqueDetail'
 import { Resources } from './pages/Resources'
 import { TournamentPrep } from './pages/TournamentPrep'
+import { ClubsAndFriends } from './pages/ClubsAndFriends'
+import { ClubDetail } from './pages/ClubDetail'
 import { AuthGate } from './components/layout/AuthGate'
 import { AppShell } from './components/layout/AppShell'
 
@@ -104,6 +106,26 @@ function App() {
             <AuthGate>
               <AppShell>
                 <TournamentPrep />
+              </AppShell>
+            </AuthGate>
+          }
+        />
+        <Route
+          path="/clubs"
+          element={
+            <AuthGate>
+              <AppShell>
+                <ClubsAndFriends />
+              </AppShell>
+            </AuthGate>
+          }
+        />
+        <Route
+          path="/clubs/:id"
+          element={
+            <AuthGate>
+              <AppShell>
+                <ClubDetail />
               </AppShell>
             </AuthGate>
           }

@@ -1,7 +1,9 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { useProfileNotes } from '../hooks/useProfileNotes'
 import { SegmentedControl } from '../components/ui/segmented-control'
+import { Icon } from '../components/ui/icon'
 import { AboutCard } from '../components/profile/AboutCard'
 import { RecordsPanel } from '../components/profile/RecordsPanel'
 import { TechniquesPanel } from '../components/profile/TechniquesPanel'
@@ -28,6 +30,18 @@ export function Profile() {
           Sign out
         </button>
       </div>
+
+      <Link
+        to="/clubs"
+        className="glow-aka card-elevated flex items-center gap-3 border border-border bg-card p-4 transition-colors duration-150 hover:border-aka"
+      >
+        <Icon name="users" className="size-6 flex-shrink-0 text-aka" />
+        <div className="flex-1">
+          <p className="font-heading text-lg">Clubs &amp; Friends</p>
+          <p className="text-xs text-muted-foreground">Connect with teammates and training partners</p>
+        </div>
+        <Icon name="chevron_down" className="size-4 flex-shrink-0 -rotate-90 text-muted-foreground" />
+      </Link>
 
       <AboutCard profileInfo={profileInfo} saveProfileInfo={saveProfileInfo} />
 
