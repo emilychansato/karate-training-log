@@ -6,6 +6,7 @@ import { popIn, staggerContainer, springy } from '../../lib/motion'
 import { Button } from '../ui/button'
 import { Icon } from '../ui/icon'
 import { CardSkeletonList } from '../ui/skeleton'
+import { PhotoGallery } from '../ui/photo-gallery'
 
 const TYPE_STYLES: Record<string, string> = {
   kata: 'bg-ao text-white',
@@ -137,6 +138,10 @@ export function SessionList({
                       ))}
                     </div>
                   )}
+
+                  <div className="mb-3 border-t border-border pt-3">
+                    <PhotoGallery entryType="training_session" entryId={s.id} />
+                  </div>
 
                   <div className="flex items-center justify-between border-t border-border pt-3">
                     <div className="flex gap-0.5">

@@ -20,6 +20,7 @@ const { mockMatch } = vi.hoisted(() => ({
     points_for: 3,
     points_against: 0,
     win_method: 'waza-ari',
+    outcome: null,
     notes: null,
     created_at: '2026-06-01T10:00:00Z',
     match_techniques: [],
@@ -101,6 +102,24 @@ describe('useCompetitionMatches', () => {
 
     const linkCall = vi.mocked(supabase.from).mock.calls.find((c) => c[0] === 'match_techniques')
     expect(linkCall).toBeTruthy()
+  })
+
+  it('quickLogOutcome inserts a bare match with just the outcome and returns no error', async () => {
+    const { result } = renderHook(() => useCompetitionMatches('c1'))
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    let response: { error: string | null } = { error: 'unset' }
+    await act(async () => {
+      response = await result.current.quickLogOutcome('win')
+    })
+
+    expect(response.error).toBeNull()
+    const matchesFrom = vi
+      .mocked(supabase.from)
+      .mock.results.find((r) => r.value.insert && r.value.select)
+    expect(matchesFrom?.value.insert).toHaveBeenCalledWith(
+      expect.objectContaining({ competition_id: 'c1', outcome: 'win' })
+    )
   })
 
   it('updateMatch updates the match, resyncs favorite techniques, and returns no error', async () => {

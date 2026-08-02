@@ -8,6 +8,7 @@ import { ReflectionForm } from '../components/forms/ReflectionForm'
 import { Button } from '../components/ui/button'
 import { Icon } from '../components/ui/icon'
 import { CardSkeletonList } from '../components/ui/skeleton'
+import { PhotoGallery } from '../components/ui/photo-gallery'
 import { useReducedMotion } from '../hooks/useReducedMotion'
 import { popIn, staggerContainer, springy } from '../lib/motion'
 
@@ -28,6 +29,7 @@ export function CompetitionDetail() {
     createMatch,
     updateMatch,
     deleteMatch,
+    quickLogOutcome,
   } = useCompetitionMatches(id ?? '')
   const [showForm, setShowForm] = useState(false)
   const [showReflection, setShowReflection] = useState(false)
@@ -74,6 +76,9 @@ export function CompetitionDetail() {
           {competition.placement ? ` · ${competition.placement}` : ''}
         </p>
         {competition.notes && <p className="mt-3 text-sm">{competition.notes}</p>}
+        <div className="mt-4">
+          <PhotoGallery entryType="competition" entryId={competition.id} />
+        </div>
       </div>
 
       <div className="flex flex-col gap-3">
@@ -115,6 +120,28 @@ export function CompetitionDetail() {
         >
           {showForm ? 'Cancel' : '+ Add match'}
         </button>
+      </div>
+
+      <div className="grid grid-cols-3 gap-2">
+        <Button
+          type="button"
+          variant="outline"
+          className="border-ao text-ao hover:bg-ao/10"
+          onClick={() => quickLogOutcome('win')}
+        >
+          WIN
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          className="border-aka text-aka hover:bg-aka/10"
+          onClick={() => quickLogOutcome('loss')}
+        >
+          LOSS
+        </Button>
+        <Button type="button" variant="outline" onClick={() => quickLogOutcome('draw')}>
+          DRAW
+        </Button>
       </div>
 
       {showForm && (
@@ -163,14 +190,27 @@ export function CompetitionDetail() {
                         )}
                         <p className="font-heading text-lg">{m.opponent_name ?? 'Opponent'}</p>
                       </div>
-                      {competition.discipline === 'kumite' && (
+                      {m.outcome && (
+                        <span
+                          className={`label-caps px-2 py-0.5 ${
+                            m.outcome === 'win'
+                              ? 'bg-ao text-white'
+                              : m.outcome === 'loss'
+                                ? 'bg-aka text-white'
+                                : 'bg-muted text-foreground'
+                          }`}
+                        >
+                          {m.outcome}
+                        </span>
+                      )}
+                      {!m.outcome && competition.discipline === 'kumite' && (
                         <p className="font-mono tabular-mono text-xl font-bold">
                           <span className="text-aka">{m.points_for ?? 0}</span>
                           {' – '}
                           <span className="text-ao">{m.points_against ?? 0}</span>
                         </p>
                       )}
-                      {competition.discipline === 'kata' && m.kata_technical_score != null && (
+                      {!m.outcome && competition.discipline === 'kata' && m.kata_technical_score != null && (
                         <p className="font-mono tabular-mono text-xl font-bold">
                           {m.kata_technical_score}
                         </p>

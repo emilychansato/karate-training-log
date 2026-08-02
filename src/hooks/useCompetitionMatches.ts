@@ -15,6 +15,8 @@ export interface FavoriteTechnique {
   name: string
 }
 
+export type MatchOutcome = 'win' | 'loss' | 'draw'
+
 export interface CompetitionMatch {
   id: string
   competition_id: string
@@ -31,6 +33,7 @@ export interface CompetitionMatch {
   points_for: number | null
   points_against: number | null
   win_method: WinMethod | null
+  outcome: MatchOutcome | null
   notes: string | null
   created_at: string
   favorite_techniques: FavoriteTechnique[]
@@ -48,6 +51,7 @@ export interface NewCompetitionMatch {
   opponent_waza_ari?: number
   opponent_ippon?: number
   win_method?: WinMethod
+  outcome?: MatchOutcome
   notes?: string
 }
 
@@ -67,6 +71,7 @@ interface RawMatchRow {
   points_for: number | null
   points_against: number | null
   win_method: WinMethod | null
+  outcome: MatchOutcome | null
   notes: string | null
   created_at: string
   match_techniques: { technique_id: string; techniques: { name: string } }[]
@@ -133,6 +138,17 @@ export function useCompetitionMatches(competitionId: string) {
     return { error: null }
   }
 
+  // One-tap outcome logging - creates a bare match with just the result,
+  // no opponent/scores/notes required. The existing edit-in-place flow
+  // (updateMatch, via the match card's Edit button) fills in detail later.
+  async function quickLogOutcome(outcome: MatchOutcome) {
+    const { error } = await supabase
+      .from('competition_matches')
+      .insert({ competition_id: competitionId, outcome, points_for: 0, points_against: 0 })
+    if (!error) await load()
+    return { error: error?.message ?? null }
+  }
+
   async function updateMatch(
     id: string,
     input: NewCompetitionMatch,
@@ -163,5 +179,5 @@ export function useCompetitionMatches(competitionId: string) {
     return { error: error?.message ?? null }
   }
 
-  return { matches, loading, createMatch, updateMatch, deleteMatch }
+  return { matches, loading, createMatch, updateMatch, deleteMatch, quickLogOutcome }
 }

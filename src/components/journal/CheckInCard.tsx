@@ -6,6 +6,7 @@ import { computeJournalStreak } from '../../lib/journalStreak'
 import { ToggleChip } from '../ui/toggle-chip'
 import { Button } from '../ui/button'
 import { Icon } from '../ui/icon'
+import { PhotoGallery } from '../ui/photo-gallery'
 
 function thisWeekDates(): string[] {
   const now = new Date()
@@ -128,6 +129,8 @@ export function CheckInCard({
             placeholder="Anything else on your mind? (optional)"
             className="min-h-20 border border-input bg-input px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground"
           />
+
+          {todayEntry && <PhotoGallery entryType="journal_entry" entryId={todayEntry.id} />}
 
           <div className="flex gap-2">
             <Button onClick={handleSave} disabled={!mood} className="glow-primary flex-1">
