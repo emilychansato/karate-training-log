@@ -6,11 +6,12 @@ import { AboutCard } from '../components/profile/AboutCard'
 import { RecordsPanel } from '../components/profile/RecordsPanel'
 import { TechniquesPanel } from '../components/profile/TechniquesPanel'
 import { WeightPanel } from '../components/profile/WeightPanel'
+import { RankPanel } from '../components/profile/RankPanel'
 
 export function Profile() {
   const { user, signOut } = useAuth()
   const { profileInfo, saveProfileInfo } = useProfileNotes()
-  const [tab, setTab] = useState<'records' | 'techniques' | 'weight'>('records')
+  const [tab, setTab] = useState<'records' | 'techniques' | 'weight' | 'rank'>('records')
 
   return (
     <div className="flex flex-col gap-6">
@@ -36,15 +37,17 @@ export function Profile() {
           { value: 'records', label: 'RECORDS' },
           { value: 'techniques', label: 'TECHNIQUES' },
           { value: 'weight', label: 'WEIGHT' },
+          { value: 'rank', label: 'RANK' },
         ]}
         value={tab}
         onChange={setTab}
-        className="max-w-sm"
+        className="max-w-md"
       />
 
       {tab === 'records' && <RecordsPanel />}
       {tab === 'techniques' && <TechniquesPanel />}
       {tab === 'weight' && <WeightPanel />}
+      {tab === 'rank' && <RankPanel />}
     </div>
   )
 }
