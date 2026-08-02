@@ -3,8 +3,22 @@ import { NavLink, useLocation } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useAuth } from '../../hooks/useAuth'
 import { useReducedMotion } from '../../hooks/useReducedMotion'
+import { useTheme } from '../theme/ThemeProvider'
 import { Icon, type IconName } from '../ui/icon'
 import { snappy, pageEnter } from '../../lib/motion'
+
+function ThemeToggle() {
+  const { theme, toggleTheme } = useTheme()
+  return (
+    <button
+      onClick={toggleTheme}
+      aria-label="Toggle theme"
+      className="flex size-9 items-center justify-center text-muted-foreground transition-colors duration-150 hover:text-foreground"
+    >
+      <Icon name={theme === 'dark' ? 'sun' : 'moon'} className="size-4" />
+    </button>
+  )
+}
 
 const NAV_ITEMS: { to: string; label: string; icon: IconName }[] = [
   { to: '/', label: 'Dashboard', icon: 'dashboard' },
@@ -55,12 +69,15 @@ export function AppShell({ children }: { children: ReactNode }) {
             </NavLink>
           ))}
         </nav>
-        <button
-          onClick={() => signOut()}
-          className="label-caps text-muted-foreground transition-colors duration-150 hover:text-foreground"
-        >
-          Sign out
-        </button>
+        <div className="flex items-center gap-1">
+          <ThemeToggle />
+          <button
+            onClick={() => signOut()}
+            className="label-caps text-muted-foreground transition-colors duration-150 hover:text-foreground"
+          >
+            Sign out
+          </button>
+        </div>
       </header>
 
       <main className="mx-auto w-full max-w-3xl flex-1 p-4 pb-24 md:pb-8">

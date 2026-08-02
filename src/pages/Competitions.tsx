@@ -14,7 +14,7 @@ import { WinRateGauge } from '../components/dashboard/WinRateGauge'
 export function Competitions() {
   const navigate = useNavigate()
   const [showForm, setShowForm] = useState(false)
-  const [tab, setTab] = useState<'past' | 'upcoming'>('past')
+  const [tab, setTab] = useState<'past' | 'upcoming'>('upcoming')
   const { competitions, loading } = useCompetitions()
   const reducedMotion = useReducedMotion()
 

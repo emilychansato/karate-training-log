@@ -21,6 +21,8 @@ import {
   FileText,
   ExternalLink,
   BookOpen,
+  Sun,
+  Moon,
   type LucideIcon,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -48,6 +50,8 @@ const ICONS = {
   file: FileText,
   external_link: ExternalLink,
   resources: BookOpen,
+  sun: Sun,
+  moon: Moon,
 } satisfies Record<string, LucideIcon>
 
 export type IconName = keyof typeof ICONS

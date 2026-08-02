@@ -17,16 +17,24 @@ const PHASES: { value: PrepPhase; label: string; blurb: string }[] = [
 function GoalForm({ addGoal }: { addGoal: (goal: string, discipline?: 'kata' | 'kumite') => Promise<{ error: string | null }> }) {
   const [text, setText] = useState('')
   const [discipline, setDiscipline] = useState<'kata' | 'kumite' | undefined>(undefined)
+  const [error, setError] = useState<string | null>(null)
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!text.trim()) return
+    setError(null)
     const { error } = await addGoal(text.trim(), discipline)
-    if (!error) setText('')
+    if (error) setError(error)
+    else setText('')
   }
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-2">
+      {error && (
+        <p className="border-l-2 border-l-destructive bg-destructive/10 px-3 py-2 text-sm text-destructive">
+          {error}
+        </p>
+      )}
       <Input placeholder="e.g. Land the kizami-gyaku combo under pressure" value={text} onChange={(e) => setText(e.target.value)} />
       <div className="flex items-center gap-2">
         <ToggleChip label="Kata" accent="ao" selected={discipline === 'kata'} onClick={() => setDiscipline((d) => (d === 'kata' ? undefined : 'kata'))} />

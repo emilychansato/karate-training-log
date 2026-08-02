@@ -16,6 +16,8 @@
 @import "@fontsource/inter/700.css";
 @import "@fontsource/jetbrains-mono/500.css";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -50,7 +52,45 @@
 }
 
 :root {
-  /* Disciplined Craft, rebuilt for dark mode (soft charcoal, confirmed 2026-08-01) */
+  /* Disciplined Craft, light mode (warm off-white, not stark AI-slop white) */
+  --background: #f6f4f2;
+  --foreground: #1a1a1c;
+
+  --card: #ffffff;
+  --card-foreground: #1a1a1c;
+  --card-title: #6f6d6a;
+
+  --muted: #efece8;
+  --muted-foreground: #6f6d6a;
+
+  --border: #e1ddd8;
+  --input: #e6e2dd;
+  --ring: #b6b2ac;
+
+  /* Primary UI actions stay monochrome — AKA/AO red/blue are reserved for
+     competitor data, not general accents (see design spec). */
+  --primary: #1a1a1c;
+  --primary-foreground: #f6f4f2;
+
+  --secondary: #efece8;
+  --secondary-foreground: #1a1a1c;
+
+  --destructive: #ff3b4a;
+  --destructive-foreground: #f6f4f2;
+
+  --aka: #ff3b4a;
+  --aka-score: #ff5b67;
+  --ao: #3d8bff;
+  --ao-score: #5c9dff;
+
+  /* Sharp corners, no rounding, per Disciplined Craft's shape language */
+  --radius: 0rem;
+
+  color-scheme: light;
+}
+
+.dark {
+  /* Disciplined Craft, dark mode (soft charcoal, confirmed 2026-08-01) */
   --background: #1a1a1c;
   --foreground: #f0f0f1;
 
@@ -65,8 +105,6 @@
   --input: #333336;
   --ring: #6b6b70;
 
-  /* Primary UI actions stay monochrome — AKA/AO red/blue are reserved for
-     competitor data, not general accents (see design spec). */
   --primary: #f0f0f1;
   --primary-foreground: #1a1a1c;
 
@@ -80,9 +118,6 @@
   --aka-score: #ff5b67;
   --ao: #3d8bff;
   --ao-score: #5c9dff;
-
-  /* Sharp corners, no rounding, per Disciplined Craft's shape language */
-  --radius: 0rem;
 
   color-scheme: dark;
 }
