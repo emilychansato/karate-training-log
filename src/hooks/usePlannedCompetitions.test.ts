@@ -12,6 +12,9 @@ const { mockPlanned } = vi.hoisted(() => ({
     division: null,
     discipline: null,
     notes: null,
+    kind: 'competition',
+    source_type: null,
+    source_id: null,
     created_at: '2026-08-02T00:00:00Z',
   },
 }))

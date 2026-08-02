@@ -2,6 +2,8 @@ import { useCallback, useEffect, useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { getCurrentUserId } from '../lib/getCurrentUserId'
 
+export type CalendarSource = 'wkf' | 'kbc'
+
 export interface PlannedCompetition {
   id: string
   event: string
@@ -10,6 +12,9 @@ export interface PlannedCompetition {
   division: string | null
   discipline: 'kata' | 'kumite' | null
   notes: string | null
+  kind: 'competition' | 'event'
+  source_type: CalendarSource | null
+  source_id: string | null
   created_at: string
 }
 
@@ -20,6 +25,9 @@ export interface NewPlannedCompetition {
   division?: string
   discipline?: 'kata' | 'kumite'
   notes?: string
+  kind?: 'competition' | 'event'
+  source_type?: CalendarSource
+  source_id?: string
 }
 
 export function usePlannedCompetitions() {
