@@ -26,9 +26,21 @@ vi.mock('../lib/supabaseClient', () => {
   const deleteFn = vi.fn(() => ({ eq: eqDelete }))
   const eqUpdate = vi.fn().mockResolvedValue({ error: null })
   const update = vi.fn(() => ({ eq: eqUpdate }))
+
+  const maybeSingle = vi.fn().mockResolvedValue({ data: null, error: null })
+  const rankLimit = vi.fn(() => ({ maybeSingle }))
+  const rankOrder = vi.fn(() => ({ limit: rankLimit }))
+  const rankLte = vi.fn(() => ({ order: rankOrder }))
+  const rankSelect = vi.fn(() => ({ lte: rankLte }))
+
+  const from = vi.fn((table: string) => {
+    if (table === 'rank_history') return { select: rankSelect }
+    return { select: listSelect, insert, delete: deleteFn, update }
+  })
+
   return {
     supabase: {
-      from: vi.fn(() => ({ select: listSelect, insert, delete: deleteFn, update })),
+      from,
       auth: {
         getClaims: vi.fn().mockResolvedValue({ data: { claims: { sub: 'user-1' } } }),
       },
@@ -60,7 +72,9 @@ describe('useCompetitions', () => {
     })
     expect(response.error).toBeNull()
     expect(response.id).toBe('new-comp-id')
-    const insertCall = vi.mocked(supabase.from).mock.results[0].value.insert
+    const insertCall = vi
+      .mocked(supabase.from)
+      .mock.results.find((r) => r.value.insert)?.value.insert
     expect(insertCall).toHaveBeenCalledWith(
       expect.objectContaining({ user_id: 'user-1', event: 'Nationals', discipline: 'kumite' })
     )

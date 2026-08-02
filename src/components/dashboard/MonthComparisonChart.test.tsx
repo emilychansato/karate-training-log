@@ -32,6 +32,7 @@ describe('MonthComparisonChart', () => {
           duration_min: 120,
           self_rating: null,
           notes: null,
+          location: null,
           improved: [],
           struggled: [],
           created_at: '',

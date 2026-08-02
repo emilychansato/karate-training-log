@@ -10,6 +10,8 @@ export interface Competition {
   discipline: 'kata' | 'kumite'
   placement: string | null
   notes: string | null
+  location: string | null
+  rank_at_time: string | null
   coach_notes: string | null
   what_went_well: string | null
   what_to_improve: string | null
@@ -25,6 +27,7 @@ export interface NewCompetition {
   discipline: 'kata' | 'kumite'
   placement?: string
   notes?: string
+  location?: string
 }
 
 export interface CompetitionReflection {
@@ -57,9 +60,21 @@ export function useCompetitions() {
     const userId = await getCurrentUserId()
     if (!userId) return { error: 'Not signed in', id: null }
 
+    // Snapshot whatever rank was current as of the competition's date, so
+    // a competition fought at green belt keeps showing green belt even
+    // after later promotions - not user-entered, derived from rank_history.
+    const { data: rankRow } = await supabase
+      .from('rank_history')
+      .select('rank, style')
+      .lte('achieved_date', input.date)
+      .order('achieved_date', { ascending: false })
+      .limit(1)
+      .maybeSingle()
+    const rank_at_time = rankRow ? `${rankRow.rank} (${rankRow.style})` : null
+
     const { data, error } = await supabase
       .from('competitions')
-      .insert({ ...input, user_id: userId })
+      .insert({ ...input, user_id: userId, rank_at_time })
       .select()
       .single()
     if (!error) await load()

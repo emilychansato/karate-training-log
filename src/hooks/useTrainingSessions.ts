@@ -10,6 +10,7 @@ export interface TrainingSession {
   duration_min: number
   self_rating: number | null
   notes: string | null
+  location: string | null
   improved: string[]
   struggled: string[]
   created_at: string
@@ -22,6 +23,7 @@ export interface NewTrainingSession {
   duration_min: number
   self_rating?: number
   notes?: string
+  location?: string
   improved?: string[]
   struggled?: string[]
 }

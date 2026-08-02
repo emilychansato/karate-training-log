@@ -17,6 +17,7 @@ const schema = z.object({
   discipline: z.enum(['kata', 'kumite'], { message: 'Discipline is required' }),
   placement: z.string().optional(),
   notes: z.string().optional(),
+  location: z.string().optional(),
 })
 
 type FormInput = z.input<typeof schema>
@@ -108,6 +109,11 @@ export function CompetitionForm({ onSuccess }: { onSuccess: (competitionId: stri
       <div className="flex flex-col gap-1.5">
         <Label htmlFor="placement">Placement</Label>
         <Input id="placement" {...register('placement')} />
+      </div>
+
+      <div className="flex flex-col gap-1.5">
+        <Label htmlFor="location">Location (optional)</Label>
+        <Input id="location" placeholder="e.g. Surrey, BC" {...register('location')} />
       </div>
 
       <div className="flex flex-col gap-1.5">

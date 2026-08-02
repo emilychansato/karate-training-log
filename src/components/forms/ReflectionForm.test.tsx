@@ -12,6 +12,8 @@ const competition: Competition = {
   discipline: 'kumite',
   placement: null,
   notes: null,
+  location: null,
+  rank_at_time: null,
   coach_notes: null,
   what_went_well: null,
   what_to_improve: null,

@@ -35,6 +35,7 @@ const schema = z.object({
     z.coerce.number().min(1).max(5).optional()
   ),
   notes: z.string().optional(),
+  location: z.string().optional(),
   improved: z.array(z.string()).default([]),
   struggled: z.array(z.string()).default([]),
 })
@@ -120,6 +121,11 @@ export function SessionForm({
       <div className="flex flex-col gap-1.5">
         <Label htmlFor="self_rating">Self-rating (1-5)</Label>
         <Input id="self_rating" type="number" min={1} max={5} {...register('self_rating')} />
+      </div>
+
+      <div className="flex flex-col gap-1.5">
+        <Label htmlFor="location">Location (optional)</Label>
+        <Input id="location" placeholder="e.g. North Shore Karate" {...register('location')} />
       </div>
 
       <fieldset className="flex flex-col gap-2">

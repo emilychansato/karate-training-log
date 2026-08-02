@@ -12,6 +12,7 @@ const session: TrainingSession = {
   duration_min: 60,
   self_rating: 4,
   notes: null,
+  location: null,
   improved: [],
   struggled: [],
   created_at: '2026-08-01T10:00:00Z',
