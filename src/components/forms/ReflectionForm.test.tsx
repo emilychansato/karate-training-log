@@ -13,6 +13,8 @@ const competition: Competition = {
   placement: null,
   notes: null,
   location: null,
+  latitude: null,
+  longitude: null,
   rank_at_time: null,
   coach_notes: null,
   what_went_well: null,

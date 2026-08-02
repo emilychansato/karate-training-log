@@ -33,6 +33,8 @@ describe('MonthComparisonChart', () => {
           self_rating: null,
           notes: null,
           location: null,
+          latitude: null,
+          longitude: null,
           improved: [],
           struggled: [],
           created_at: '',

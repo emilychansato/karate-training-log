@@ -12,6 +12,8 @@ function makeSession(overrides: Partial<TrainingSession>): TrainingSession {
     self_rating: null,
     notes: null,
     location: null,
+    latitude: null,
+    longitude: null,
     improved: [],
     struggled: [],
     created_at: '2026-08-01T00:00:00Z',

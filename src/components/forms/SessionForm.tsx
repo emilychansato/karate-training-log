@@ -9,6 +9,7 @@ import { Label } from '../ui/label'
 import { SegmentedControl } from '../ui/segmented-control'
 import { ToggleChip } from '../ui/toggle-chip'
 import { DatePicker } from '../ui/date-picker'
+import { LocationPicker } from '../ui/location-picker'
 import { todayIso } from '@/lib/dateFormat'
 
 const SESSION_TYPES = ['kata', 'kumite', 'conditioning', 'other'] as const
@@ -36,6 +37,8 @@ const schema = z.object({
   ),
   notes: z.string().optional(),
   location: z.string().optional(),
+  latitude: z.number().optional(),
+  longitude: z.number().optional(),
   improved: z.array(z.string()).default([]),
   struggled: z.array(z.string()).default([]),
 })
@@ -54,6 +57,8 @@ export function SessionForm({
     register,
     control,
     handleSubmit,
+    watch,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<FormInput, unknown, FormOutput>({
     resolver: zodResolver(schema),
@@ -125,7 +130,42 @@ export function SessionForm({
 
       <div className="flex flex-col gap-1.5">
         <Label htmlFor="location">Location (optional)</Label>
-        <Input id="location" placeholder="e.g. North Shore Karate" {...register('location')} />
+        <div className="flex gap-2">
+          <Input
+            id="location"
+            placeholder="e.g. North Shore Karate"
+            {...register('location')}
+            className="flex-1"
+          />
+          <Controller
+            name="latitude"
+            control={control}
+            render={({ field: latField }) => (
+              <Controller
+                name="longitude"
+                control={control}
+                render={({ field: lngField }) => (
+                  <LocationPicker
+                    value={
+                      latField.value != null && lngField.value != null
+                        ? {
+                            label: watch('location') ?? '',
+                            latitude: latField.value,
+                            longitude: lngField.value,
+                          }
+                        : null
+                    }
+                    onChange={(picked) => {
+                      setValue('location', picked.label)
+                      latField.onChange(picked.latitude)
+                      lngField.onChange(picked.longitude)
+                    }}
+                  />
+                )}
+              />
+            )}
+          />
+        </div>
       </div>
 
       <fieldset className="flex flex-col gap-2">

@@ -11,6 +11,8 @@ export interface Competition {
   placement: string | null
   notes: string | null
   location: string | null
+  latitude: number | null
+  longitude: number | null
   rank_at_time: string | null
   coach_notes: string | null
   what_went_well: string | null
@@ -28,6 +30,8 @@ export interface NewCompetition {
   placement?: string
   notes?: string
   location?: string
+  latitude?: number
+  longitude?: number
 }
 
 export interface CompetitionReflection {
