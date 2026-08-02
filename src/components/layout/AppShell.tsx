@@ -12,6 +12,7 @@ const NAV_ITEMS: { to: string; label: string; icon: IconName }[] = [
   { to: '/competitions', label: 'Comps', icon: 'trophy' },
   { to: '/records', label: 'Records', icon: 'award' },
   { to: '/techniques', label: 'Techniques', icon: 'target' },
+  { to: '/resources', label: 'Resources', icon: 'resources' },
 ]
 
 export function AppShell({ children }: { children: ReactNode }) {

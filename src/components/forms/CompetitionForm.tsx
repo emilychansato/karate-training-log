@@ -2,10 +2,12 @@ import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useCompetitions } from '../../hooks/useCompetitions'
+import { KATA_CATEGORIES, KUMITE_DIVISIONS } from '../../lib/competitionCategories'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
 import { Label } from '../ui/label'
 import { SegmentedControl } from '../ui/segmented-control'
+import { Select } from '../ui/select'
 
 const schema = z.object({
   event: z.string().min(1, 'Event is required'),
@@ -29,8 +31,12 @@ export function CompetitionForm({ onSuccess }: { onSuccess: (competitionId: stri
     register,
     control,
     handleSubmit,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm<FormInput, unknown, FormOutput>({ resolver: zodResolver(schema) })
+
+  const discipline = watch('discipline')
+  const divisionOptions = discipline === 'kata' ? KATA_CATEGORIES : KUMITE_DIVISIONS
 
   async function onSubmit(values: FormOutput) {
     const { error, id } = await createCompetition(values)
@@ -78,7 +84,18 @@ export function CompetitionForm({ onSuccess }: { onSuccess: (competitionId: stri
 
       <div className="flex flex-col gap-1.5">
         <Label htmlFor="division">Division</Label>
-        <Input id="division" {...register('division')} />
+        <Controller
+          name="division"
+          control={control}
+          render={({ field }) => (
+            <Select
+              value={field.value ?? ''}
+              onChange={field.onChange}
+              options={divisionOptions}
+              placeholder={discipline ? 'Select division…' : 'Pick a discipline first'}
+            />
+          )}
+        />
       </div>
 
       <div className="flex flex-col gap-1.5">

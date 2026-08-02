@@ -16,6 +16,11 @@ import {
   Dumbbell,
   Minus,
   Search,
+  ChevronDown,
+  Check,
+  FileText,
+  ExternalLink,
+  BookOpen,
   type LucideIcon,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -38,6 +43,11 @@ const ICONS = {
   dumbbell: Dumbbell,
   minus: Minus,
   search: Search,
+  chevron_down: ChevronDown,
+  check: Check,
+  file: FileText,
+  external_link: ExternalLink,
+  resources: BookOpen,
 } satisfies Record<string, LucideIcon>
 
 export type IconName = keyof typeof ICONS

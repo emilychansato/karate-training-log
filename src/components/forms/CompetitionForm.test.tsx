@@ -33,6 +33,33 @@ describe('CompetitionForm', () => {
     expect(onSuccess).toHaveBeenCalledWith('new-comp-id')
   })
 
+  it('offers real WKF kumite weight divisions once kumite is selected, and submits the chosen one', async () => {
+    const createCompetition = vi.fn().mockResolvedValue({ error: null, id: 'new-comp-id' })
+    vi.mocked(useCompetitions).mockReturnValue({
+      competitions: [],
+      loading: false,
+      createCompetition,
+      updateCompetition: vi.fn(),
+      deleteCompetition: vi.fn(),
+    })
+    render(<CompetitionForm onSuccess={vi.fn()} />)
+    const user = userEvent.setup()
+
+    await user.click(screen.getByRole('radio', { name: 'KUMITE' }))
+    await user.click(screen.getByRole('combobox'))
+    await user.click(await screen.findByRole('option', { name: 'Male Senior (18+ years) -67 kg' }))
+
+    await user.type(screen.getByLabelText(/event/i), 'BC Open')
+    await user.type(screen.getByLabelText(/^date/i), '2026-06-01')
+    await user.click(screen.getByRole('button', { name: /save competition/i }))
+
+    await waitFor(() =>
+      expect(createCompetition).toHaveBeenCalledWith(
+        expect.objectContaining({ division: 'Male Senior (18+ years) -67 kg' })
+      )
+    )
+  })
+
   it('shows a validation error when the event is missing', async () => {
     vi.mocked(useCompetitions).mockReturnValue({
       competitions: [],
