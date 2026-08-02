@@ -56,55 +56,66 @@ async function embedBatch(texts: string[], apiKey: string): Promise<number[][]> 
   return data.data.map((d: { embedding: number[] }) => d.embedding)
 }
 
-Deno.serve(async () => {
+// Processes ONE resource per invocation (pass { "index": 0..12 } in the
+// request body). Doing all 13 PDFs in a single call exceeded the Edge
+// Function's compute/memory limit (PDF parsing is heavy) - the caller
+// loops over indices instead, one HTTP request per document.
+Deno.serve(async (req) => {
   try {
     const openaiKey = Deno.env.get('OPENAI_API_KEY')
     if (!openaiKey) {
       return new Response(JSON.stringify({ error: 'OPENAI_API_KEY not configured' }), { status: 500 })
     }
 
+    const { index } = await req.json().catch(() => ({ index: undefined }))
+    if (typeof index !== 'number' || !RESOURCES[index]) {
+      return new Response(
+        JSON.stringify({ error: `index required, 0..${RESOURCES.length - 1}` }),
+        { status: 400 }
+      )
+    }
+    const resource = RESOURCES[index]
+
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL')!,
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     )
 
-    const results: { title: string; chunks: number; error: string | null }[] = []
+    const res = await fetch(resource.url)
+    if (!res.ok) {
+      return new Response(
+        JSON.stringify({ title: resource.title, chunks: 0, error: `fetch ${res.status}` }),
+        { status: 502 }
+      )
+    }
+    const buffer = new Uint8Array(await res.arrayBuffer())
+    const pdf = await getDocumentProxy(buffer)
+    const { text } = await extractText(pdf, { mergePages: true })
+    const chunks = chunkText(text as string)
 
-    for (const resource of RESOURCES) {
-      try {
-        const res = await fetch(resource.url)
-        if (!res.ok) {
-          results.push({ title: resource.title, chunks: 0, error: `fetch ${res.status}` })
-          continue
-        }
-        const buffer = new Uint8Array(await res.arrayBuffer())
-        const pdf = await getDocumentProxy(buffer)
-        const { text } = await extractText(pdf, { mergePages: true })
-        const chunks = chunkText(text as string)
+    await supabase.from('resource_chunks').delete().eq('resource_url', resource.url)
 
-        await supabase.from('resource_chunks').delete().eq('resource_url', resource.url)
-
-        const BATCH = 50
-        for (let i = 0; i < chunks.length; i += BATCH) {
-          const batch = chunks.slice(i, i + BATCH)
-          const embeddings = await embedBatch(batch, openaiKey)
-          await supabase.from('resource_chunks').insert(
-            batch.map((content, j) => ({
-              resource_title: resource.title,
-              resource_url: resource.url,
-              content,
-              embedding: embeddings[j],
-            }))
-          )
-        }
-
-        results.push({ title: resource.title, chunks: chunks.length, error: null })
-      } catch (err) {
-        results.push({ title: resource.title, chunks: 0, error: String(err) })
+    const BATCH = 20
+    for (let i = 0; i < chunks.length; i += BATCH) {
+      const batch = chunks.slice(i, i + BATCH)
+      const embeddings = await embedBatch(batch, openaiKey)
+      const { error: insertError } = await supabase.from('resource_chunks').insert(
+        batch.map((content, j) => ({
+          resource_title: resource.title,
+          resource_url: resource.url,
+          content,
+          embedding: embeddings[j],
+        }))
+      )
+      if (insertError) {
+        return new Response(
+          JSON.stringify({ title: resource.title, chunks: i, error: insertError.message }),
+          { status: 500 }
+        )
       }
     }
 
-    return new Response(JSON.stringify({ results }), {
+    return new Response(JSON.stringify({ title: resource.title, chunks: chunks.length, error: null }), {
       headers: { 'Content-Type': 'application/json' },
     })
   } catch (err) {
