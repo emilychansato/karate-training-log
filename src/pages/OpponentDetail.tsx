@@ -30,7 +30,7 @@ export function OpponentDetail() {
     return (
       <div className="flex flex-col gap-4">
         <p className="text-sm text-muted-foreground">No matches found against this opponent.</p>
-        <Link to="/profile" className="label-caps text-aka">← Profile</Link>
+        <Link to="/profile" className="label-caps text-aka transition-colors duration-150 hover:underline">← Profile</Link>
       </div>
     )
   }

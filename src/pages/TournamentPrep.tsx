@@ -128,7 +128,7 @@ export function TournamentPrep() {
     return (
       <div className="flex flex-col gap-4">
         <p className="text-sm text-muted-foreground">Competition not found in your upcoming list.</p>
-        <Link to="/competitions" className="label-caps text-aka">← Competitions</Link>
+        <Link to="/competitions" className="label-caps text-aka transition-colors duration-150 hover:underline">← Competitions</Link>
       </div>
     )
   }

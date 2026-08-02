@@ -116,7 +116,7 @@ export function Competitions() {
                           />
                           <Link
                             to={`/competitions/${c.id}`}
-                            className="card-elevated block border border-border bg-card p-5"
+                            className="card-elevated block border border-border bg-card p-5 transition-colors duration-150 hover:border-ring"
                           >
                             <div className="mb-2 flex items-start justify-between">
                               <div>

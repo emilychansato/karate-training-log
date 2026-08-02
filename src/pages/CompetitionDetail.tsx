@@ -44,7 +44,7 @@ export function CompetitionDetail() {
     return (
       <div className="flex flex-col gap-4">
         <p className="text-sm text-muted-foreground">Competition not found.</p>
-        <Link to="/competitions" className="label-caps text-aka">
+        <Link to="/competitions" className="label-caps text-aka transition-colors duration-150 hover:underline">
           Back to competitions
         </Link>
       </div>
