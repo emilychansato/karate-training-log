@@ -1,12 +1,15 @@
 import { useState } from 'react'
 import { useAuth } from '../hooks/useAuth'
+import { useProfileNotes } from '../hooks/useProfileNotes'
 import { SegmentedControl } from '../components/ui/segmented-control'
+import { AboutCard } from '../components/profile/AboutCard'
 import { RecordsPanel } from '../components/profile/RecordsPanel'
 import { TechniquesPanel } from '../components/profile/TechniquesPanel'
 import { WeightPanel } from '../components/profile/WeightPanel'
 
 export function Profile() {
   const { user, signOut } = useAuth()
+  const { profileInfo, saveProfileInfo } = useProfileNotes()
   const [tab, setTab] = useState<'records' | 'techniques' | 'weight'>('records')
 
   return (
@@ -24,6 +27,8 @@ export function Profile() {
           Sign out
         </button>
       </div>
+
+      <AboutCard profileInfo={profileInfo} saveProfileInfo={saveProfileInfo} />
 
       <SegmentedControl
         name="profile-tab"
