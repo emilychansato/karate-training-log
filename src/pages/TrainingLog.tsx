@@ -3,7 +3,9 @@ import { motion } from 'framer-motion'
 import { SessionForm } from '../components/forms/SessionForm'
 import { SessionList } from '../components/log/SessionList'
 import { SessionCalendar } from '../components/log/SessionCalendar'
+import { VoiceLogButton } from '../components/log/VoiceLogButton'
 import { HoursChart } from '../components/dashboard/HoursChart'
+import type { NewTrainingSession } from '../hooks/useTrainingSessions'
 import { Icon } from '../components/ui/icon'
 import { Input } from '../components/ui/input'
 import { SegmentedControl } from '../components/ui/segmented-control'
@@ -102,6 +104,7 @@ export function TrainingLog() {
   const [searchQuery, setSearchQuery] = useState('')
   const [typeFilter, setTypeFilter] = useState('all')
   const [view, setView] = useState<LogView>('list')
+  const [voicePrefill, setVoicePrefill] = useState<Partial<NewTrainingSession> | null>(null)
   const reducedMotion = useReducedMotion()
   const { sessions, loading, createSession, deleteSession } = useTrainingSessions()
 
@@ -121,7 +124,23 @@ export function TrainingLog() {
       </div>
       <StatStrip sessions={sessions} />
       {showForm && (
-        <SessionForm createSession={createSession} onSuccess={() => setShowForm(false)} />
+        <div className="flex flex-col gap-3">
+          <VoiceLogButton onParsed={setVoicePrefill} />
+          {voicePrefill && (
+            <p className="text-xs text-muted-foreground">
+              Heard you — review and save, or edit anything below.
+            </p>
+          )}
+          <SessionForm
+            key={voicePrefill ? 'voice' : 'manual'}
+            createSession={createSession}
+            initialValues={voicePrefill ?? undefined}
+            onSuccess={() => {
+              setShowForm(false)
+              setVoicePrefill(null)
+            }}
+          />
+        </div>
       )}
       <SegmentedControl
         name="log-view"

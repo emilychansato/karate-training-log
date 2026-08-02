@@ -49,9 +49,13 @@ type FormOutput = z.output<typeof schema>
 export function SessionForm({
   onSuccess,
   createSession,
+  initialValues,
 }: {
   onSuccess: () => void
   createSession: (input: NewTrainingSession) => Promise<{ error: string | null }>
+  /** Prefills the form (e.g. from a parsed voice log) - still requires
+   * the user to review/edit and hit Save, never auto-submitted. */
+  initialValues?: Partial<NewTrainingSession>
 }) {
   const {
     register,
@@ -62,7 +66,12 @@ export function SessionForm({
     formState: { errors, isSubmitting },
   } = useForm<FormInput, unknown, FormOutput>({
     resolver: zodResolver(schema),
-    defaultValues: { date: todayIso(), improved: [], struggled: [] },
+    defaultValues: {
+      date: todayIso(),
+      improved: [],
+      struggled: [],
+      ...(initialValues as Partial<FormInput>),
+    },
   })
   const [submitError, setSubmitError] = useState<string | null>(null)
 

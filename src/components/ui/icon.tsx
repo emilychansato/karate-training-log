@@ -30,6 +30,7 @@ import {
   MessageSquareText,
   Flame,
   MapPin,
+  Mic,
   type LucideIcon,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -66,6 +67,7 @@ const ICONS = {
   feedback: MessageSquareText,
   streak: Flame,
   location_on: MapPin,
+  mic: Mic,
 } satisfies Record<string, LucideIcon>
 
 export type IconName = keyof typeof ICONS
