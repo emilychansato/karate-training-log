@@ -8,6 +8,7 @@ import { Icon } from '../components/ui/icon'
 import { SegmentedControl } from '../components/ui/segmented-control'
 import { useReducedMotion } from '../hooks/useReducedMotion'
 import { popIn, staggerContainer, springy } from '../lib/motion'
+import { groupByTimeframe } from '../lib/groupByTimeframe'
 import { CardSkeletonList } from '../components/ui/skeleton'
 import { WinRateGauge } from '../components/dashboard/WinRateGauge'
 
@@ -81,54 +82,74 @@ export function Competitions() {
               <p className="text-sm text-muted-foreground">No competitions logged yet.</p>
             </motion.div>
           )}
-          <motion.ul
-            className="flex flex-col gap-4"
-            variants={reducedMotion ? undefined : staggerContainer()}
-            initial={reducedMotion ? undefined : 'hidden'}
-            animate={reducedMotion ? undefined : 'show'}
-          >
-            <AnimatePresence mode="popLayout">
-              {competitions.map((c) => (
-                <motion.li
-                  key={c.id}
-                  variants={reducedMotion ? undefined : popIn}
-                  exit={reducedMotion ? undefined : 'exit'}
-                  layout={!reducedMotion}
-                  whileHover={reducedMotion ? undefined : { y: -3 }}
-                  transition={springy}
-                >
-                  <Link
-                    to={`/competitions/${c.id}`}
-                    className="card-elevated block border border-border bg-card p-5"
+          {!loading && competitions.length > 0 && (
+            <div className="flex flex-col gap-8">
+              {groupByTimeframe(competitions, (c) => c.date).map((group) => (
+                <div key={group.label} className="flex flex-col gap-3">
+                  <div className="flex items-center gap-3">
+                    <span className="label-caps text-foreground">{group.label}</span>
+                    <span className="font-mono tabular-mono text-xs text-muted-foreground">
+                      {group.items.length} comp{group.items.length === 1 ? '' : 's'}
+                    </span>
+                  </div>
+                  <motion.ul
+                    className="relative flex flex-col gap-4 border-l border-border pl-5"
+                    variants={reducedMotion ? undefined : staggerContainer()}
+                    initial={reducedMotion ? undefined : 'hidden'}
+                    animate={reducedMotion ? undefined : 'show'}
                   >
-                    <div className="mb-2 flex items-start justify-between">
-                      <div>
-                        <span
-                          className={`label-caps mb-2 inline-block px-2 py-0.5 ${
-                            c.discipline === 'kata' ? 'bg-ao text-white' : 'bg-aka text-white'
-                          }`}
+                    <AnimatePresence mode="popLayout">
+                      {group.items.map((c) => (
+                        <motion.li
+                          key={c.id}
+                          className="relative"
+                          variants={reducedMotion ? undefined : popIn}
+                          exit={reducedMotion ? undefined : 'exit'}
+                          layout={!reducedMotion}
+                          whileHover={reducedMotion ? undefined : { y: -3 }}
+                          transition={springy}
                         >
-                          {c.discipline}
-                        </span>
-                        <h3 className="font-heading text-xl">{c.event}</h3>
-                      </div>
-                      <p className="label-caps text-muted-foreground">{c.date}</p>
-                    </div>
-                    <div className="flex items-center justify-between text-sm text-muted-foreground">
-                      <div className="flex items-center gap-1.5">
-                        <Icon name="trophy" className="size-4" />
-                        {c.placement ?? 'no placement recorded'}
-                      </div>
-                      <span className="label-caps flex items-center gap-1">
-                        View matches
-                        <Icon name="add" className="size-3" />
-                      </span>
-                    </div>
-                  </Link>
-                </motion.li>
+                          <span
+                            className={`absolute top-6 -left-[27px] size-2.5 rounded-full ${
+                              c.discipline === 'kata' ? 'bg-ao' : 'bg-aka'
+                            }`}
+                          />
+                          <Link
+                            to={`/competitions/${c.id}`}
+                            className="card-elevated block border border-border bg-card p-5"
+                          >
+                            <div className="mb-2 flex items-start justify-between">
+                              <div>
+                                <span
+                                  className={`label-caps mb-2 inline-block px-2 py-0.5 ${
+                                    c.discipline === 'kata' ? 'bg-ao text-white' : 'bg-aka text-white'
+                                  }`}
+                                >
+                                  {c.discipline}
+                                </span>
+                                <h3 className="font-heading text-xl">{c.event}</h3>
+                              </div>
+                              <p className="label-caps text-muted-foreground">{c.date}</p>
+                            </div>
+                            <div className="flex items-center justify-between text-sm text-muted-foreground">
+                              <div className="flex items-center gap-1.5">
+                                <Icon name="trophy" className="size-4" />
+                                {c.placement ?? 'no placement recorded'}
+                              </div>
+                              <span className="label-caps flex items-center gap-1">
+                                View matches
+                                <Icon name="add" className="size-3" />
+                              </span>
+                            </div>
+                          </Link>
+                        </motion.li>
+                      ))}
+                    </AnimatePresence>
+                  </motion.ul>
+                </div>
               ))}
-            </AnimatePresence>
-          </motion.ul>
+            </div>
+          )}
         </>
       )}
 
