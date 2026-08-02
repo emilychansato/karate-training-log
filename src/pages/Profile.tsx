@@ -5,13 +5,13 @@ import { SegmentedControl } from '../components/ui/segmented-control'
 import { AboutCard } from '../components/profile/AboutCard'
 import { RecordsPanel } from '../components/profile/RecordsPanel'
 import { TechniquesPanel } from '../components/profile/TechniquesPanel'
-import { WeightPanel } from '../components/profile/WeightPanel'
+import { GoalsPanel } from '../components/profile/GoalsPanel'
 import { RankPanel } from '../components/profile/RankPanel'
 
 export function Profile() {
   const { user, signOut } = useAuth()
   const { profileInfo, saveProfileInfo } = useProfileNotes()
-  const [tab, setTab] = useState<'records' | 'techniques' | 'weight' | 'rank'>('records')
+  const [tab, setTab] = useState<'records' | 'techniques' | 'goals' | 'rank'>('records')
 
   return (
     <div className="flex flex-col gap-6">
@@ -36,7 +36,7 @@ export function Profile() {
         options={[
           { value: 'records', label: 'RECORDS' },
           { value: 'techniques', label: 'TECHNIQUES' },
-          { value: 'weight', label: 'WEIGHT' },
+          { value: 'goals', label: 'GOALS' },
           { value: 'rank', label: 'RANK' },
         ]}
         value={tab}
@@ -46,7 +46,7 @@ export function Profile() {
 
       {tab === 'records' && <RecordsPanel />}
       {tab === 'techniques' && <TechniquesPanel />}
-      {tab === 'weight' && <WeightPanel />}
+      {tab === 'goals' && <GoalsPanel />}
       {tab === 'rank' && <RankPanel />}
     </div>
   )
