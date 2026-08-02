@@ -24,6 +24,7 @@ const NAV_ITEMS: { to: string; label: string; icon: IconName }[] = [
   { to: '/', label: 'Dashboard', icon: 'dashboard' },
   { to: '/log', label: 'Logs', icon: 'event_note' },
   { to: '/competitions', label: 'Comps', icon: 'trophy' },
+  { to: '/unfiltered', label: 'Unfiltered', icon: 'unfiltered' },
   { to: '/profile', label: 'Profile', icon: 'profile' },
 ]
 

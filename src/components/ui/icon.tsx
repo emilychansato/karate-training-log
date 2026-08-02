@@ -24,6 +24,7 @@ import {
   Sun,
   Moon,
   CircleUserRound,
+  Heart,
   type LucideIcon,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -54,6 +55,7 @@ const ICONS = {
   sun: Sun,
   moon: Moon,
   profile: CircleUserRound,
+  unfiltered: Heart,
 } satisfies Record<string, LucideIcon>
 
 export type IconName = keyof typeof ICONS

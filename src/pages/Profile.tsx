@@ -3,10 +3,11 @@ import { useAuth } from '../hooks/useAuth'
 import { SegmentedControl } from '../components/ui/segmented-control'
 import { RecordsPanel } from '../components/profile/RecordsPanel'
 import { TechniquesPanel } from '../components/profile/TechniquesPanel'
+import { WeightPanel } from '../components/profile/WeightPanel'
 
 export function Profile() {
   const { user, signOut } = useAuth()
-  const [tab, setTab] = useState<'records' | 'techniques'>('records')
+  const [tab, setTab] = useState<'records' | 'techniques' | 'weight'>('records')
 
   return (
     <div className="flex flex-col gap-6">
@@ -29,13 +30,16 @@ export function Profile() {
         options={[
           { value: 'records', label: 'RECORDS' },
           { value: 'techniques', label: 'TECHNIQUES' },
+          { value: 'weight', label: 'WEIGHT' },
         ]}
         value={tab}
         onChange={setTab}
-        className="max-w-xs"
+        className="max-w-sm"
       />
 
-      {tab === 'records' ? <RecordsPanel /> : <TechniquesPanel />}
+      {tab === 'records' && <RecordsPanel />}
+      {tab === 'techniques' && <TechniquesPanel />}
+      {tab === 'weight' && <WeightPanel />}
     </div>
   )
 }

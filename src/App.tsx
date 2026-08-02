@@ -5,6 +5,7 @@ import { Competitions } from './pages/Competitions'
 import { CompetitionDetail } from './pages/CompetitionDetail'
 import { Dashboard } from './pages/Dashboard'
 import { Profile } from './pages/Profile'
+import { Unfiltered } from './pages/Unfiltered'
 import { TechniqueDetail } from './pages/TechniqueDetail'
 import { Resources } from './pages/Resources'
 import { TournamentPrep } from './pages/TournamentPrep'
@@ -52,6 +53,16 @@ function App() {
             <AuthGate>
               <AppShell>
                 <CompetitionDetail />
+              </AppShell>
+            </AuthGate>
+          }
+        />
+        <Route
+          path="/unfiltered"
+          element={
+            <AuthGate>
+              <AppShell>
+                <Unfiltered />
               </AppShell>
             </AuthGate>
           }
