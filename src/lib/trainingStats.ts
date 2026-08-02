@@ -3,7 +3,17 @@ import type { TrainingSession } from '../hooks/useTrainingSessions'
 export interface SessionStats {
   totalSessions: number
   hoursThisWeek: number
-  intensityPercent: number | null
+  monthHoursDelta: number | null
+}
+
+function monthHours(sessions: TrainingSession[], year: number, month: number): number {
+  const total = sessions
+    .filter((s) => {
+      const [y, m] = s.date.split('-').map(Number)
+      return y === year && m === month + 1
+    })
+    .reduce((sum, s) => sum + s.duration_min, 0)
+  return Math.round((total / 60) * 10) / 10
 }
 
 // Date-only strings ("2026-08-01") parse as UTC midnight, so week
@@ -35,17 +45,22 @@ export function computeSessionStats(sessions: TrainingSession[], now: Date): Ses
     })
     .reduce((sum, s) => sum + s.duration_min, 0)
 
-  const ratings = sessions
-    .map((s) => s.self_rating)
-    .filter((r): r is number => r != null)
-
-  const intensityPercent = ratings.length
-    ? Math.round((ratings.reduce((sum, r) => sum + r, 0) / ratings.length / 5) * 100)
-    : null
+  const lastMonthDate = new Date(now)
+  lastMonthDate.setUTCMonth(lastMonthDate.getUTCMonth() - 1)
+  const thisMonthHours = monthHours(sessions, now.getUTCFullYear(), now.getUTCMonth())
+  const lastMonthHours = monthHours(
+    sessions,
+    lastMonthDate.getUTCFullYear(),
+    lastMonthDate.getUTCMonth()
+  )
+  const monthHoursDelta =
+    thisMonthHours === 0 && lastMonthHours === 0
+      ? null
+      : Math.round((thisMonthHours - lastMonthHours) * 10) / 10
 
   return {
     totalSessions: sessions.length,
     hoursThisWeek: Math.round((minutesThisWeek / 60) * 10) / 10,
-    intensityPercent,
+    monthHoursDelta,
   }
 }

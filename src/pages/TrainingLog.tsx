@@ -82,9 +82,15 @@ function StatStrip({ sessions }: { sessions: TrainingSession[] }) {
         <p className="font-heading mt-1 text-2xl text-ao">{stats.hoursThisWeek}h</p>
       </div>
       <div className="card-elevated flex min-w-[130px] flex-col justify-between border border-border bg-card p-4">
-        <p className="label-caps text-muted-foreground">Intensity</p>
-        <p className="font-heading mt-1 text-2xl text-aka">
-          {stats.intensityPercent != null ? `${stats.intensityPercent}%` : '—'}
+        <p className="label-caps text-muted-foreground">vs last month</p>
+        <p
+          className={`font-heading mt-1 text-2xl ${
+            stats.monthHoursDelta != null && stats.monthHoursDelta < 0 ? 'text-aka' : 'text-ao'
+          }`}
+        >
+          {stats.monthHoursDelta != null
+            ? `${stats.monthHoursDelta >= 0 ? '+' : ''}${stats.monthHoursDelta}h`
+            : '—'}
         </p>
       </div>
     </div>

@@ -40,18 +40,16 @@ describe('computeSessionStats', () => {
     expect(computeSessionStats(sessions, new Date('2026-08-01')).hoursThisWeek).toBe(2.5)
   })
 
-  it('computes average intensity as a percentage of the 1-5 rating scale', () => {
+  it('computes the change in hours between this month and last month', () => {
     const sessions = [
-      makeSession({ id: 'a', self_rating: 5 }),
-      makeSession({ id: 'b', self_rating: 3 }),
-      makeSession({ id: 'c', self_rating: null }),
+      makeSession({ id: 'a', date: '2026-08-01', duration_min: 120 }), // this month: 2h
+      makeSession({ id: 'b', date: '2026-07-15', duration_min: 60 }), // last month: 1h
     ]
-    // average of 5 and 3 = 4, 4/5 = 80%
-    expect(computeSessionStats(sessions, new Date('2026-08-01')).intensityPercent).toBe(80)
+    expect(computeSessionStats(sessions, new Date('2026-08-01')).monthHoursDelta).toBe(1)
   })
 
-  it('returns null intensity and 0 hours/sessions for an empty list', () => {
+  it('returns null monthHoursDelta and 0 hours/sessions for an empty list', () => {
     const stats = computeSessionStats([], new Date('2026-08-01'))
-    expect(stats).toEqual({ totalSessions: 0, hoursThisWeek: 0, intensityPercent: null })
+    expect(stats).toEqual({ totalSessions: 0, hoursThisWeek: 0, monthHoursDelta: null })
   })
 })
