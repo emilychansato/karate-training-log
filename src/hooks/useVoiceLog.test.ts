@@ -95,4 +95,35 @@ describe('useVoiceLog', () => {
     await waitFor(() => expect(result.current.state).toBe('error'))
     expect(result.current.error).toBe('boom')
   })
+
+  it('shows an actionable message for a "network" recognition error', async () => {
+    const { result } = renderHook(() => useVoiceLog())
+    act(() => {
+      result.current.start()
+    })
+
+    act(() => {
+      lastInstance?.onerror?.({ error: 'network' })
+    })
+
+    expect(result.current.state).toBe('error')
+    expect(result.current.error).toBe(
+      'Voice recognition needs an internet connection to reach the speech service - check your connection and try again.'
+    )
+  })
+
+  it('shows an actionable message for a "not-allowed" recognition error', async () => {
+    const { result } = renderHook(() => useVoiceLog())
+    act(() => {
+      result.current.start()
+    })
+
+    act(() => {
+      lastInstance?.onerror?.({ error: 'not-allowed' })
+    })
+
+    expect(result.current.error).toBe(
+      'Microphone access is blocked for this site - check your browser/site settings and try again.'
+    )
+  })
 })

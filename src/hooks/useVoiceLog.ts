@@ -23,6 +23,26 @@ function getSpeechRecognition(): (new () => SpeechRecognitionLike) | null {
 
 export type VoiceLogState = 'idle' | 'listening' | 'parsing' | 'error'
 
+// The Web Speech API's onerror gives a terse code, not a message - surface
+// something a user can actually act on instead of a generic failure.
+function describeRecognitionError(code: string | undefined): string {
+  switch (code) {
+    case 'not-allowed':
+    case 'permission-denied':
+      return 'Microphone access is blocked for this site - check your browser/site settings and try again.'
+    case 'no-speech':
+      return "Didn't catch anything - try again and speak right after tapping."
+    case 'network':
+      return 'Voice recognition needs an internet connection to reach the speech service - check your connection and try again.'
+    case 'audio-capture':
+      return 'No microphone found - check that one is connected and try again.'
+    case 'aborted':
+      return 'Voice input was cancelled.'
+    default:
+      return `Voice input failed${code ? ` (${code})` : ''} - try again.`
+  }
+}
+
 export function useVoiceLog() {
   const [state, setState] = useState<VoiceLogState>('idle')
   const [error, setError] = useState<string | null>(null)
@@ -77,8 +97,9 @@ export function useVoiceLog() {
       setState('idle')
     }
 
-    recognition.onerror = () => {
-      setError('Voice input failed - try again.')
+    recognition.onerror = (event: unknown) => {
+      const code = (event as { error?: string })?.error
+      setError(describeRecognitionError(code))
       setState('error')
     }
 
