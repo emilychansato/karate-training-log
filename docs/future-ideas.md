@@ -283,6 +283,32 @@ should ever reference patterns across entries (which raises different privacy st
 one-off reply). Worth a dedicated design conversation when the journal itself is built, not
 bolted on as an afterthought.
 
+## Resources Q&A assistant, answers grounded ONLY in the Resources documents (flagged 2026-08-03)
+
+Emily wants to eventually ask quick questions ("what's the weight class for Female Cadet?", "how
+many points is a yuko?") and get an answer sourced *only* from the WKF/Karate Canada PDFs on the
+Resources page — never the model's general knowledge, since a wrong rule (made up vs. actually
+published) could cost someone at a real tournament. This is a retrieval-augmented generation (RAG)
+problem, not a plain chatbot:
+
+1. **Ingest** — fetch each PDF from `resources.ts`, extract its text, split into small overlapping
+   passages (a few hundred words each), and generate a vector embedding per passage (e.g. via an
+   embeddings API). Store passages + embeddings + their source (title, URL, ideally page number) in
+   a Postgres table using the `pgvector` extension (Supabase supports this natively).
+2. **Query** — embed the user's question the same way, do a vector similarity search against the
+   stored passages to pull the handful most relevant to the question, then send *only those
+   passages* + the question to an LLM with an explicit instruction: answer strictly from the
+   provided text, and say "not covered in these documents" rather than guessing if the passages
+   don't contain the answer.
+3. **Cite the source** — show which document (and ideally page) the answer came from, so it's
+   checkable against the real PDF rather than trusted blindly.
+
+This is what "grounding" means in RAG: the model can't wander outside the reference set. It's a
+real build (needs an embeddings/LLM API, a vector-capable table, a PDF text-extraction step run
+once per document) but is a natural fit for the Resources page specifically, since the source set
+is small, fixed, and already organized. Not scoped or scheduled — noted for when Resources has
+been used a bit and the actual question patterns are clearer.
+
 ## Comprehensive competition logging (flagged 2026-08-02)
 
 Current `competition_results` covers the factual/scoring side well (event, date, division,

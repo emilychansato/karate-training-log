@@ -33,12 +33,12 @@ export function Select({
       </SelectPrimitive.Trigger>
       <SelectPrimitive.Portal>
         <SelectPrimitive.Positioner sideOffset={4} className="z-50">
-          <SelectPrimitive.Popup className="card-elevated max-h-72 w-[var(--anchor-width)] overflow-y-auto border border-border bg-card py-1">
+          <SelectPrimitive.Popup className="card-elevated max-h-52 w-[var(--anchor-width)] overflow-y-auto overscroll-contain border border-border bg-card py-1">
             {options.map((opt) => (
               <SelectPrimitive.Item
                 key={opt}
                 value={opt}
-                className="flex cursor-pointer items-center justify-between gap-2 px-3 py-2 text-sm text-foreground outline-none data-[highlighted]:bg-muted"
+                className="flex cursor-pointer items-center justify-between gap-2 px-3 py-1.5 text-sm text-foreground outline-none data-[highlighted]:bg-muted"
               >
                 <SelectPrimitive.ItemText>{opt}</SelectPrimitive.ItemText>
                 <SelectPrimitive.ItemIndicator>

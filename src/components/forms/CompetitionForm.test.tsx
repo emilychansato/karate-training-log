@@ -47,7 +47,7 @@ describe('CompetitionForm', () => {
 
     await user.click(screen.getByRole('radio', { name: 'KUMITE' }))
     await user.click(screen.getByRole('combobox'))
-    await user.click(await screen.findByRole('option', { name: 'Male Senior (18+ years) -67 kg' }))
+    await user.click(await screen.findByRole('option', { name: 'Male Senior -67 kg' }))
 
     await user.type(screen.getByLabelText(/event/i), 'BC Open')
     await user.type(screen.getByLabelText(/^date/i), '2026-06-01')
@@ -55,7 +55,7 @@ describe('CompetitionForm', () => {
 
     await waitFor(() =>
       expect(createCompetition).toHaveBeenCalledWith(
-        expect.objectContaining({ division: 'Male Senior (18+ years) -67 kg' })
+        expect.objectContaining({ division: 'Male Senior -67 kg' })
       )
     )
   })

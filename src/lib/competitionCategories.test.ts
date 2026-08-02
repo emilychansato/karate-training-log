@@ -13,12 +13,13 @@ describe('competitionCategories', () => {
   })
 
   it('formats open weight classes with a leading + rather than -', () => {
-    expect(KUMITE_DIVISIONS).toContain('Male Senior (18+ years) +84 kg')
-    expect(KUMITE_DIVISIONS).toContain('Female U14 (12 to <14 years) +52 kg')
+    expect(KUMITE_DIVISIONS).toContain('Male Senior +84 kg')
+    expect(KUMITE_DIVISIONS).toContain('Female U14 +52 kg')
   })
 
-  it('formats a known middle-weight division exactly as WKF publishes it', () => {
-    expect(KUMITE_DIVISIONS).toContain('Male Senior (18+ years) -67 kg')
-    expect(KUMITE_DIVISIONS).toContain('Female Junior (16 to <18 years) -53 kg')
+  it('formats a known middle-weight division without the age-range parenthetical', () => {
+    expect(KUMITE_DIVISIONS).toContain('Male Senior -67 kg')
+    expect(KUMITE_DIVISIONS).toContain('Female Junior -53 kg')
+    expect(KUMITE_DIVISIONS.some((d) => d.includes('('))).toBe(false)
   })
 })

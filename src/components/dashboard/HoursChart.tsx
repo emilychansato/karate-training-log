@@ -3,7 +3,14 @@ import { useTrainingSessions } from '../../hooks/useTrainingSessions'
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/card'
 import { Icon } from '../ui/icon'
 
+const WEEKS_SHOWN = 10
+
+/** Always builds a fixed trailing window of weeks (instead of only the
+ * weeks that happen to have sessions) so a single recent session doesn't
+ * render as one massive bar filling the whole chart - real training
+ * frequency reads as a rhythm across ~2 months, not one huge block. */
 function toWeeklyHours(sessions: { date: string; duration_min: number }[]) {
+  const now = new Date()
   const byWeek = new Map<string, number>()
   for (const s of sessions) {
     const d = new Date(s.date)
@@ -12,25 +19,19 @@ function toWeeklyHours(sessions: { date: string; duration_min: number }[]) {
     const key = weekStart.toISOString().slice(0, 10)
     byWeek.set(key, (byWeek.get(key) ?? 0) + s.duration_min / 60)
   }
-  return Array.from(byWeek.entries())
-    .map(([week, hours]) => ({ week, hours: Math.round(hours * 10) / 10 }))
-    .sort((a, b) => a.week.localeCompare(b.week))
-}
 
-/** Flat zero-height placeholder weeks so the axes still render with structure
- * before any data exists, instead of the chart flashing in and out. */
-function placeholderWeeks() {
-  const now = new Date()
-  return Array.from({ length: 4 }, (_, i) => {
+  return Array.from({ length: WEEKS_SHOWN }, (_, i) => {
     const d = new Date(now)
-    d.setDate(now.getDate() - (3 - i) * 7)
-    return { week: d.toISOString().slice(0, 10), hours: 0 }
+    d.setDate(now.getDate() - now.getDay() - (WEEKS_SHOWN - 1 - i) * 7)
+    const key = d.toISOString().slice(0, 10)
+    const hours = byWeek.get(key) ?? 0
+    return { week: key, hours: Math.round(hours * 10) / 10 }
   })
 }
 
 export function HoursChart() {
   const { sessions, loading } = useTrainingSessions()
-  const data = sessions.length > 0 ? toWeeklyHours(sessions) : placeholderWeeks()
+  const data = toWeeklyHours(sessions)
   const isEmpty = !loading && sessions.length === 0
 
   return (
@@ -45,12 +46,13 @@ export function HoursChart() {
         <div className="relative h-48 w-full">
           <ResponsiveContainer>
             <BarChart data={data}>
-              <XAxis dataKey="week" tick={{ fontSize: 11 }} />
+              <XAxis dataKey="week" tick={{ fontSize: 11 }} interval={1} />
               <YAxis tick={{ fontSize: 11 }} domain={isEmpty ? [0, 1] : undefined} />
-              <Tooltip />
+              <Tooltip cursor={false} />
               <Bar
                 dataKey="hours"
                 fill="var(--aka)"
+                activeBar={false}
                 radius={0}
                 isAnimationActive
                 animationDuration={700}

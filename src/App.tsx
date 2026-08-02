@@ -6,6 +6,7 @@ import { CompetitionDetail } from './pages/CompetitionDetail'
 import { Dashboard } from './pages/Dashboard'
 import { Records } from './pages/Records'
 import { Techniques } from './pages/Techniques'
+import { TechniqueDetail } from './pages/TechniqueDetail'
 import { Resources } from './pages/Resources'
 import { AuthGate } from './components/layout/AuthGate'
 import { AppShell } from './components/layout/AppShell'
@@ -71,6 +72,16 @@ function App() {
             <AuthGate>
               <AppShell>
                 <Techniques />
+              </AppShell>
+            </AuthGate>
+          }
+        />
+        <Route
+          path="/techniques/:id"
+          element={
+            <AuthGate>
+              <AppShell>
+                <TechniqueDetail />
               </AppShell>
             </AuthGate>
           }

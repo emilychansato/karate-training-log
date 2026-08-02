@@ -1,6 +1,8 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { useTechniques } from '../hooks/useTechniques'
 import { useUserTechniques } from '../hooks/useUserTechniques'
+import { classifyKumiteTechnique } from '../lib/techniqueClassification'
 import { TechniquePortfolio } from '../components/techniques/TechniquePortfolio'
 import { Input } from '../components/ui/input'
 import { Button } from '../components/ui/button'
@@ -15,7 +17,8 @@ const CATEGORY_TABS: { value: 'kata' | 'kumite_combo'; label: string }[] = [
 
 export function Techniques() {
   const { techniques, loading } = useTechniques()
-  const { bookmarks, addBookmark } = useUserTechniques()
+  const { bookmarks, loading: bookmarksLoading, addBookmark, removeBookmark } =
+    useUserTechniques()
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState<'kata' | 'kumite_combo'>('kata')
 
@@ -64,16 +67,22 @@ export function Techniques() {
           ) : (
             <ul className="flex max-h-80 flex-col gap-1 overflow-y-auto">
               {filtered.map((t) => {
+                const bookmark = bookmarks.find((b) => b.technique_id === t.id)
                 const isBookmarked = bookmarkedIds.has(t.id)
+                const typeLabel =
+                  t.category === 'kata' ? 'Kata' : classifyKumiteTechnique(t.name)
                 return (
                   <li
                     key={t.id}
                     className="flex items-center justify-between border-b border-border py-2 text-sm last:border-b-0"
                   >
-                    <div>
-                      <p>{t.name}</p>
-                      <p className="label-caps text-muted-foreground">{t.category}</p>
-                    </div>
+                    <Link to={`/techniques/${t.id}`} className="hover:underline">
+                      <p>
+                        {t.name}
+                        {bookmark?.nickname ? ` (${bookmark.nickname})` : ''}
+                      </p>
+                      <p className="label-caps text-muted-foreground">{typeLabel}</p>
+                    </Link>
                     <Button
                       variant={isBookmarked ? 'ghost' : 'outline'}
                       size="sm"
@@ -103,7 +112,11 @@ export function Techniques() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <TechniquePortfolio />
+          <TechniquePortfolio
+            bookmarks={bookmarks}
+            loading={bookmarksLoading}
+            removeBookmark={removeBookmark}
+          />
         </CardContent>
       </Card>
     </div>
