@@ -42,11 +42,12 @@ describe('useAuth', () => {
 
     let response: { error: string | null } = { error: 'unset' }
     await act(async () => {
-      response = await result.current.signUp('test@example.com', 'password123')
+      response = await result.current.signUp('test@example.com', 'password123', 'Jamie Lee', 'jamielee')
     })
     expect(supabase.auth.signUp).toHaveBeenCalledWith({
       email: 'test@example.com',
       password: 'password123',
+      options: { data: { full_name: 'Jamie Lee', username: 'jamielee' } },
     })
     expect(response.error).toBeNull()
   })

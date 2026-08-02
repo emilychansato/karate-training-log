@@ -7,6 +7,7 @@ import { pageEnter, shake, springy } from '../lib/motion'
 import { Button } from '../components/ui/button'
 import { Input } from '../components/ui/input'
 import { Label } from '../components/ui/label'
+import { Icon } from '../components/ui/icon'
 import {
   Card,
   CardHeader,
@@ -19,8 +20,11 @@ export function Login() {
   const { user, signIn, signUp } = useAuth()
   const reducedMotion = useReducedMotion()
   const [mode, setMode] = useState<'sign-in' | 'sign-up'>('sign-in')
+  const [fullName, setFullName] = useState('')
+  const [username, setUsername] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [shakeError, setShakeError] = useState(false)
   const [signUpComplete, setSignUpComplete] = useState(false)
@@ -31,7 +35,9 @@ export function Login() {
     setSubmitting(true)
     setError(null)
     const { error } =
-      mode === 'sign-in' ? await signIn(email, password) : await signUp(email, password)
+      mode === 'sign-in'
+        ? await signIn(email, password)
+        : await signUp(email, password, fullName, username)
     setSubmitting(false)
     if (error) {
       setError(error)
@@ -107,6 +113,28 @@ export function Login() {
                   transition={springy}
                   className="flex flex-col gap-4"
                 >
+                  {mode === 'sign-up' && (
+                    <>
+                      <div className="flex flex-col gap-1.5">
+                        <Label htmlFor="fullName">Name</Label>
+                        <Input
+                          id="fullName"
+                          value={fullName}
+                          onChange={(e) => setFullName(e.target.value)}
+                          required
+                        />
+                      </div>
+                      <div className="flex flex-col gap-1.5">
+                        <Label htmlFor="username">Username</Label>
+                        <Input
+                          id="username"
+                          value={username}
+                          onChange={(e) => setUsername(e.target.value)}
+                          required
+                        />
+                      </div>
+                    </>
+                  )}
                   <div className="flex flex-col gap-1.5">
                     <Label htmlFor="email">Email</Label>
                     <Input
@@ -119,13 +147,24 @@ export function Login() {
                   </div>
                   <div className="flex flex-col gap-1.5">
                     <Label htmlFor="password">Password</Label>
-                    <Input
-                      id="password"
-                      type="password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      required
-                    />
+                    <div className="relative">
+                      <Input
+                        id="password"
+                        type={showPassword ? 'text' : 'password'}
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className="pr-9"
+                        required
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword((v) => !v)}
+                        aria-label={showPassword ? 'Hide password' : 'Show password'}
+                        className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                      >
+                        <Icon name={showPassword ? 'eye_off' : 'eye'} className="size-4" />
+                      </button>
+                    </div>
                   </div>
                   <AnimatePresence>
                     {error && (
