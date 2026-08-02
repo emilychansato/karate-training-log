@@ -110,8 +110,11 @@ export const RESOURCE_GROUPS: ResourceGroup[] = [
         title: 'Recommended Protocols for Return to Karate Training',
         url: 'https://karatecanada.org/recommended-protocols-for-return-to-karate-training/',
       },
-      { title: 'CCES Anti-Doping Resources', url: 'https://www.cces.ca' },
-      { title: 'True Sport Clean Course', url: 'https://www.truesport.ca' },
+      {
+        title: 'Sport Integrity Canada (formerly CCES) — Anti-Doping Resources',
+        url: 'https://sportintegrity.ca/',
+      },
+      { title: 'True Sport Clean Course', url: 'https://sportintegrity.ca/true-sport' },
       { title: 'Global DRO (Drug Reference Online)', url: 'https://www.globaldro.com' },
     ],
   },
