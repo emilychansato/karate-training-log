@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import { usePhotos, type EntryType } from '@/hooks/usePhotos'
 import { Button } from './button'
 import { Icon } from './icon'
@@ -15,13 +15,28 @@ export function PhotoGallery({
 }) {
   const { photos, loading, uploadPhoto, deletePhoto } = usePhotos(entryType, entryId)
   const inputRef = useRef<HTMLInputElement>(null)
+  // Uploading + the signed-URL round trip take a moment - show the picked
+  // file immediately via a local object URL instead of an empty gap, so
+  // it's obvious the upload is happening rather than looking like nothing
+  // happened.
+  const [pendingPreview, setPendingPreview] = useState<string | null>(null)
+  const [uploadError, setUploadError] = useState<string | null>(null)
 
   if (!entryId) return null
 
   async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
-    if (file) await uploadPhoto(file)
     e.target.value = ''
+    if (!file) return
+
+    setUploadError(null)
+    const objectUrl = URL.createObjectURL(file)
+    setPendingPreview(objectUrl)
+
+    const { error } = await uploadPhoto(file)
+    URL.revokeObjectURL(objectUrl)
+    setPendingPreview(null)
+    if (error) setUploadError(error)
   }
 
   return (
@@ -41,8 +56,15 @@ export function PhotoGallery({
         />
       </div>
 
-      {!loading && photos.length > 0 && (
+      {uploadError && <p className="text-sm text-destructive">{uploadError}</p>}
+
+      {(pendingPreview || (!loading && photos.length > 0)) && (
         <div className="flex flex-wrap gap-2">
+          {pendingPreview && (
+            <div className="relative size-20 overflow-hidden border border-border opacity-60">
+              <img src={pendingPreview} alt="" className="size-full object-cover" />
+            </div>
+          )}
           {photos.map((photo) => (
             <div key={photo.id} className="group relative size-20 overflow-hidden border border-border">
               <img src={photo.url} alt="" className="size-full object-cover" />

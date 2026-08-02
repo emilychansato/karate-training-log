@@ -104,16 +104,17 @@ describe('useCompetitionMatches', () => {
     expect(linkCall).toBeTruthy()
   })
 
-  it('quickLogOutcome inserts a bare match with just the outcome and returns no error', async () => {
+  it('quickLogOutcome inserts a bare match with just the outcome and returns the new id', async () => {
     const { result } = renderHook(() => useCompetitionMatches('c1'))
     await waitFor(() => expect(result.current.loading).toBe(false))
 
-    let response: { error: string | null } = { error: 'unset' }
+    let response: { error: string | null; id: string | null } = { error: 'unset', id: null }
     await act(async () => {
       response = await result.current.quickLogOutcome('win')
     })
 
     expect(response.error).toBeNull()
+    expect(response.id).toBe('new-match-id')
     const matchesFrom = vi
       .mocked(supabase.from)
       .mock.results.find((r) => r.value.insert && r.value.select)

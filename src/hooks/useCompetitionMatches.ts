@@ -139,14 +139,17 @@ export function useCompetitionMatches(competitionId: string) {
   }
 
   // One-tap outcome logging - creates a bare match with just the result,
-  // no opponent/scores/notes required. The existing edit-in-place flow
-  // (updateMatch, via the match card's Edit button) fills in detail later.
+  // no opponent/scores/notes required. Returns the new match id so the
+  // caller can immediately open the edit form - a bare "Opponent / Edit /
+  // Delete" card gave no visible cue that more detail could be added.
   async function quickLogOutcome(outcome: MatchOutcome) {
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from('competition_matches')
       .insert({ competition_id: competitionId, outcome, points_for: 0, points_against: 0 })
+      .select()
+      .single()
     if (!error) await load()
-    return { error: error?.message ?? null }
+    return { error: error?.message ?? null, id: (data?.id as string) ?? null }
   }
 
   async function updateMatch(

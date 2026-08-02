@@ -38,6 +38,11 @@ export function CompetitionDetail() {
 
   const competition = competitions.find((c) => c.id === id)
 
+  async function handleQuickLog(outcome: 'win' | 'loss' | 'draw') {
+    const { id: newMatchId } = await quickLogOutcome(outcome)
+    if (newMatchId) setEditingMatchId(newMatchId)
+  }
+
   if (competitionsLoading) {
     return <p className="text-sm text-muted-foreground">Loading…</p>
   }
@@ -127,19 +132,22 @@ export function CompetitionDetail() {
           type="button"
           variant="outline"
           className="border-ao text-ao hover:bg-ao/10"
-          onClick={() => quickLogOutcome('win')}
+          onClick={() => handleQuickLog('win')}
         >
+          <Icon name="add" className="size-4" />
           WIN
         </Button>
         <Button
           type="button"
           variant="outline"
           className="border-aka text-aka hover:bg-aka/10"
-          onClick={() => quickLogOutcome('loss')}
+          onClick={() => handleQuickLog('loss')}
         >
+          <Icon name="add" className="size-4" />
           LOSS
         </Button>
-        <Button type="button" variant="outline" onClick={() => quickLogOutcome('draw')}>
+        <Button type="button" variant="outline" onClick={() => handleQuickLog('draw')}>
+          <Icon name="add" className="size-4" />
           DRAW
         </Button>
       </div>
