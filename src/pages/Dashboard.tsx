@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion'
 import { HoursChart } from '../components/dashboard/HoursChart'
-import { RatingTrendChart } from '../components/dashboard/RatingTrendChart'
+import { MonthComparisonChart } from '../components/dashboard/MonthComparisonChart'
+import { CountdownStat } from '../components/dashboard/CountdownStat'
 import { CompetitionTimeline } from '../components/dashboard/CompetitionTimeline'
 import { RecentActivity } from '../components/dashboard/RecentActivity'
 import { NextCompetitionGoals } from '../components/dashboard/NextCompetitionGoals'
@@ -53,12 +54,7 @@ export function Dashboard() {
         </div>
         <div className="flex gap-8">
           <TelemetryStat label="This week" value={stats.hoursThisWeek} suffix="h" accent="ao" />
-          <TelemetryStat
-            label="Intensity"
-            value={stats.intensityPercent ?? 0}
-            suffix="%"
-            accent="aka"
-          />
+          <CountdownStat />
         </div>
       </motion.div>
 
@@ -68,7 +64,7 @@ export function Dashboard() {
           <HoursChart />
         </div>
         <div className="md:col-span-5">
-          <RatingTrendChart />
+          <MonthComparisonChart />
         </div>
       </div>
 
