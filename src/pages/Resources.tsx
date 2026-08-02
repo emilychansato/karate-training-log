@@ -13,6 +13,20 @@ export function Resources() {
         </p>
       </div>
 
+      <a
+        href="https://www.wkf.net/"
+        target="_blank"
+        rel="noreferrer noopener"
+        className="glow-aka card-elevated flex items-center gap-3 border border-aka bg-card p-4 transition-colors duration-150 hover:border-aka"
+      >
+        <Icon name="sports_martial_arts" className="size-6 flex-shrink-0 text-aka" />
+        <div className="flex-1">
+          <p className="font-heading text-lg">WKF — Official Site</p>
+          <p className="text-xs text-muted-foreground">wkf.net</p>
+        </div>
+        <Icon name="external_link" className="size-4 flex-shrink-0 text-muted-foreground" />
+      </a>
+
       <ResourcesAssistant />
 
       <div className="flex flex-col gap-8">
