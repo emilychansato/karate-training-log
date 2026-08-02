@@ -33,6 +33,10 @@ export function AppShell({ children }: { children: ReactNode }) {
   const location = useLocation()
   const reducedMotion = useReducedMotion()
 
+  function scrollToTop() {
+    window.scrollTo({ top: 0, behavior: reducedMotion ? 'auto' : 'smooth' })
+  }
+
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground">
       {/* TopAppBar */}
@@ -47,6 +51,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               key={item.to}
               to={item.to}
               end={item.to === '/'}
+              onClick={scrollToTop}
               className={({ isActive }) =>
                 `label-caps relative px-3 py-2 ${
                   isActive ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'
@@ -104,6 +109,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             key={item.to}
             to={item.to}
             end={item.to === '/'}
+            onClick={scrollToTop}
             className={({ isActive }) =>
               `relative flex flex-1 flex-col items-center gap-1 py-2.5 ${
                 isActive ? 'text-aka' : 'text-muted-foreground'

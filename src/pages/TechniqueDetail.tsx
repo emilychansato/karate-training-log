@@ -26,7 +26,7 @@ export function TechniqueDetail() {
     return (
       <div className="flex flex-col gap-4">
         <p className="text-sm text-muted-foreground">Technique not found.</p>
-        <Link to="/techniques" className="label-caps text-aka">← Techniques</Link>
+        <Link to="/profile" className="label-caps text-aka">← Profile</Link>
       </div>
     )
   }
@@ -44,8 +44,8 @@ export function TechniqueDetail() {
   return (
     <div className="flex flex-col gap-6">
       <div className="border-b border-border pb-6">
-        <Link to="/techniques" className="label-caps mb-2 block text-muted-foreground hover:text-foreground">
-          ← Techniques
+        <Link to="/profile" className="label-caps mb-2 block text-muted-foreground hover:text-foreground">
+          ← Profile
         </Link>
         <span className="label-caps mb-2 inline-block bg-ao px-2 py-0.5 text-white">
           {categoryLabel}
