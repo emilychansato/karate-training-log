@@ -5,6 +5,7 @@ import { useAuth } from '../../hooks/useAuth'
 import { useReducedMotion } from '../../hooks/useReducedMotion'
 import { useTheme } from '../theme/ThemeProvider'
 import { Icon, type IconName } from '../ui/icon'
+import { FeedbackButton } from './FeedbackButton'
 import { snappy, pageEnter } from '../../lib/motion'
 
 function ResourcesLink({ reducedMotion }: { reducedMotion: boolean }) {
@@ -74,6 +75,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         <div className="flex items-center gap-2">
           <Icon name="sports_martial_arts" />
           <h1 className="text-sm font-bold uppercase tracking-widest">Karate OS</h1>
+          <FeedbackButton />
         </div>
         <nav className="hidden md:flex md:items-center md:gap-1">
           {NAV_ITEMS.map((item) => (

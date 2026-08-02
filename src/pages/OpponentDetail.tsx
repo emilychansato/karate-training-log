@@ -53,7 +53,7 @@ export function OpponentDetail() {
       </div>
 
       <div className="card-elevated flex flex-col gap-3 border border-border bg-card p-5">
-        <p className="font-heading text-lg">Scouting notes</p>
+        <p className="font-heading text-lg">Notes</p>
         {notesLoading ? (
           <p className="text-sm text-muted-foreground">Loading…</p>
         ) : editing ? (

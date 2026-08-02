@@ -27,6 +27,7 @@ import {
   Heart,
   Eye,
   EyeOff,
+  MessageSquareText,
   type LucideIcon,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -60,6 +61,7 @@ const ICONS = {
   unfiltered: Heart,
   eye: Eye,
   eye_off: EyeOff,
+  feedback: MessageSquareText,
 } satisfies Record<string, LucideIcon>
 
 export type IconName = keyof typeof ICONS
