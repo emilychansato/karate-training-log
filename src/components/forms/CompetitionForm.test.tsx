@@ -3,6 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { CompetitionForm } from './CompetitionForm'
 import { useCompetitions } from '../../hooks/useCompetitions'
+import { todayIso } from '@/lib/dateFormat'
 
 vi.mock('../../hooks/useCompetitions')
 
@@ -21,13 +22,14 @@ describe('CompetitionForm', () => {
     const user = userEvent.setup()
 
     await user.type(screen.getByLabelText(/event/i), 'BC Open')
-    await user.type(screen.getByLabelText(/^date/i), '2026-06-01')
+    await user.click(screen.getByRole('button', { name: 'Date' }))
+    await user.click(screen.getByRole('button', { name: 'Today' }))
     await user.click(screen.getByRole('radio', { name: 'KUMITE' }))
     await user.click(screen.getByRole('button', { name: /save competition/i }))
 
     await waitFor(() =>
       expect(createCompetition).toHaveBeenCalledWith(
-        expect.objectContaining({ event: 'BC Open', date: '2026-06-01', discipline: 'kumite' })
+        expect.objectContaining({ event: 'BC Open', date: todayIso(), discipline: 'kumite' })
       )
     )
     expect(onSuccess).toHaveBeenCalledWith('new-comp-id')
@@ -50,7 +52,8 @@ describe('CompetitionForm', () => {
     await user.click(await screen.findByRole('option', { name: 'Male Senior -67 kg' }))
 
     await user.type(screen.getByLabelText(/event/i), 'BC Open')
-    await user.type(screen.getByLabelText(/^date/i), '2026-06-01')
+    await user.click(screen.getByRole('button', { name: 'Date' }))
+    await user.click(screen.getByRole('button', { name: 'Today' }))
     await user.click(screen.getByRole('button', { name: /save competition/i }))
 
     await waitFor(() =>
@@ -71,7 +74,6 @@ describe('CompetitionForm', () => {
     render(<CompetitionForm onSuccess={vi.fn()} />)
     const user = userEvent.setup()
 
-    await user.type(screen.getByLabelText(/^date/i), '2026-06-01')
     await user.click(screen.getByRole('radio', { name: 'KUMITE' }))
     await user.click(screen.getByRole('button', { name: /save competition/i }))
 

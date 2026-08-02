@@ -5,6 +5,7 @@ import { useWkfEvents } from '../../hooks/useWkfEvents'
 import { useKbcEvents } from '../../hooks/useKbcEvents'
 import { Icon } from '../ui/icon'
 import { Input } from '../ui/input'
+import { DatePicker } from '../ui/date-picker'
 import { Button } from '../ui/button'
 import { ToggleChip } from '../ui/toggle-chip'
 import { CardSkeletonList } from '../ui/skeleton'
@@ -106,6 +107,7 @@ export function UpcomingTimeline() {
 
   async function handleManualAdd(e: React.FormEvent) {
     e.preventDefault()
+    if (!date) return
     const { error } = await addPlanned({ event, date, location: location || undefined })
     if (!error) {
       setEvent('')
@@ -212,7 +214,7 @@ export function UpcomingTimeline() {
             className="card-elevated flex flex-col gap-3 border border-border bg-card p-4"
           >
             <Input placeholder="Event name" value={event} onChange={(e) => setEvent(e.target.value)} required />
-            <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} required />
+            <DatePicker value={date} onChange={setDate} />
             <Input
               placeholder="Location (optional)"
               value={location}

@@ -8,6 +8,8 @@ import { Input } from '../ui/input'
 import { Label } from '../ui/label'
 import { SegmentedControl } from '../ui/segmented-control'
 import { ToggleChip } from '../ui/toggle-chip'
+import { DatePicker } from '../ui/date-picker'
+import { todayIso } from '@/lib/dateFormat'
 
 const SESSION_TYPES = ['kata', 'kumite', 'conditioning', 'other'] as const
 const SESSION_TYPE_OPTIONS = SESSION_TYPES.map((t) => ({
@@ -54,7 +56,7 @@ export function SessionForm({
     formState: { errors, isSubmitting },
   } = useForm<FormInput, unknown, FormOutput>({
     resolver: zodResolver(schema),
-    defaultValues: { improved: [], struggled: [] },
+    defaultValues: { date: todayIso(), improved: [], struggled: [] },
   })
   const [submitError, setSubmitError] = useState<string | null>(null)
 
@@ -80,7 +82,13 @@ export function SessionForm({
 
       <div className="flex flex-col gap-1.5">
         <Label htmlFor="date">Date</Label>
-        <Input id="date" type="date" {...register('date')} />
+        <Controller
+          name="date"
+          control={control}
+          render={({ field }) => (
+            <DatePicker value={field.value ?? ''} onChange={field.onChange} />
+          )}
+        />
         {errors.date && <p className="text-sm text-destructive">{errors.date.message}</p>}
       </div>
 

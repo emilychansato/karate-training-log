@@ -8,6 +8,7 @@ import { Input } from '../ui/input'
 import { Label } from '../ui/label'
 import { SegmentedControl } from '../ui/segmented-control'
 import { Select } from '../ui/select'
+import { DatePicker } from '../ui/date-picker'
 
 const schema = z.object({
   event: z.string().min(1, 'Event is required'),
@@ -56,7 +57,13 @@ export function CompetitionForm({ onSuccess }: { onSuccess: (competitionId: stri
 
       <div className="flex flex-col gap-1.5">
         <Label htmlFor="date">Date</Label>
-        <Input id="date" type="date" {...register('date')} />
+        <Controller
+          name="date"
+          control={control}
+          render={({ field }) => (
+            <DatePicker value={field.value ?? ''} onChange={field.onChange} />
+          )}
+        />
         {errors.date && <p className="text-sm text-destructive">{errors.date.message}</p>}
       </div>
 
