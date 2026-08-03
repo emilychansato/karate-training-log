@@ -12,6 +12,7 @@ import { ToggleChip } from '../ui/toggle-chip'
 import { CardSkeletonList } from '../ui/skeleton'
 import { useReducedMotion } from '../../hooks/useReducedMotion'
 import { popIn, staggerContainer, springy } from '../../lib/motion'
+import { todayIso } from '../../lib/dateFormat'
 
 type Kind = 'competition' | 'event'
 
@@ -24,10 +25,6 @@ interface DiscoverItem {
   kind: Kind
   sourceType: 'wkf' | 'kbc'
   sourceId: string
-}
-
-function todayIso() {
-  return new Date().toISOString().slice(0, 10)
 }
 
 export function UpcomingTimeline() {

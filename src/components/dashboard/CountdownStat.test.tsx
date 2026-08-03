@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { CountdownStat } from './CountdownStat'
 import { usePlannedCompetitions } from '../../hooks/usePlannedCompetitions'
+import { toIso } from '../../lib/dateFormat'
 
 vi.mock('../../hooks/usePlannedCompetitions')
 
@@ -22,7 +23,7 @@ describe('CountdownStat', () => {
   it('shows the number of days until the soonest upcoming competition', () => {
     const future = new Date()
     future.setDate(future.getDate() + 12)
-    const futureIso = future.toISOString().slice(0, 10)
+    const futureIso = toIso(future)
 
     vi.mocked(usePlannedCompetitions).mockReturnValue({
       planned: [

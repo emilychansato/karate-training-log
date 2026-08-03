@@ -1,10 +1,12 @@
 import { motion } from 'framer-motion'
 import { useCompetitions } from '../../hooks/useCompetitions'
+import { useReducedMotion } from '../../hooks/useReducedMotion'
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/card'
 import { Icon } from '../ui/icon'
 
 export function CompetitionTimeline() {
   const { competitions, loading } = useCompetitions()
+  const reducedMotion = useReducedMotion()
 
   return (
     <Card>
@@ -18,9 +20,9 @@ export function CompetitionTimeline() {
         {!loading && competitions.length === 0 ? (
           <motion.p
             className="text-sm text-muted-foreground"
-            initial={{ opacity: 0 }}
+            initial={reducedMotion ? undefined : { opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 0.25 }}
+            transition={reducedMotion ? { duration: 0 } : { duration: 0.25 }}
           >
             No competitions logged yet.
           </motion.p>

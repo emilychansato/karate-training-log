@@ -2,28 +2,36 @@ import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, LabelList } 
 import { useTrainingSessions } from '../../hooks/useTrainingSessions'
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/card'
 import { Icon } from '../ui/icon'
+import { parseIso, toIso } from '../../lib/dateFormat'
 
 const WEEKS_SHOWN = 10
 
 /** Always builds a fixed trailing window of weeks (instead of only the
  * weeks that happen to have sessions) so a single recent session doesn't
  * render as one massive bar filling the whole chart - real training
- * frequency reads as a rhythm across ~2 months, not one huge block. */
+ * frequency reads as a rhythm across ~2 months, not one huge block.
+ *
+ * Uses parseIso/toIso (local-date based) throughout rather than
+ * new Date(dateString)/.toISOString() - date-only strings parse as UTC
+ * midnight, and mixing that with local date arithmetic shifts week
+ * boundaries by a day depending on timezone (same bug class fixed in
+ * trainingStats.ts and dateFormat.todayIso()). */
 function toWeeklyHours(sessions: { date: string; duration_min: number }[]) {
   const now = new Date()
   const byWeek = new Map<string, number>()
   for (const s of sessions) {
-    const d = new Date(s.date)
+    const d = parseIso(s.date)
+    if (!d) continue
     const weekStart = new Date(d)
     weekStart.setDate(d.getDate() - d.getDay())
-    const key = weekStart.toISOString().slice(0, 10)
+    const key = toIso(weekStart)
     byWeek.set(key, (byWeek.get(key) ?? 0) + s.duration_min / 60)
   }
 
   return Array.from({ length: WEEKS_SHOWN }, (_, i) => {
     const d = new Date(now)
     d.setDate(now.getDate() - now.getDay() - (WEEKS_SHOWN - 1 - i) * 7)
-    const key = d.toISOString().slice(0, 10)
+    const key = toIso(d)
     const hours = byWeek.get(key) ?? 0
     return { week: key, hours: Math.round(hours * 10) / 10 }
   })

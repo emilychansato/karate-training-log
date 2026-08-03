@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import { useCompetitionStats } from '../../hooks/useCompetitionStats'
+import { useReducedMotion } from '../../hooks/useReducedMotion'
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/card'
 import { Icon } from '../ui/icon'
 import { AnimatedNumber } from '../ui/animated-number'
@@ -16,6 +17,7 @@ export function RecordsPanel() {
   const hasStreak = records.longestWinStreak >= 3
   const [drill, setDrill] = useState<RecordDrill>(null)
   const [groupByDivision, setGroupByDivision] = useState(false)
+  const reducedMotion = useReducedMotion()
 
   if (loading) return <CardSkeletonList count={3} />
 
@@ -48,9 +50,9 @@ export function RecordsPanel() {
           {records.totalCompetitions === 0 ? (
             <motion.p
               className="text-sm text-muted-foreground"
-              initial={{ opacity: 0 }}
+              initial={reducedMotion ? undefined : { opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 0.25 }}
+              transition={reducedMotion ? { duration: 0 } : { duration: 0.25 }}
             >
               No competitions logged yet.
             </motion.p>
@@ -200,9 +202,9 @@ export function RecordsPanel() {
           {opponents.length === 0 ? (
             <motion.p
               className="text-sm text-muted-foreground"
-              initial={{ opacity: 0 }}
+              initial={reducedMotion ? undefined : { opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 0.25 }}
+              transition={reducedMotion ? { duration: 0 } : { duration: 0.25 }}
             >
               No scored kumite matches with an opponent name yet.
             </motion.p>
@@ -255,9 +257,9 @@ export function RecordsPanel() {
           {divisionHistory.length === 0 ? (
             <motion.p
               className="text-sm text-muted-foreground"
-              initial={{ opacity: 0 }}
+              initial={reducedMotion ? undefined : { opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 0.25 }}
+              transition={reducedMotion ? { duration: 0 } : { duration: 0.25 }}
             >
               No divisions logged yet.
             </motion.p>

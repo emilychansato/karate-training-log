@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import { snappy } from '@/lib/motion'
+import { useReducedMotion } from '@/hooks/useReducedMotion'
 
 export function SegmentedControl<T extends string>({
   options,
@@ -15,6 +16,8 @@ export function SegmentedControl<T extends string>({
   name: string
   className?: string
 }) {
+  const reducedMotion = useReducedMotion()
+
   return (
     <div
       role="radiogroup"
@@ -37,9 +40,10 @@ export function SegmentedControl<T extends string>({
           >
             {isActive && (
               <motion.span
-                layoutId={`segmented-${name}`}
+                layoutId={reducedMotion ? undefined : `segmented-${name}`}
+                layout={!reducedMotion}
                 className="glow-primary absolute inset-0 bg-foreground"
-                transition={snappy}
+                transition={reducedMotion ? { duration: 0 } : snappy}
               />
             )}
             <span className="relative z-10">{opt.label}</span>

@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { CheckInCard } from './CheckInCard'
-import { todayIso } from '../../lib/dateFormat'
+import { todayIso, toIso } from '../../lib/dateFormat'
 
 describe('CheckInCard', () => {
   it('opens the check-in flow, picks a mood and emotion, and saves', async () => {
@@ -36,7 +36,7 @@ describe('CheckInCard', () => {
     const yesterday = (() => {
       const d = new Date()
       d.setDate(d.getDate() - 1)
-      return d.toISOString().slice(0, 10)
+      return toIso(d)
     })()
 
     render(

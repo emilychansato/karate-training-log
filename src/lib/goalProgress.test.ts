@@ -9,6 +9,7 @@ import type { Goal } from '../hooks/useGoals'
 import type { TrainingSession } from '../hooks/useTrainingSessions'
 import type { WeightLog } from '../hooks/useWeightLogs'
 import type { Competition } from '../hooks/useCompetitions'
+import { todayIso as realTodayIso } from '../lib/dateFormat'
 
 function makeGoal(overrides: Partial<Goal>): Goal {
   return {
@@ -46,8 +47,7 @@ function makeSession(date: string): TrainingSession {
 
 describe('computeTrainingFrequencyProgress', () => {
   it('counts sessions from this week against the target', () => {
-    const now = new Date()
-    const todayIso = now.toISOString().slice(0, 10)
+    const todayIso = realTodayIso()
     const goal = makeGoal({ goal_type: 'training_frequency', target_value: 4 })
     const sessions = [makeSession(todayIso), makeSession(todayIso)]
     const progress = computeTrainingFrequencyProgress(goal, sessions)
@@ -56,7 +56,7 @@ describe('computeTrainingFrequencyProgress', () => {
   })
 
   it('clamps fraction at 1 when the target is exceeded', () => {
-    const todayIso = new Date().toISOString().slice(0, 10)
+    const todayIso = realTodayIso()
     const goal = makeGoal({ goal_type: 'training_frequency', target_value: 2 })
     const sessions = [makeSession(todayIso), makeSession(todayIso), makeSession(todayIso)]
     expect(computeTrainingFrequencyProgress(goal, sessions).fraction).toBe(1)

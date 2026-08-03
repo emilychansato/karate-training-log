@@ -3,10 +3,11 @@ import { usePlannedCompetitions } from '../../hooks/usePlannedCompetitions'
 import { usePrepPlan } from '../../hooks/usePrepPlan'
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/card'
 import { Icon } from '../ui/icon'
+import { todayIso } from '../../lib/dateFormat'
 
 export function NextCompetitionGoals() {
   const { planned, loading: plannedLoading } = usePlannedCompetitions()
-  const today = new Date().toISOString().slice(0, 10)
+  const today = todayIso()
 
   const next = planned
     .filter((p) => p.kind === 'competition' && p.date >= today)

@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion'
 import { useTrainingSessions } from '../../hooks/useTrainingSessions'
+import { useReducedMotion } from '../../hooks/useReducedMotion'
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/card'
 import { Icon, type IconName } from '../ui/icon'
 
@@ -24,6 +25,7 @@ function relativeDate(dateStr: string): string {
 export function RecentActivity() {
   const { sessions, loading } = useTrainingSessions()
   const recent = sessions.slice(0, 5)
+  const reducedMotion = useReducedMotion()
 
   return (
     <Card>
@@ -37,9 +39,9 @@ export function RecentActivity() {
         {!loading && recent.length === 0 ? (
           <motion.p
             className="text-sm text-muted-foreground"
-            initial={{ opacity: 0 }}
+            initial={reducedMotion ? undefined : { opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 0.25 }}
+            transition={reducedMotion ? { duration: 0 } : { duration: 0.25 }}
           >
             No sessions logged yet.
           </motion.p>
