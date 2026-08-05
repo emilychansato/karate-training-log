@@ -4,6 +4,7 @@
 // any public calendar at a fixed URL pattern - no auth, no scraping
 // fragility (verified 2026-08-02: 900+ real events, going back to 2018).
 import { createClient } from 'npm:@supabase/supabase-js@2'
+import { corsHeaders, handleCors } from '../_shared/cors.ts'
 
 const KBC_CALENDAR_ID = 'karatebc.org_8irvnngo7krsp7teh40uhq04rc@group.calendar.google.com'
 const ICS_URL = `https://calendar.google.com/calendar/ical/${encodeURIComponent(KBC_CALENDAR_ID)}/public/basic.ics`
@@ -96,7 +97,17 @@ function parseEvents(ics: string): ParsedEvent[] {
   return events
 }
 
-Deno.serve(async () => {
+function json(body: unknown, init?: ResponseInit) {
+  return new Response(JSON.stringify(body), {
+    ...init,
+    headers: { ...corsHeaders, 'Content-Type': 'application/json', ...(init?.headers ?? {}) },
+  })
+}
+
+Deno.serve(async (req) => {
+  const preflight = handleCors(req)
+  if (preflight) return preflight
+
   try {
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL')!,
@@ -105,9 +116,7 @@ Deno.serve(async () => {
 
     const res = await fetch(ICS_URL)
     if (!res.ok) {
-      return new Response(JSON.stringify({ error: `KBC calendar fetch failed: ${res.status}` }), {
-        status: 502,
-      })
+      return json({ error: `KBC calendar fetch failed: ${res.status}` }, { status: 502 })
     }
     const ics = await res.text()
     const allEvents = parseEvents(ics)
@@ -137,11 +146,8 @@ Deno.serve(async () => {
       else if (data && data.length > 0) inserted++
     }
 
-    return new Response(
-      JSON.stringify({ parsed: allEvents.length, upcoming: upcoming.length, inserted, errors: errors.slice(0, 3) }),
-      { headers: { 'Content-Type': 'application/json' } }
-    )
+    return json({ parsed: allEvents.length, upcoming: upcoming.length, inserted, errors: errors.slice(0, 3) })
   } catch (err) {
-    return new Response(JSON.stringify({ error: String(err) }), { status: 500 })
+    return json({ error: String(err) }, { status: 500 })
   }
 })

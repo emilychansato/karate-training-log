@@ -8,6 +8,7 @@
 // parser (Deno has no DOMParser without an extra dependency, and the
 // structure here doesn't need one).
 import { createClient } from 'npm:@supabase/supabase-js@2'
+import { corsHeaders, handleCors } from '../_shared/cors.ts'
 
 const WKF_CALENDAR_URL = 'https://www.wkf.net/calendar'
 
@@ -104,7 +105,17 @@ async function hashKey(input: string): Promise<string> {
     .join('')
 }
 
-Deno.serve(async () => {
+function json(body: unknown, init?: ResponseInit) {
+  return new Response(JSON.stringify(body), {
+    ...init,
+    headers: { ...corsHeaders, 'Content-Type': 'application/json', ...(init?.headers ?? {}) },
+  })
+}
+
+Deno.serve(async (req) => {
+  const preflight = handleCors(req)
+  if (preflight) return preflight
+
   try {
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL')!,
@@ -115,9 +126,7 @@ Deno.serve(async () => {
       headers: { 'User-Agent': 'Mozilla/5.0 (compatible; karate-training-log-bot/1.0)' },
     })
     if (!res.ok) {
-      return new Response(JSON.stringify({ error: `WKF fetch failed: ${res.status}` }), {
-        status: 502,
-      })
+      return json({ error: `WKF fetch failed: ${res.status}` }, { status: 502 })
     }
     const html = await res.text()
     const events = parseEvents(html)
@@ -144,11 +153,8 @@ Deno.serve(async () => {
       else if (data && data.length > 0) inserted++
     }
 
-    return new Response(
-      JSON.stringify({ parsed: events.length, inserted, errors: errors.slice(0, 3) }),
-      { headers: { 'Content-Type': 'application/json' } }
-    )
+    return json({ parsed: events.length, inserted, errors: errors.slice(0, 3) })
   } catch (err) {
-    return new Response(JSON.stringify({ error: String(err) }), { status: 500 })
+    return json({ error: String(err) }, { status: 500 })
   }
 })
