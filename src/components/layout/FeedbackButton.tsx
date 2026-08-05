@@ -41,7 +41,7 @@ export function FeedbackButton() {
         <Popover.Positioner sideOffset={8} className="z-50">
           <Popover.Popup className="card-elevated w-72 border border-border bg-card p-4">
             {sent ? (
-              <p className="text-sm">Thanks — got it. We read every one of these.</p>
+              <p className="text-sm">Thanks for your feedback/suggestions! I promise I read them all :)</p>
             ) : (
               <>
                 <p className="font-heading text-base">Feedback</p>
