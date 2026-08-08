@@ -1,119 +1,112 @@
-import { motion } from 'framer-motion'
+import { useEffect, useRef, useState } from 'react'
 import { useReducedMotion } from '../../hooks/useReducedMotion'
+import kickOutdoor from '../../assets/login-bg/kick-outdoor.jpg'
+import goldenHour from '../../assets/login-bg/golden-hour.jpg'
+import gymMartialArts from '../../assets/login-bg/gym-martial-arts.jpg'
+import twoMenTrees from '../../assets/login-bg/two-men-trees.jpg'
+import womanGi from '../../assets/login-bg/woman-gi.jpg'
 
-/** Simple pictogram-style marks (short hand-authored paths, in the same
- * flat/rounded visual language as Olympic sport pictograms) rather than
- * anything photorealistic - placeholder ambient motion until real
- * photography/licensed imagery replaces it. */
-function KickMark(props: React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg viewBox="0 0 64 64" fill="none" {...props}>
-      <circle cx="20" cy="14" r="6" fill="currentColor" />
-      <path
-        d="M20 20 L18 34 L8 44 M18 34 L30 38 L48 22"
-        stroke="currentColor"
-        strokeWidth="5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  )
-}
+// Free, real photos under the Unsplash License (commercial use allowed,
+// no attribution required) - not WKF's own copyrighted photography, and
+// not the earlier placeholder pictogram silhouettes.
+const IMAGES = [kickOutdoor, goldenHour, gymMartialArts, twoMenTrees, womanGi]
 
-function StanceMark(props: React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg viewBox="0 0 64 64" fill="none" {...props}>
-      <circle cx="32" cy="12" r="6" fill="currentColor" />
-      <path
-        d="M32 18 L32 34 M32 22 L16 30 M32 22 L48 30 M32 34 L20 52 M32 34 L44 52"
-        stroke="currentColor"
-        strokeWidth="5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  )
-}
-
-function StrikeArcMark(props: React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg viewBox="0 0 64 64" fill="none" {...props}>
-      <path
-        d="M10 46 A28 28 0 0 1 46 10"
-        stroke="currentColor"
-        strokeWidth="4"
-        strokeLinecap="round"
-        strokeDasharray="2 8"
-      />
-      <circle cx="46" cy="10" r="4" fill="currentColor" />
-    </svg>
-  )
-}
-
-function BlockMark(props: React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg viewBox="0 0 64 64" fill="none" {...props}>
-      <circle cx="24" cy="12" r="6" fill="currentColor" />
-      <path
-        d="M24 18 L24 40 M24 22 L44 16 M24 40 L14 56 M24 40 L36 56"
-        stroke="currentColor"
-        strokeWidth="5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  )
-}
-
-const MARKS = [KickMark, StanceMark, StrikeArcMark, BlockMark]
-
-interface Placement {
-  Mark: typeof MARKS[number]
-  top: string
-  left: string
+interface Orbit {
+  src: string
   size: number
-  color: string
-  duration: number
-  delay: number
-  rotate: number
+  ampX: number
+  ampY: number
+  period: number
+  phase: number
 }
 
-const PLACEMENTS: Placement[] = [
-  { Mark: MARKS[0], top: '8%', left: '12%', size: 72, color: 'var(--foreground)', duration: 9, delay: 0, rotate: -8 },
-  { Mark: MARKS[1], top: '18%', left: '78%', size: 90, color: 'var(--aka)', duration: 11, delay: 1.2, rotate: 6 },
-  { Mark: MARKS[2], top: '68%', left: '8%', size: 60, color: 'var(--ao)', duration: 8, delay: 0.6, rotate: 0 },
-  { Mark: MARKS[3], top: '78%', left: '82%', size: 80, color: 'var(--foreground)', duration: 10, delay: 2, rotate: 10 },
-  { Mark: MARKS[2], top: '42%', left: '90%', size: 50, color: 'var(--foreground)', duration: 7.5, delay: 0.3, rotate: -14 },
-  { Mark: MARKS[1], top: '86%', left: '46%', size: 64, color: 'var(--ao)', duration: 9.5, delay: 1.6, rotate: -4 },
+const ORBITS: Orbit[] = [
+  { src: IMAGES[0], size: 96, ampX: 34, ampY: 16, period: 16, phase: 0 },
+  { src: IMAGES[1], size: 80, ampX: 30, ampY: 14, period: 19, phase: 1.4 },
+  { src: IMAGES[2], size: 88, ampX: 32, ampY: 15, period: 14, phase: 3.1 },
+  { src: IMAGES[3], size: 72, ampX: 26, ampY: 12, period: 21, phase: 4.6 },
+  { src: IMAGES[4], size: 84, ampX: 30, ampY: 14, period: 17, phase: 5.5 },
 ]
 
-/** Ambient, autoplay-only motion (no hover/touch trail - the app is
- * mobile-first and touch users would never discover a drag-triggered
- * effect on a login screen). Purely decorative, sits behind the form. */
+const ANCHORS = [
+  { top: '10%', left: '18%' },
+  { top: '16%', left: '76%' },
+  { top: '62%', left: '10%' },
+  { top: '72%', left: '80%' },
+  { top: '88%', left: '46%' },
+]
+
+/** Each photo travels a figure-eight (lemniscate) path around its anchor
+ * point via requestAnimationFrame, rather than framer-motion keyframes -
+ * a figure-eight needs x/y driven together from one continuously
+ * advancing angle (x = sin(t), y = sin(t)*cos(t)), which keyframe arrays
+ * can't express as a smooth continuous loop. Autoplay only (no
+ * hover/touch trail - the app is mobile-first and a drag-triggered
+ * effect would go undiscovered on a login screen). */
 export function AmbientKarateBackground() {
   const reducedMotion = useReducedMotion()
+  const containerRef = useRef<HTMLDivElement>(null)
+  const [, forceRender] = useState(0)
+  const offsetsRef = useRef<{ x: number; y: number }[]>(ORBITS.map(() => ({ x: 0, y: 0 })))
+
+  useEffect(() => {
+    if (reducedMotion) return
+
+    let frameId: number
+    const start = performance.now()
+
+    function tick(now: number) {
+      const elapsed = (now - start) / 1000
+      ORBITS.forEach((orbit, i) => {
+        const t = (elapsed / orbit.period) * Math.PI * 2 + orbit.phase
+        offsetsRef.current[i] = {
+          x: Math.sin(t) * orbit.ampX,
+          y: Math.sin(t) * Math.cos(t) * orbit.ampY,
+        }
+      })
+      if (containerRef.current) {
+        const marks = containerRef.current.querySelectorAll<HTMLElement>('[data-mark]')
+        marks.forEach((el, i) => {
+          const { x, y } = offsetsRef.current[i]
+          el.style.transform = `translate(${x}px, ${y}px)`
+        })
+      }
+      frameId = requestAnimationFrame(tick)
+    }
+
+    frameId = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(frameId)
+  }, [reducedMotion])
+
+  useEffect(() => {
+    // Reduced-motion: render once, statically, at the anchor point.
+    if (reducedMotion) forceRender((n) => n + 1)
+  }, [reducedMotion])
 
   return (
-    <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
-      {PLACEMENTS.map(({ Mark, top, left, size, color, duration, delay, rotate }, i) => (
-        <motion.div
+    <div
+      ref={containerRef}
+      className="pointer-events-none absolute inset-0 overflow-hidden"
+      aria-hidden="true"
+    >
+      {ORBITS.map((orbit, i) => (
+        <div
           key={i}
-          className="absolute opacity-20"
-          style={{ top, left, width: size, height: size, color }}
-          initial={reducedMotion ? undefined : { y: 0, rotate }}
-          animate={
-            reducedMotion
-              ? undefined
-              : { y: [0, -14, 0], rotate: [rotate, rotate + 4, rotate] }
-          }
-          transition={
-            reducedMotion
-              ? undefined
-              : { duration, delay, repeat: Infinity, ease: 'easeInOut' }
-          }
+          data-mark
+          className="absolute rounded-full opacity-25 shadow-lg"
+          style={{
+            top: ANCHORS[i].top,
+            left: ANCHORS[i].left,
+            width: orbit.size,
+            height: orbit.size,
+          }}
         >
-          <Mark className="size-full" style={{ transform: reducedMotion ? `rotate(${rotate}deg)` : undefined }} />
-        </motion.div>
+          <img
+            src={orbit.src}
+            alt=""
+            className="size-full rounded-full border border-white/10 object-cover"
+          />
+        </div>
       ))}
     </div>
   )

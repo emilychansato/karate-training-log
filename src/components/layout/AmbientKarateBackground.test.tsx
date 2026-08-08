@@ -14,9 +14,9 @@ describe('AmbientKarateBackground', () => {
     expect(root).toHaveClass('pointer-events-none')
   })
 
-  it('renders without crashing when reduced motion is preferred', () => {
+  it('renders the photo marks without crashing when reduced motion is preferred', () => {
     vi.mocked(useReducedMotion).mockReturnValue(true)
     const { container } = render(<AmbientKarateBackground />)
-    expect(container.querySelectorAll('svg').length).toBeGreaterThan(0)
+    expect(container.querySelectorAll('img').length).toBeGreaterThan(0)
   })
 })
