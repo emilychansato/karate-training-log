@@ -114,7 +114,7 @@ export const RESOURCE_GROUPS: ResourceGroup[] = [
         title: 'Sport Integrity Canada (formerly CCES) — Anti-Doping Resources',
         url: 'https://sportintegrity.ca/',
       },
-      { title: 'True Sport Clean Course', url: 'https://sportintegrity.ca/true-sport' },
+      { title: 'True Sport Clean Course', url: 'https://sportintegrity.ca/' },
       { title: 'Global DRO (Drug Reference Online)', url: 'https://www.globaldro.com' },
     ],
   },
