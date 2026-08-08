@@ -1,15 +1,13 @@
 @import "tailwindcss";
 
 /* Self-hosted fonts (no external CDN) — Disciplined Craft typography:
-   Fraunces (a confident editorial serif with an athletic optical-size axis)
-   for headlines, Inter for body/UI, JetBrains Mono for data. Replaced
-   Bodoni Moda 2026-08-01: Bodoni read as generic fashion/wedding-invite
-   didone rather than premium competitive-athletics. Fraunces at heavier
-   weights (600/700/900) reads sturdier and more deliberate. */
-@import "@fontsource/fraunces/600.css";
-@import "@fontsource/fraunces/700.css";
-@import "@fontsource/fraunces/700-italic.css";
-@import "@fontsource/fraunces/900.css";
+   Bebas Neue (tall, condensed, athletic display face) for headlines, Inter
+   for body/UI, JetBrains Mono for data. Replaced Fraunces 2026-08-08 -
+   Emily's pick from the font-compare artifact. Bebas Neue only ships one
+   weight (400) - single-weight condensed display face by design. Given
+   generous extra letter-spacing (see .font-heading below) since its
+   default tracking reads too tight at headline sizes. */
+@import "@fontsource/bebas-neue/400.css";
 @import "@fontsource/inter/400.css";
 @import "@fontsource/inter/500.css";
 @import "@fontsource/inter/600.css";
@@ -43,7 +41,7 @@
   --color-ao-score: var(--ao-score);
 
   --font-sans: "Inter", -apple-system, "Segoe UI", sans-serif;
-  --font-heading: "Fraunces", "Georgia", serif;
+  --font-heading: "Bebas Neue", "Arial Narrow", sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
 
   --radius-sm: var(--radius);
@@ -130,19 +128,18 @@ body {
 
 .font-heading {
   font-family: var(--font-heading);
-  font-weight: 700;
-  font-optical-sizing: auto;
-  letter-spacing: -0.02em;
+  font-weight: 400;
+  letter-spacing: 0.03em;
 }
 
-/* Page-level hero titles (h1s) get the heaviest weight in the scale, so
-   hierarchy is legible at a glance: hero (900) > card/section title (700,
-   via .font-heading alone) > label-caps (700, but tiny + tracked). */
+/* Page-level hero titles (h1s) get a touch more tracking than card/section
+   titles, so hierarchy stays legible at a glance even though Bebas Neue
+   only ships one weight (400 - no 700/900 to lean on for hierarchy the
+   way Fraunces did). */
 .font-heading-hero {
   font-family: var(--font-heading);
-  font-weight: 900;
-  font-optical-sizing: auto;
-  letter-spacing: -0.025em;
+  font-weight: 400;
+  letter-spacing: 0.04em;
 }
 
 .label-caps {
