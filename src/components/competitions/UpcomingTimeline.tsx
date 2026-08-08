@@ -9,10 +9,12 @@ import { Input } from '../ui/input'
 import { DatePicker } from '../ui/date-picker'
 import { Button } from '../ui/button'
 import { ToggleChip } from '../ui/toggle-chip'
+import { Select } from '../ui/select'
 import { CardSkeletonList } from '../ui/skeleton'
 import { useReducedMotion } from '../../hooks/useReducedMotion'
 import { popIn, staggerContainer, springy } from '../../lib/motion'
 import { todayIso } from '../../lib/dateFormat'
+import { extractCountry } from '../../lib/eventLocation'
 
 type Kind = 'competition' | 'event'
 
@@ -33,6 +35,7 @@ export function UpcomingTimeline() {
   const { events: kbcEvents, loading: kbcLoading, syncing: kbcSyncing, syncNow: syncKbc } = useKbcEvents()
   const [showComps, setShowComps] = useState(true)
   const [showEvents, setShowEvents] = useState(true)
+  const [countryFilter, setCountryFilter] = useState('')
   const [showForm, setShowForm] = useState(false)
   const [event, setEvent] = useState('')
   const [date, setDate] = useState('')
@@ -75,8 +78,20 @@ export function UpcomingTimeline() {
       sourceId: e.id,
     }))
 
-  const discoverItems = [...wkfItems, ...kbcItems]
-    .filter((i) => (i.kind === 'competition' ? showComps : showEvents))
+  const kindFilteredItems = [...wkfItems, ...kbcItems].filter((i) =>
+    i.kind === 'competition' ? showComps : showEvents
+  )
+
+  const countryOptions = Array.from(
+    new Set(
+      kindFilteredItems
+        .map((i) => extractCountry(i.location))
+        .filter((c): c is string => c !== null)
+    )
+  ).sort()
+
+  const discoverItems = kindFilteredItems
+    .filter((i) => !countryFilter || extractCountry(i.location) === countryFilter)
     .sort((a, b) => a.date.localeCompare(b.date))
 
   async function handleAdd(item: DiscoverItem) {
@@ -188,9 +203,30 @@ export function UpcomingTimeline() {
       <div className="flex flex-col gap-4 border-t border-border pt-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <span className="label-caps text-muted-foreground">Discover</span>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <ToggleChip label="Competitions" accent="aka" selected={showComps} onClick={() => setShowComps((v) => !v)} />
             <ToggleChip label="Events" accent="ao" selected={showEvents} onClick={() => setShowEvents((v) => !v)} />
+            {countryOptions.length > 0 && (
+              <div className="flex items-center gap-1">
+                <Select
+                  value={countryFilter}
+                  onChange={setCountryFilter}
+                  options={countryOptions}
+                  placeholder="All countries"
+                  className="w-40"
+                />
+                {countryFilter && (
+                  <button
+                    type="button"
+                    aria-label="Clear country filter"
+                    onClick={() => setCountryFilter('')}
+                    className="p-1 text-muted-foreground hover:text-foreground"
+                  >
+                    <Icon name="close" className="size-3.5" />
+                  </button>
+                )}
+              </div>
+            )}
           </div>
           <div className="flex items-center gap-3">
             <button
@@ -216,7 +252,9 @@ export function UpcomingTimeline() {
           <CardSkeletonList count={3} />
         ) : discoverItems.length === 0 ? (
           <p className="py-6 text-center text-sm text-muted-foreground">
-            Nothing to discover yet — tap "Sync WKF" or "Sync BC" above.
+            {countryFilter
+              ? `Nothing found in ${countryFilter} — try another country.`
+              : 'Nothing to discover yet — tap "Sync WKF" or "Sync BC" above.'}
           </p>
         ) : (
           <motion.ul

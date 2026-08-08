@@ -118,4 +118,17 @@ describe('UpcomingTimeline', () => {
     )
     expect(screen.getByText('WKF Karate 1 Series A')).toBeInTheDocument()
   })
+
+  it('filters discover items by country extracted from location', async () => {
+    render(<UpcomingTimeline />, { wrapper: MemoryRouter })
+    const user = userEvent.setup()
+
+    await user.click(screen.getByRole('combobox'))
+    await user.click(screen.getByRole('option', { name: 'France' }))
+
+    await waitFor(() =>
+      expect(screen.queryByText('William Gomes Kumite Seminar')).not.toBeInTheDocument()
+    )
+    expect(screen.getByText('WKF Karate 1 Series A')).toBeInTheDocument()
+  })
 })
