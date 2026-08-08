@@ -98,7 +98,7 @@ export function AmbientKarateBackground() {
       {PLACEMENTS.map(({ Mark, top, left, size, color, duration, delay, rotate }, i) => (
         <motion.div
           key={i}
-          className="absolute opacity-[0.07]"
+          className="absolute opacity-20"
           style={{ top, left, width: size, height: size, color }}
           initial={reducedMotion ? undefined : { y: 0, rotate }}
           animate={
