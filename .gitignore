@@ -12,6 +12,9 @@ dist
 dist-ssr
 *.local
 
+# screenshot-site skill's local grabs - reference material, not app code
+.claude/skills/screenshot-site/screenshots/*.png
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

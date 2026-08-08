@@ -1,0 +1,9 @@
+{
+  "name": "screenshot-site-tool",
+  "private": true,
+  "type": "module",
+  "description": "Standalone Playwright screenshot tool for the screenshot-site skill. Not part of the app build - never import from src/.",
+  "dependencies": {
+    "playwright": "^1.48.0"
+  }
+}

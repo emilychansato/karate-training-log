@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { useAuth } from '../hooks/useAuth'
 import { useReducedMotion } from '../hooks/useReducedMotion'
 import { pageEnter, shake, springy } from '../lib/motion'
+import { AmbientKarateBackground } from '../components/layout/AmbientKarateBackground'
 import { Button } from '../components/ui/button'
 import { Input } from '../components/ui/input'
 import { Label } from '../components/ui/label'
@@ -55,9 +56,10 @@ export function Login() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-background">
+    <div className="relative min-h-screen flex items-center justify-center overflow-hidden p-4 bg-background">
+      <AmbientKarateBackground />
       <motion.div
-        className="w-full sm:max-w-sm"
+        className="relative w-full sm:max-w-sm"
         initial={reducedMotion ? undefined : 'hidden'}
         animate={reducedMotion ? undefined : shakeError ? 'shake' : 'show'}
         variants={{ ...pageEnter, ...shake }}
