@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "echo \"[env check] VITE_SUPABASE_URL=$VITE_SUPABASE_URL\" && echo \"[env check] VITE_SUPABASE_ANON_KEY length=${#VITE_SUPABASE_ANON_KEY}\" && tsc -b && vite build",
+    "build": "tsc -b && vite build",
     "lint": "oxlint",
     "preview": "vite preview",
     "test": "vitest run"
