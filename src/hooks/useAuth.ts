@@ -53,9 +53,19 @@ export function useAuth() {
     return { error: error?.message ?? null }
   }
 
+  // A real (anonymous) Supabase auth user - not a mocked/local-only demo
+  // mode. Every existing RLS policy (auth.uid() = user_id) keeps working
+  // unchanged, so a guest can actually use the app, not just look at a
+  // canned preview. Their data lives as long as the anonymous session
+  // does (tied to this browser) unless they later create a real account.
+  async function browseAsGuest() {
+    const { error } = await supabase.auth.signInAnonymously()
+    return { error: error?.message ?? null }
+  }
+
   async function signOut() {
     await supabase.auth.signOut()
   }
 
-  return { user, loading, signUp, signIn, signOut }
+  return { user, loading, signUp, signIn, signOut, browseAsGuest }
 }

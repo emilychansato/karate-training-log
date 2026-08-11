@@ -24,6 +24,16 @@ export function usePrepPlan(plannedCompetitionId: string) {
   const [loading, setLoading] = useState(true)
 
   const load = useCallback(async () => {
+    // No competition selected yet (e.g. dashboard widget with no upcoming
+    // competition) - skip the query entirely rather than filtering on an
+    // empty string, which Postgres rejects as an invalid uuid (400).
+    if (!plannedCompetitionId) {
+      setGoals([])
+      setTasks([])
+      setLoading(false)
+      return
+    }
+
     setLoading(true)
     const [{ data: goalRows }, { data: taskRows }] = await Promise.all([
       supabase

@@ -12,6 +12,7 @@ vi.mock('../lib/supabaseClient', () => ({
       })),
       signUp: vi.fn(),
       signInWithPassword: vi.fn(),
+      signInAnonymously: vi.fn(),
       signOut: vi.fn(),
     },
   },
@@ -65,5 +66,36 @@ describe('useAuth', () => {
       response = await result.current.signIn('test@example.com', 'wrong')
     })
     expect(response.error).toBe('Invalid login credentials')
+  })
+
+  it('browseAsGuest calls supabase.auth.signInAnonymously and returns no error on success', async () => {
+    vi.mocked(supabase.auth.signInAnonymously).mockResolvedValue({
+      data: { user: null, session: null },
+      error: null,
+    } as never)
+    const { result } = renderHook(() => useAuth())
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    let response: { error: string | null } = { error: 'unset' }
+    await act(async () => {
+      response = await result.current.browseAsGuest()
+    })
+    expect(supabase.auth.signInAnonymously).toHaveBeenCalled()
+    expect(response.error).toBeNull()
+  })
+
+  it('browseAsGuest returns the error message on failure', async () => {
+    vi.mocked(supabase.auth.signInAnonymously).mockResolvedValue({
+      data: { user: null, session: null },
+      error: { message: 'Anonymous sign-ins are disabled' },
+    } as never)
+    const { result } = renderHook(() => useAuth())
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    let response: { error: string | null } = { error: 'unset' }
+    await act(async () => {
+      response = await result.current.browseAsGuest()
+    })
+    expect(response.error).toBe('Anonymous sign-ins are disabled')
   })
 })

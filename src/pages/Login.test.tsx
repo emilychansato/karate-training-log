@@ -16,6 +16,7 @@ describe('Login', () => {
       signUp: vi.fn(),
       signIn,
       signOut: vi.fn(),
+      browseAsGuest: vi.fn(),
     })
 
     render(<Login />)
@@ -34,6 +35,7 @@ describe('Login', () => {
       signUp: vi.fn(),
       signIn: vi.fn().mockResolvedValue({ error: 'Invalid login credentials' }),
       signOut: vi.fn(),
+      browseAsGuest: vi.fn(),
     })
 
     render(<Login />)
@@ -54,6 +56,7 @@ describe('Login', () => {
       signUp,
       signIn,
       signOut: vi.fn(),
+      browseAsGuest: vi.fn(),
     })
 
     render(<Login />)
@@ -76,6 +79,7 @@ describe('Login', () => {
       signUp: vi.fn(),
       signIn: vi.fn(),
       signOut: vi.fn(),
+      browseAsGuest: vi.fn(),
     })
 
     render(<Login />)
@@ -97,6 +101,7 @@ describe('Login', () => {
       signUp: vi.fn().mockResolvedValue({ error: null }),
       signIn: vi.fn(),
       signOut: vi.fn(),
+      browseAsGuest: vi.fn(),
     })
 
     render(<Login />)
@@ -111,6 +116,41 @@ describe('Login', () => {
     expect(await screen.findByText(/check your email/i)).toBeInTheDocument()
   })
 
+  it('calls browseAsGuest when the guest button is tapped', async () => {
+    const browseAsGuest = vi.fn().mockResolvedValue({ error: null })
+    vi.mocked(useAuth).mockReturnValue({
+      user: null,
+      loading: false,
+      signUp: vi.fn(),
+      signIn: vi.fn(),
+      signOut: vi.fn(),
+      browseAsGuest,
+    })
+
+    render(<Login />)
+    const user = userEvent.setup()
+    await user.click(screen.getByRole('button', { name: /browse app as guest/i }))
+
+    expect(browseAsGuest).toHaveBeenCalled()
+  })
+
+  it('shows the error message when browseAsGuest fails', async () => {
+    vi.mocked(useAuth).mockReturnValue({
+      user: null,
+      loading: false,
+      signUp: vi.fn(),
+      signIn: vi.fn(),
+      signOut: vi.fn(),
+      browseAsGuest: vi.fn().mockResolvedValue({ error: 'Anonymous sign-ins are disabled' }),
+    })
+
+    render(<Login />)
+    const user = userEvent.setup()
+    await user.click(screen.getByRole('button', { name: /browse app as guest/i }))
+
+    expect(await screen.findByText('Anonymous sign-ins are disabled')).toBeInTheDocument()
+  })
+
   it('redirects to / when already signed in (e.g. sign-up logged the user in immediately)', () => {
     vi.mocked(useAuth).mockReturnValue({
       user: { id: 'u1', email: 'test@example.com' },
@@ -118,6 +158,7 @@ describe('Login', () => {
       signUp: vi.fn(),
       signIn: vi.fn(),
       signOut: vi.fn(),
+      browseAsGuest: vi.fn(),
     })
 
     render(

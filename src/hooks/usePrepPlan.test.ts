@@ -82,4 +82,12 @@ describe('usePrepPlan', () => {
     })
     expect(response.error).toBeNull()
   })
+
+  it('skips the query entirely when given an empty id, instead of filtering on an invalid uuid', async () => {
+    const { result } = renderHook(() => usePrepPlan(''))
+    await waitFor(() => expect(result.current.loading).toBe(false))
+    expect(result.current.goals).toEqual([])
+    expect(result.current.tasks).toEqual([])
+    expect(supabase.from).not.toHaveBeenCalled()
+  })
 })

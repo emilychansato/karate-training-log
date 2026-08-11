@@ -4,7 +4,11 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { useAuth } from '../hooks/useAuth'
 import { useReducedMotion } from '../hooks/useReducedMotion'
 import { pageEnter, shake, springy } from '../lib/motion'
-import { AmbientKarateBackground } from '../components/layout/AmbientKarateBackground'
+// Ambient background is temporarily off - real photos are still being
+// picked (see src/assets/login-bg/candidates/) - re-add
+// <AmbientKarateBackground /> once the final set is chosen. Component,
+// its data, and its figure-eight motion mechanism are untouched.
+// import { AmbientKarateBackground } from '../components/layout/AmbientKarateBackground'
 import { Button } from '../components/ui/button'
 import { Input } from '../components/ui/input'
 import { Label } from '../components/ui/label'
@@ -18,7 +22,7 @@ import {
 } from '../components/ui/card'
 
 export function Login() {
-  const { user, signIn, signUp } = useAuth()
+  const { user, signIn, signUp, browseAsGuest } = useAuth()
   const reducedMotion = useReducedMotion()
   const [mode, setMode] = useState<'sign-in' | 'sign-up'>('sign-in')
   const [fullName, setFullName] = useState('')
@@ -30,6 +34,21 @@ export function Login() {
   const [shakeError, setShakeError] = useState(false)
   const [signUpComplete, setSignUpComplete] = useState(false)
   const [submitting, setSubmitting] = useState(false)
+  const [guestLoading, setGuestLoading] = useState(false)
+
+  async function handleGuest() {
+    setGuestLoading(true)
+    setError(null)
+    const { error } = await browseAsGuest()
+    setGuestLoading(false)
+    if (error) {
+      setError(error)
+      if (!reducedMotion) {
+        setShakeError(true)
+        setTimeout(() => setShakeError(false), 400)
+      }
+    }
+  }
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
@@ -57,7 +76,7 @@ export function Login() {
 
   return (
     <div className="relative min-h-screen flex items-center justify-center overflow-hidden p-4 bg-background">
-      <AmbientKarateBackground />
+      {/* <AmbientKarateBackground /> */}
       <motion.div
         className="relative w-full sm:max-w-sm"
         initial={reducedMotion ? undefined : 'hidden'}
@@ -201,6 +220,20 @@ export function Login() {
                       ? 'Create an account'
                       : 'Already have an account? Sign in'}
                   </button>
+                  <div className="flex items-center gap-3">
+                    <div className="h-px flex-1 bg-border" />
+                    <span className="text-xs text-muted-foreground">or</span>
+                    <div className="h-px flex-1 bg-border" />
+                  </div>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    disabled={guestLoading}
+                    onClick={handleGuest}
+                    className="w-full"
+                  >
+                    {guestLoading ? 'Setting up…' : 'Browse app as guest'}
+                  </Button>
                 </motion.form>
               )}
             </AnimatePresence>
