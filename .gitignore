@@ -27,3 +27,6 @@ dist-ssr
 *.sw?
 .claude/learning/
 .claude/history/
+
+.vercel
+.env*
