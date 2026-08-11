@@ -5,17 +5,17 @@ const SECTIONS: { icon: IconName; title: string; body: string }[] = [
   {
     icon: 'dashboard',
     title: 'Dashboard',
-    body: 'Your week at a glance — mat hours, journal streak, and your next competition countdown.',
+    body: 'Your week at a glance: mat hours, journal streak, and your next competition countdown.',
   },
   {
     icon: 'event_note',
     title: 'Training Logs',
-    body: 'Log every session — type, duration, what improved, what to work on. See it as a list, a chart, or a calendar.',
+    body: 'Log every session: type, duration, what improved, what to work on. See it as a list, a chart, or a calendar.',
   },
   {
     icon: 'trophy',
     title: 'Competitions',
-    body: 'Track every match — one-tap Win/Loss/Draw, or full scores and reflections when you want the detail.',
+    body: 'Track every match: one-tap Win/Loss/Draw, or full scores and reflections when you want the detail.',
   },
   {
     icon: 'unfiltered',
