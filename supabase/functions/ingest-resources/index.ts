@@ -7,6 +7,7 @@
 // rather than diffing).
 import { createClient } from 'npm:@supabase/supabase-js@2'
 import { extractText, getDocumentProxy } from 'npm:unpdf@0.11.0'
+import { corsHeaders, handleCors } from '../_shared/cors.ts'
 
 const OPENAI_EMBEDDING_URL = 'https://api.openai.com/v1/embeddings'
 const EMBEDDING_MODEL = 'text-embedding-3-small'
@@ -56,23 +57,30 @@ async function embedBatch(texts: string[], apiKey: string): Promise<number[][]> 
   return data.data.map((d: { embedding: number[] }) => d.embedding)
 }
 
+function json(body: unknown, init?: ResponseInit) {
+  return new Response(JSON.stringify(body), {
+    ...init,
+    headers: { ...corsHeaders, 'Content-Type': 'application/json', ...(init?.headers ?? {}) },
+  })
+}
+
 // Processes ONE resource per invocation (pass { "index": 0..12 } in the
 // request body). Doing all 13 PDFs in a single call exceeded the Edge
 // Function's compute/memory limit (PDF parsing is heavy) - the caller
 // loops over indices instead, one HTTP request per document.
 Deno.serve(async (req) => {
+  const preflight = handleCors(req)
+  if (preflight) return preflight
+
   try {
     const openaiKey = Deno.env.get('OPENAI_API_KEY')
     if (!openaiKey) {
-      return new Response(JSON.stringify({ error: 'OPENAI_API_KEY not configured' }), { status: 500 })
+      return json({ error: 'OPENAI_API_KEY not configured' }, { status: 500 })
     }
 
     const { index } = await req.json().catch(() => ({ index: undefined }))
     if (typeof index !== 'number' || !RESOURCES[index]) {
-      return new Response(
-        JSON.stringify({ error: `index required, 0..${RESOURCES.length - 1}` }),
-        { status: 400 }
-      )
+      return json({ error: `index required, 0..${RESOURCES.length - 1}` }, { status: 400 })
     }
     const resource = RESOURCES[index]
 
@@ -83,10 +91,7 @@ Deno.serve(async (req) => {
 
     const res = await fetch(resource.url)
     if (!res.ok) {
-      return new Response(
-        JSON.stringify({ title: resource.title, chunks: 0, error: `fetch ${res.status}` }),
-        { status: 502 }
-      )
+      return json({ title: resource.title, chunks: 0, error: `fetch ${res.status}` }, { status: 502 })
     }
     const buffer = new Uint8Array(await res.arrayBuffer())
     const pdf = await getDocumentProxy(buffer)
@@ -108,17 +113,12 @@ Deno.serve(async (req) => {
         }))
       )
       if (insertError) {
-        return new Response(
-          JSON.stringify({ title: resource.title, chunks: i, error: insertError.message }),
-          { status: 500 }
-        )
+        return json({ title: resource.title, chunks: i, error: insertError.message }, { status: 500 })
       }
     }
 
-    return new Response(JSON.stringify({ title: resource.title, chunks: chunks.length, error: null }), {
-      headers: { 'Content-Type': 'application/json' },
-    })
+    return json({ title: resource.title, chunks: chunks.length, error: null })
   } catch (err) {
-    return new Response(JSON.stringify({ error: String(err) }), { status: 500 })
+    return json({ error: String(err) }, { status: 500 })
   }
 })

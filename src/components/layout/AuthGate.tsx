@@ -1,6 +1,7 @@
-import type { ReactNode } from 'react'
+import { type ReactNode } from 'react'
 import { Navigate } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
+import { hasSeenWelcome } from '../../lib/welcome'
 
 export function AuthGate({ children }: { children: ReactNode }) {
   const { user, loading } = useAuth()
@@ -14,7 +15,7 @@ export function AuthGate({ children }: { children: ReactNode }) {
   }
 
   if (!user) {
-    return <Navigate to="/login" replace />
+    return <Navigate to={hasSeenWelcome() ? '/login' : '/welcome'} replace />
   }
 
   return <>{children}</>

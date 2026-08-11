@@ -4,6 +4,8 @@
 // the transcript into the notes field - it actually fills the same form
 // fields a typed entry would. Reuses OPENAI_API_KEY (already configured
 // for ask-resources) rather than adding a second AI provider/key.
+import { corsHeaders, handleCors } from '../_shared/cors.ts'
+
 const OPENAI_CHAT_URL = 'https://api.openai.com/v1/chat/completions'
 const CHAT_MODEL = 'gpt-4o-mini'
 
@@ -47,16 +49,26 @@ function sanitize(parsed: ParsedFields): ParsedFields {
   }
 }
 
+function json(body: unknown, init?: ResponseInit) {
+  return new Response(JSON.stringify(body), {
+    ...init,
+    headers: { ...corsHeaders, 'Content-Type': 'application/json', ...(init?.headers ?? {}) },
+  })
+}
+
 Deno.serve(async (req) => {
+  const preflight = handleCors(req)
+  if (preflight) return preflight
+
   try {
     const openaiKey = Deno.env.get('OPENAI_API_KEY')
     if (!openaiKey) {
-      return new Response(JSON.stringify({ error: 'OPENAI_API_KEY not configured' }), { status: 500 })
+      return json({ error: 'OPENAI_API_KEY not configured' }, { status: 500 })
     }
 
     const { transcript } = await req.json()
     if (!transcript || typeof transcript !== 'string') {
-      return new Response(JSON.stringify({ error: 'transcript is required' }), { status: 400 })
+      return json({ error: 'transcript is required' }, { status: 400 })
     }
 
     const chatRes = await fetch(OPENAI_CHAT_URL, {
@@ -73,17 +85,13 @@ Deno.serve(async (req) => {
       }),
     })
     if (!chatRes.ok) {
-      return new Response(JSON.stringify({ error: `chat completion failed: ${await chatRes.text()}` }), {
-        status: 502,
-      })
+      return json({ error: `chat completion failed: ${await chatRes.text()}` }, { status: 502 })
     }
     const chatData = await chatRes.json()
     const parsed = JSON.parse(chatData.choices[0].message.content) as ParsedFields
 
-    return new Response(JSON.stringify(sanitize(parsed)), {
-      headers: { 'Content-Type': 'application/json' },
-    })
+    return json(sanitize(parsed))
   } catch (err) {
-    return new Response(JSON.stringify({ error: String(err) }), { status: 500 })
+    return json({ error: String(err) }, { status: 500 })
   }
 })

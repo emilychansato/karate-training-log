@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "echo \"[env check] VITE_SUPABASE_URL=$VITE_SUPABASE_URL\" && echo \"[env check] VITE_SUPABASE_ANON_KEY length=${#VITE_SUPABASE_ANON_KEY}\" && tsc -b && vite build",
     "lint": "oxlint",
     "preview": "vite preview",
     "test": "vitest run"
@@ -49,6 +49,7 @@
     "oxlint": "^1.71.0",
     "typescript": "~6.0.2",
     "vite": "^8.1.1",
+    "vite-plugin-pwa": "^1.3.0",
     "vitest": "^4.1.10"
   }
 }

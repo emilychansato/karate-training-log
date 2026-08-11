@@ -7,6 +7,7 @@
 // tournament - general model knowledge is not an acceptable substitute
 // for the actual WKF/Karate Canada documents.
 import { createClient } from 'npm:@supabase/supabase-js@2'
+import { corsHeaders, handleCors } from '../_shared/cors.ts'
 
 const OPENAI_EMBEDDING_URL = 'https://api.openai.com/v1/embeddings'
 const OPENAI_CHAT_URL = 'https://api.openai.com/v1/chat/completions'
@@ -28,16 +29,26 @@ interface ChunkMatch {
   content: string
 }
 
+function json(body: unknown, init?: ResponseInit) {
+  return new Response(JSON.stringify(body), {
+    ...init,
+    headers: { ...corsHeaders, 'Content-Type': 'application/json', ...(init?.headers ?? {}) },
+  })
+}
+
 Deno.serve(async (req) => {
+  const preflight = handleCors(req)
+  if (preflight) return preflight
+
   try {
     const openaiKey = Deno.env.get('OPENAI_API_KEY')
     if (!openaiKey) {
-      return new Response(JSON.stringify({ error: 'OPENAI_API_KEY not configured' }), { status: 500 })
+      return json({ error: 'OPENAI_API_KEY not configured' }, { status: 500 })
     }
 
     const { question } = await req.json()
     if (!question || typeof question !== 'string') {
-      return new Response(JSON.stringify({ error: 'question is required' }), { status: 400 })
+      return json({ error: 'question is required' }, { status: 400 })
     }
 
     const supabase = createClient(
@@ -51,7 +62,7 @@ Deno.serve(async (req) => {
       body: JSON.stringify({ model: EMBEDDING_MODEL, input: question }),
     })
     if (!embedRes.ok) {
-      return new Response(JSON.stringify({ error: `embedding failed: ${await embedRes.text()}` }), { status: 502 })
+      return json({ error: `embedding failed: ${await embedRes.text()}` }, { status: 502 })
     }
     const embedData = await embedRes.json()
     const queryEmbedding = embedData.data[0].embedding
@@ -61,18 +72,15 @@ Deno.serve(async (req) => {
       match_count: MATCH_COUNT,
     })
     if (matchError) {
-      return new Response(JSON.stringify({ error: matchError.message }), { status: 500 })
+      return json({ error: matchError.message }, { status: 500 })
     }
 
     const chunks = (matches ?? []) as ChunkMatch[]
     if (chunks.length === 0) {
-      return new Response(
-        JSON.stringify({
-          answer: "That's not covered in the documents I have access to.",
-          sources: [],
-        }),
-        { headers: { 'Content-Type': 'application/json' } }
-      )
+      return json({
+        answer: "That's not covered in the documents I have access to.",
+        sources: [],
+      })
     }
 
     const context = chunks
@@ -92,7 +100,7 @@ Deno.serve(async (req) => {
       }),
     })
     if (!chatRes.ok) {
-      return new Response(JSON.stringify({ error: `chat completion failed: ${await chatRes.text()}` }), { status: 502 })
+      return json({ error: `chat completion failed: ${await chatRes.text()}` }, { status: 502 })
     }
     const chatData = await chatRes.json()
     const answer = chatData.choices[0].message.content
@@ -102,10 +110,8 @@ Deno.serve(async (req) => {
       url: c.resource_url,
     }))
 
-    return new Response(JSON.stringify({ answer, sources }), {
-      headers: { 'Content-Type': 'application/json' },
-    })
+    return json({ answer, sources })
   } catch (err) {
-    return new Response(JSON.stringify({ error: String(err) }), { status: 500 })
+    return json({ error: String(err) }, { status: 500 })
   }
 })

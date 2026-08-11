@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { Welcome } from './pages/Welcome'
 import { Login } from './pages/Login'
 import { TrainingLog } from './pages/TrainingLog'
 import { Competitions } from './pages/Competitions'
@@ -41,6 +42,7 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
+        <Route path="/welcome" element={<Welcome />} />
         <Route path="/login" element={<Login />} />
         <Route
           path="/"
