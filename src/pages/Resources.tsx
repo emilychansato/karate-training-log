@@ -1,10 +1,12 @@
 import { RESOURCE_GROUPS } from '../lib/resources'
 import { Icon } from '../components/ui/icon'
 import { ResourcesAssistant } from '../components/resources/ResourcesAssistant'
+import { AiAssistantMascot } from '../components/resources/AiAssistantMascot'
 
 export function Resources() {
   return (
     <div className="flex flex-col gap-6">
+      <AiAssistantMascot />
       <div className="border-b border-border pb-6">
         <span className="label-caps mb-1 block text-aka">Karate OS</span>
         <h1 className="font-heading-hero text-4xl">Resources</h1>

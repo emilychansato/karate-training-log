@@ -7,17 +7,16 @@ import { useTheme } from '../theme/ThemeProvider'
 import { Icon, type IconName } from '../ui/icon'
 import { FeedbackButton } from './FeedbackButton'
 import { snappy, pageEnter } from '../../lib/motion'
-import aiLion from '../../assets/mascot/ai-lion.png'
 
 function ResourcesLink({ reducedMotion }: { reducedMotion: boolean }) {
   return (
     <Link
       to="/resources"
-      aria-label="Ask the AI assistant"
-      className="flex size-9 items-center justify-center transition-transform duration-150 hover:scale-110"
+      aria-label="Resources"
+      className="flex size-9 items-center justify-center text-muted-foreground transition-colors duration-150 hover:text-foreground"
     >
       {reducedMotion ? (
-        <img src={aiLion} alt="" className="size-7 rounded-full object-cover" />
+        <Icon name="resources" className="size-4" />
       ) : (
         <motion.span
           animate={{
@@ -32,7 +31,7 @@ function ResourcesLink({ reducedMotion }: { reducedMotion: boolean }) {
           transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
           className="flex"
         >
-          <img src={aiLion} alt="" className="size-7 rounded-full object-cover" />
+          <Icon name="resources" className="size-4" />
         </motion.span>
       )}
     </Link>
