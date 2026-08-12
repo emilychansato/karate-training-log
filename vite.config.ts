@@ -32,6 +32,13 @@ export default defineConfig({
         // API responses (Supabase REST/Edge Function calls) - training
         // data must always come from the network, never a stale cache.
         globPatterns: ['**/*.{js,css,html,woff,woff2,png,svg}'],
+        // Without these, a new deploy's service worker installs but sits
+        // "waiting" until every open tab is fully closed before it takes
+        // over - a hard refresh alone isn't enough, so updates (like this
+        // one) can look like they never shipped. skipWaiting + clientsClaim
+        // make the new worker activate and take control immediately.
+        skipWaiting: true,
+        clientsClaim: true,
       },
     }),
   ],
