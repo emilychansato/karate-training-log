@@ -30,3 +30,9 @@ dist-ssr
 
 .vercel
 .env*
+
+# Local workspace / design-research material, not app code
+/references/
+/repomix-output.xml
+/.mcp.json
+/docs/superpowers/
