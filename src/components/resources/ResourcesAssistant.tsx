@@ -1,11 +1,18 @@
 import { useState } from 'react'
-import { useResourcesAssistant } from '../../hooks/useResourcesAssistant'
+import type { AssistantAnswer } from '../../hooks/useResourcesAssistant'
 import { Input } from '../ui/input'
 import { Button } from '../ui/button'
 import { Icon } from '../ui/icon'
 
-export function ResourcesAssistant() {
-  const { history, asking, ask } = useResourcesAssistant()
+export function ResourcesAssistant({
+  history,
+  asking,
+  ask,
+}: {
+  history: AssistantAnswer[]
+  asking: boolean
+  ask: (question: string) => Promise<{ error: string | null }>
+}) {
   const [question, setQuestion] = useState('')
   const [error, setError] = useState<string | null>(null)
 

@@ -2,11 +2,14 @@ import { RESOURCE_GROUPS } from '../lib/resources'
 import { Icon } from '../components/ui/icon'
 import { ResourcesAssistant } from '../components/resources/ResourcesAssistant'
 import { AiAssistantMascot } from '../components/resources/AiAssistantMascot'
+import { useResourcesAssistant } from '../hooks/useResourcesAssistant'
 
 export function Resources() {
+  const { history, asking, ask } = useResourcesAssistant()
+
   return (
     <div className="flex flex-col gap-6">
-      <AiAssistantMascot />
+      <AiAssistantMascot history={history} asking={asking} ask={ask} />
       <div className="border-b border-border pb-6">
         <span className="label-caps mb-1 block text-aka">Karate OS</span>
         <h1 className="font-heading-hero text-4xl">Resources</h1>
@@ -29,7 +32,7 @@ export function Resources() {
         <Icon name="external_link" className="size-4 flex-shrink-0 text-muted-foreground" />
       </a>
 
-      <ResourcesAssistant />
+      <ResourcesAssistant history={history} asking={asking} ask={ask} />
 
       <div className="flex flex-col gap-8">
         {RESOURCE_GROUPS.map((group) => (
