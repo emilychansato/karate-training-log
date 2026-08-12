@@ -1,6 +1,5 @@
 import { RESOURCE_GROUPS } from '../lib/resources'
 import { Icon } from '../components/ui/icon'
-import { ResourcesAssistant } from '../components/resources/ResourcesAssistant'
 import { AiAssistantMascot } from '../components/resources/AiAssistantMascot'
 import { useResourcesAssistant } from '../hooks/useResourcesAssistant'
 
@@ -31,8 +30,6 @@ export function Resources() {
         </div>
         <Icon name="external_link" className="size-4 flex-shrink-0 text-muted-foreground" />
       </a>
-
-      <ResourcesAssistant history={history} asking={asking} ask={ask} />
 
       <div className="flex flex-col gap-8">
         {RESOURCE_GROUPS.map((group) => (
