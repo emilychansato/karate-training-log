@@ -31,7 +31,12 @@ const SECTIONS: { icon: IconName; title: string; body: string }[] = [
 
 export function WelcomeOverlay({ onDismiss }: { onDismiss: () => void }) {
   return (
-    <div className="fixed inset-0 z-[60] flex flex-col overflow-y-auto bg-background">
+    // Always dark, regardless of the user's theme preference/toggle -
+    // the first screen anyone sees should be the app's real identity,
+    // not whatever the OS happens to default to. `dark` scopes the
+    // custom variant to this subtree (see @custom-variant in index.css),
+    // independent of the <html> element's class.
+    <div className="dark fixed inset-0 z-[60] flex flex-col overflow-y-auto bg-background text-foreground">
       <div className="mx-auto flex w-full max-w-md flex-1 flex-col gap-6 px-6 py-10">
         <div>
           <span className="label-caps mb-1 block text-aka">Karate OS</span>
