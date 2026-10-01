@@ -112,7 +112,7 @@ export function TrainingLog() {
     <div className="flex flex-col gap-6">
       <div className="flex items-end justify-between border-b border-border pb-6">
         <div>
-          <span className="label-caps mb-1 block text-aka">Karate OS</span>
+          <span className="label-caps mb-1 block text-aka">Karate Log</span>
           <h1 className="font-heading-hero text-4xl">Training Logs</h1>
         </div>
         <button

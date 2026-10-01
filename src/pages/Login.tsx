@@ -85,7 +85,7 @@ export function Login() {
       >
         <Card className="border-border bg-card">
           <CardHeader>
-            <span className="label-caps mb-1 block text-aka">Karate OS</span>
+            <span className="label-caps mb-1 block text-aka">Karate Log</span>
             <CardTitle className="font-heading text-3xl">Training Log</CardTitle>
             <AnimatePresence mode="wait">
               <motion.div

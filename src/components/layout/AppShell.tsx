@@ -74,7 +74,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       <header className="sticky top-0 z-40 flex items-center justify-between border-b border-border bg-background px-5 py-4">
         <div className="flex items-center gap-2">
           <Icon name="sports_martial_arts" />
-          <h1 className="text-sm font-bold uppercase tracking-widest">Karate OS</h1>
+          <h1 className="text-sm font-bold uppercase tracking-widest">Karate Log</h1>
           <FeedbackButton />
         </div>
         <nav className="hidden md:flex md:items-center md:gap-1">
