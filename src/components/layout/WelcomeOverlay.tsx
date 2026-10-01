@@ -39,7 +39,7 @@ export function WelcomeOverlay({ onDismiss }: { onDismiss: () => void }) {
     <div className="dark fixed inset-0 z-[60] flex flex-col overflow-y-auto bg-background text-foreground">
       <div className="mx-auto flex w-full max-w-md flex-1 flex-col gap-6 px-6 py-10">
         <div>
-          <span className="label-caps mb-1 block text-aka">Karate OS</span>
+          <span className="label-caps mb-1 block text-aka">Karate Log</span>
           <h1 className="font-heading-hero text-4xl">Welcome to your training log.</h1>
           <p className="mt-2 text-sm text-muted-foreground">
             A quick look at what's here before you get started.

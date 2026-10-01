@@ -283,7 +283,7 @@ export function ClubsAndFriends() {
   return (
     <div className="flex flex-col gap-6">
       <div className="border-b border-border pb-6">
-        <span className="label-caps mb-1 block text-aka">Karate OS</span>
+        <span className="label-caps mb-1 block text-aka">Karate Log</span>
         <h1 className="font-heading-hero flex items-center gap-2 text-4xl">
           <Icon name="users" className="size-8" />
           Clubs &amp; Friends

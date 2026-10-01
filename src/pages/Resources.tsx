@@ -10,7 +10,7 @@ export function Resources() {
     <div className="flex flex-col gap-6">
       <AiAssistantMascot history={history} asking={asking} ask={ask} />
       <div className="border-b border-border pb-6">
-        <span className="label-caps mb-1 block text-aka">Karate OS</span>
+        <span className="label-caps mb-1 block text-aka">Karate Log</span>
         <h1 className="font-heading-hero text-4xl">Resources</h1>
         <p className="mt-2 text-sm text-muted-foreground">
           Official WKF and Karate Canada rulebooks, grading guidelines, and policy documents.

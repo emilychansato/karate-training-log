@@ -14,7 +14,7 @@ export default defineConfig({
       includeAssets: ['favicon.svg', 'apple-touch-icon.png'],
       manifest: {
         name: 'Karate Training Log',
-        short_name: 'Karate OS',
+        short_name: 'Karate Log',
         description: 'Training log, competition tracking, and prep for karate athletes.',
         theme_color: '#1a1a1c',
         background_color: '#1a1a1c',
